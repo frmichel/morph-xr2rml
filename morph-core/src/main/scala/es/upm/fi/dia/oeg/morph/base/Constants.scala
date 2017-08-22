@@ -18,6 +18,11 @@ object Constants {
         val ConstantTermMap, ColumnTermMap, TemplateTermMap, ReferenceTermMap, InvalidTermMapType = Value
     }
 
+    object NestedTermMapType extends Enumeration {
+        type NestedTermMapType = Value
+        val SimpleNestedTermMap, TemplateNestedTermMap, ReferenceNestedTermMap, InvalidNestedTermMapType = Value
+    }
+        
     object MorphPOS extends Enumeration {
         type MorphPOS = Value
         val sub, pre, obj, graph = Value

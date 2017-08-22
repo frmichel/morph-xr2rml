@@ -44,11 +44,10 @@ object R2RMLObjectMap {
                 case Constants.MorphTermMapType.TemplateTermMap => Constants.R2RML_IRI_URI
                 case _ => Constants.R2RML_LITERAL_URI
             }
-            val ntmStmt = rdfNode.asResource().getProperty(Constants.xR2RML_NESTEDTM_PROPERTY);
-            val ntmRes:Resource = ntmStmt.getObject.asResource
-            val ntmTermMapType = R2RMLTermMap.extractTermMapType(ntmRes)
-   
-            Some(new xR2RMLNestedTermMap(termMapType, ntmTermMapType, Some(ntmTermType), None, None, None))
+            
+            //default nested term map type is simple
+            val nestedTermMapType = Constants.NestedTermMapType.SimpleNestedTermMap;
+            Some(new xR2RMLNestedTermMap(termMapType, nestedTermMapType, Some(ntmTermType), None, None, None))
         } else {
           coreProperties._5;
         }

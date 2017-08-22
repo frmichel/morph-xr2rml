@@ -24,7 +24,8 @@ class xR2RMLNestedTermMap(
 		nestedTermMap: Option[xR2RMLNestedTermMap]) {
 
 	val logger = Logger.getLogger(this.getClass().getName());
-
+	logger.info("nested term map type = " + nestedTermMapType);
+	
 	override def toString(): String = {
 			"NestedTermMap[termType:" + termType + ", datatype:" + datatype + ", language:" + languageTag + "]";
 	}
@@ -81,9 +82,9 @@ object xR2RMLNestedTermMap {
 
 
 	/**
-	 * Deduce the type of the term map (constant, column, reference, template) based on its properties
-	 * @param rdfNode the term map node
-	 * @throws es.upm.fi.dia.oeg.morph.base.exception.MorphException in case the term map type cannot be decided
+	 * Deduce the type of the nested term map (simple, reference, template) based on its properties
+	 * @param rdfNode the nested term map node
+	 * @throws es.upm.fi.dia.oeg.morph.base.exception.MorphException in case the nested term map type cannot be decided
 	 */
 	def extractNestedTermMapType(rdfNode: RDFNode) = {
 			rdfNode match {

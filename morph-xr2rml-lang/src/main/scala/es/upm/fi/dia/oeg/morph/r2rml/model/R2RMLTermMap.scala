@@ -332,7 +332,7 @@ object R2RMLTermMap {
                     val datatype = if (datatypeStmt == null) None else Some(datatypeStmt.getObject().toString())
                     val language = if (langStmt == null) None else Some(langStmt.getObject().toString())
 
-                   val nestedTermMapType = xR2RMLNestedTermMap.extractNestedTermMapType(resource)
+                   val nestedTermMapType = xR2RMLNestedTermMap.extractNestedTermMapType(ntmRes)
 
                     Some(new xR2RMLNestedTermMap(parentTermMapType, nestedTermMapType, termType, datatype, language, None))
                 } else None

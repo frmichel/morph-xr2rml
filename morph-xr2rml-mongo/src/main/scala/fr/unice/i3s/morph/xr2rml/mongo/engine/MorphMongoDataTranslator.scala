@@ -130,7 +130,7 @@ class MorphMongoDataTranslator(val fact: IMorphFactory) extends MorphBaseDataTra
                         val subjectsCandidates: Set[List[RDFTerm]] = for (joinCond <- refObjectMap.joinConditions) yield {
 
                             // Evaluate the child reference on the current document (of the child triples map)
-                            val childMsp = MixedSyntaxPath(joinCond.childRef, sm.refFormulaion)
+                            val childMsp = MixedSyntaxPath(joinCond.childRef, sm.refFormulation)
                             val childValues: List[Object] = childMsp.evaluate(document)
 
                             // ---- Evaluate the parent reference on the results of the parent triples map logical source
@@ -276,7 +276,7 @@ class MorphMongoDataTranslator(val fact: IMorphFactory) extends MorphBaseDataTra
                 val msPath =
                     if (termMap.reference == "$._id")
                         // The MongoDB "_id" field is an ObjectId: retrieve the $oid subfield to get the id value
-                        MixedSyntaxPath("$._id.$oid", termMap.refFormulaion)
+                        MixedSyntaxPath("$._id.$oid", termMap.refFormulation)
                     else
                         termMap.getMixedSyntaxPaths()(0) // '(0)' because in a reference there is only one mixed syntax path
 
@@ -302,9 +302,9 @@ class MorphMongoDataTranslator(val fact: IMorphFactory) extends MorphBaseDataTra
                     tplStrings.map(tplString => {
                         if (tplString == "$._id")
                             // The MongoDB "_id" field is an ObjectId: retrieve the $oid subfield to get the id value
-                            MixedSyntaxPath("$._id.$oid", termMap.refFormulaion)
+                            MixedSyntaxPath("$._id.$oid", termMap.refFormulation)
                         else
-                            MixedSyntaxPath(tplString, termMap.refFormulaion)
+                            MixedSyntaxPath(tplString, termMap.refFormulation)
                     })
                 }
 
@@ -428,7 +428,7 @@ object MorphMongoDataTranslator extends java.io.Serializable {
                 val msPath =
                     if (termMap.reference == "$._id")
                         // The MongoDB "_id" field is an ObjectId: retrieve the $oid subfield to get the id value
-                        MixedSyntaxPath("$._id.$oid", termMap.refFormulaion)
+                        MixedSyntaxPath("$._id.$oid", termMap.refFormulation)
                     else
                         termMap.getMixedSyntaxPaths()(0) // '(0)' because in a reference there is only one mixed syntax path
 
@@ -456,9 +456,9 @@ object MorphMongoDataTranslator extends java.io.Serializable {
                     tplStrings.map(tplString => {
                         if (tplString == "$._id")
                             // The MongoDB "_id" field is an ObjectId: retrieve the $oid subfield to get the id value
-                            MixedSyntaxPath("$._id.$oid", termMap.refFormulaion)
+                            MixedSyntaxPath("$._id.$oid", termMap.refFormulation)
                         else
-                            MixedSyntaxPath(tplString, termMap.refFormulaion)
+                            MixedSyntaxPath(tplString, termMap.refFormulation)
                     })
                 }
 

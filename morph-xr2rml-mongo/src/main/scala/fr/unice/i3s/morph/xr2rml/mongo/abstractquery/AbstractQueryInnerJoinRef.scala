@@ -265,7 +265,7 @@ class AbstractQueryInnerJoinRef(
                                 val joinCond = rom.joinConditions.head
 
                                 // Evaluate the child reference on the current document (of the child triples map)
-                                val childMsp = MixedSyntaxPath(joinCond.childRef, sm.refFormulaion)
+                                val childMsp = MixedSyntaxPath(joinCond.childRef, sm.refFormulation)
                                 val childValues: List[Object] = childMsp.evaluate(document)
 
                                 // Evaluate the parent reference on each parent query result. The result is stored as pairs:

@@ -19,7 +19,7 @@ abstract class R2RMLTermMap(
     val nestedTermMap: Option[xR2RMLNestedTermMap],
 
     /** Reference formulation from the logical source */
-    val refFormulaion: String)
+    val refFormulation: String)
 
         extends IConstantTermMap with IColumnTermMap with ITemplateTermMap with IReferenceTermMap
         with java.io.Serializable {
@@ -154,14 +154,14 @@ abstract class R2RMLTermMap(
             case Constants.MorphTermMapType.ColumnTermMap => { List(this.columnName) }
             case Constants.MorphTermMapType.ReferenceTermMap => {
                 // Parse reference as a mixed syntax path and return the column referenced in the first path "Column()" 
-                List(MixedSyntaxPath(this.reference, refFormulaion).getReferencedColumn.get)
+                List(MixedSyntaxPath(this.reference, refFormulation).getReferencedColumn.get)
             }
             case Constants.MorphTermMapType.TemplateTermMap => {
                 // Get the list of template strings
                 val tplStrings = TemplateUtility.getTemplateColumns(this.templateString)
 
                 // For each one, parse it as a mixed syntax path and return the column referenced in the first path "Column()" 
-                tplStrings.map(tplString => MixedSyntaxPath(tplString, refFormulaion).getReferencedColumn.get)
+                tplStrings.map(tplString => MixedSyntaxPath(tplString, refFormulation).getReferencedColumn.get)
             }
             case _ => { throw new Exception("Invalid term map type") }
         }
@@ -205,14 +205,14 @@ abstract class R2RMLTermMap(
 
         this.termMapType match {
             case Constants.MorphTermMapType.ReferenceTermMap => {
-                List(MixedSyntaxPath(this.reference, refFormulaion))
+                List(MixedSyntaxPath(this.reference, refFormulation))
             }
             case Constants.MorphTermMapType.TemplateTermMap => {
                 // Get the list of template strings
                 val tplStrings = TemplateUtility.getTemplateGroups(this.templateString)
 
                 // For each one, parse it as a mixed syntax path
-                tplStrings.map(tplString => MixedSyntaxPath(tplString, refFormulaion))
+                tplStrings.map(tplString => MixedSyntaxPath(tplString, refFormulation))
             }
             case _ => { throw new Exception("Cannot build a MixedSyntaxPath with a term map of type " + this.termMapType) }
         }
@@ -323,7 +323,7 @@ object R2RMLTermMap {
             case resource: Resource => {
                 var ntmStmt = resource.getProperty(Constants.xR2RML_NESTEDTM_PROPERTY);
                 if ((ntmStmt != null) && ntmStmt.getObject.isResource) {
-                    val ntmRes = ntmStmt.getObject.asResource
+                    val ntmRes:Resource = ntmStmt.getObject.asResource
                     val termTypeStmt = ntmRes.getProperty(Constants.R2RML_TERMTYPE_PROPERTY)
                     val datatypeStmt = ntmRes.getProperty(Constants.R2RML_DATATYPE_PROPERTY)
                     val langStmt = ntmRes.getProperty(Constants.R2RML_LANGUAGE_PROPERTY)
@@ -332,7 +332,9 @@ object R2RMLTermMap {
                     val datatype = if (datatypeStmt == null) None else Some(datatypeStmt.getObject().toString())
                     val language = if (langStmt == null) None else Some(langStmt.getObject().toString())
 
-                    Some(new xR2RMLNestedTermMap(parentTermMapType, termType, datatype, language, None))
+                    val ntmTermMapType = R2RMLTermMap.extractTermMapType(ntmRes)
+
+                    Some(new xR2RMLNestedTermMap(parentTermMapType, ntmTermMapType, termType, datatype, language, None))
                 } else None
             }
             case _ => { None }

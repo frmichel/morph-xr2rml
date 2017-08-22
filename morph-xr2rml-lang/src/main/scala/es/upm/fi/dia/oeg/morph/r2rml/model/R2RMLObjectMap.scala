@@ -31,20 +31,26 @@ object R2RMLObjectMap {
         val termType = coreProperties._2;
         val datatype = coreProperties._3;
         val languageTag = coreProperties._4;
-        var nestedTermMap = coreProperties._5;
+        val extractedNestedTermMap = coreProperties._5;
 
         // A term map with an RDF collection/container term type must have a nested term map.
         // If this is not the case here, define a default nested term type (see xR2RML specification 3.2.1.3):
         // it has term type rr:Literal if the parent term map is column- or reference-valued,
         // it has term type rr:iri if the parent term map is template-valued.
-        if (R2RMLTermMap.isRdfCollectionTermType(termType) && (!nestedTermMap.isDefined)) {
+        val nestedTermMap = if (R2RMLTermMap.isRdfCollectionTermType(termType) && (!extractedNestedTermMap.isDefined)) {
             val ntmTermType = termMapType match {
                 case Constants.MorphTermMapType.ColumnTermMap => Constants.R2RML_LITERAL_URI
                 case Constants.MorphTermMapType.ReferenceTermMap => Constants.R2RML_LITERAL_URI
                 case Constants.MorphTermMapType.TemplateTermMap => Constants.R2RML_IRI_URI
                 case _ => Constants.R2RML_LITERAL_URI
             }
-            nestedTermMap = Some(new xR2RMLNestedTermMap(termMapType, Some(ntmTermType), None, None, None))
+            val ntmStmt = rdfNode.asResource().getProperty(Constants.xR2RML_NESTEDTM_PROPERTY);
+            val ntmRes:Resource = ntmStmt.getObject.asResource
+            val ntmTermMapType = R2RMLTermMap.extractTermMapType(ntmRes)
+   
+            Some(new xR2RMLNestedTermMap(termMapType, ntmTermMapType, Some(ntmTermType), None, None, None))
+        } else {
+          coreProperties._5;
         }
 
         val om = new R2RMLObjectMap(termMapType, termType, datatype, languageTag, nestedTermMap, refFormulation);

@@ -14,6 +14,7 @@ import es.upm.fi.dia.oeg.morph.base.Constants
 class xR2RMLNestedTermMap(
         /** Type of the root parent term map, used to infer the term type if it is not provided explicitly */
         parentTermMapType: Constants.MorphTermMapType.Value,
+        termMapType: Constants.MorphTermMapType.Value,
         termType: Option[String],
         val datatype: Option[String],
         val languageTag: Option[String],
@@ -22,23 +23,27 @@ class xR2RMLNestedTermMap(
     val logger = Logger.getLogger(this.getClass().getName());
 
     override def toString(): String = {
-        "NestedTermMap[termType:" + termType + ", datatype:" + datatype + ", language:" + languageTag + "]";
+        "NestedTermMap[termType:" + termType + ", termMapType:" + termMapType + ", datatype:" + datatype + ", language:" + languageTag + "]";
     }
 
     /**
      * Return true if the nested term map has a xrr:reference property
      */
-    def isReferenceValuedNestedTermMap = { false }
+    def isReferenceValuedNestedTermMap = { 
+        this.termMapType == Constants.MorphTermMapType.ReferenceTermMap 
+      }
 
     /**
      * Return true if the nested term map has a rr:template property
      */
-    def isTemplateValuedNestedTermMap = { false }
+    def isTemplateValuedNestedTermMap = {         
+      this.termMapType == Constants.MorphTermMapType.TemplateTermMap
+    }
 
     /**
      * Return true if the nested term map has no xrr:reference nor rr:template property
      */
-    def isSimpleNestedTermMap = { true }
+    def isSimpleNestedTermMap = { !isReferenceValuedNestedTermMap && !isTemplateValuedNestedTermMap }
 
     /**
      * Return the term type mentioned by property rr:termType or the default term type otherwise

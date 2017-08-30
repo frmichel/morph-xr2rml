@@ -37,7 +37,7 @@ object R2RMLObjectMap {
         // If this is not the case here, define a default nested term type (see xR2RML specification 3.2.1.3):
         // it has term type rr:Literal if the parent term map is column- or reference-valued,
         // it has term type rr:iri if the parent term map is template-valued.
-        val nestedTermMap = if (R2RMLTermMap.isRdfCollectionTermType(termType) && (!extractedNestedTermMap.isDefined)) {
+        val nestedTermMap = if (AbstractTermMap.isRdfCollectionTermType(termType) && (!extractedNestedTermMap.isDefined)) {
             val ntmTermType = termMapType match {
                 case Constants.MorphTermMapType.ColumnTermMap => Constants.R2RML_LITERAL_URI
                 case Constants.MorphTermMapType.ReferenceTermMap => Constants.R2RML_LITERAL_URI
@@ -45,8 +45,8 @@ object R2RMLObjectMap {
                 case _ => Constants.R2RML_LITERAL_URI
             }
             
-            //default nested term map type is simple
-            val nestedTermMapType = Constants.NestedTermMapType.SimpleNestedTermMap;
+            //default nested term map type is same as its parent
+            val nestedTermMapType = termMapType;
             Some(new xR2RMLNestedTermMap(termMapType, nestedTermMapType, Some(ntmTermType), None, None, None))
         } else {
           coreProperties._5;

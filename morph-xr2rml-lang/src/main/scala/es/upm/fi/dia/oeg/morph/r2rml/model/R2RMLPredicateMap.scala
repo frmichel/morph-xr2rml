@@ -31,7 +31,7 @@ object R2RMLPredicateMap {
         if (nestTM.isDefined)
             logger.error("A nested term map cannot be defined in a subject map. Ignoring.")
 
-        if (R2RMLTermMap.isRdfCollectionTermType(termType))
+        if (AbstractTermMap.isRdfCollectionTermType(termType))
             logger.error("A subject map cannot have a term type: " + termType + ". Ignoring.")
 
         val pm = new R2RMLPredicateMap(termMapType, termType, refFormulation);

@@ -245,7 +245,9 @@ object R2RMLMappingDocument {
         }
 
         // From the list of R2RMLTriplesMap, create an R2RML mapping document
-        val md = new R2RMLMappingDocument(classMappings.toSet, mdPath, model.getNsPrefixMap().toMap)
+        val classMappingsSet = classMappings.toSet;
+        val nsPrefixMap = model.getNsPrefixMap().toMap;
+        val md = new R2RMLMappingDocument(classMappingsSet, mdPath, nsPrefixMap)
         md
     }
 

@@ -38,7 +38,7 @@ object R2RMLSubjectMap {
         if (nestTM.isDefined)
             logger.error("A nested term map cannot be defined in a subject map. Ignoring.")
 
-        if (R2RMLTermMap.isRdfCollectionTermType(termType))
+        if (AbstractTermMap.isRdfCollectionTermType(termType))
             logger.error("A subject map cannot have a term type: " + termType + ". Ignoring.")
 
         // List the optional rr:class properties of the subject map

@@ -261,7 +261,7 @@ class MorphRDBDataTranslator(factory: IMorphFactory) extends MorphBaseDataTransl
         var memberTermType: String = Constants.R2RML_LITERAL_URI
 
         // In case of a collection/container, a nested term map should give the details of term type, datatype and language or the terms 
-        if (R2RMLTermMap.isRdfCollectionTermType(termMap.inferTermType)) {
+        if (termMap.isRdfCollectionTermType()) {
             collecTermType = Some(termMap.inferTermType)
             if (termMap.nestedTermMap.isDefined) { // a nested term type MUST be defined in a term map with collection/container term type
                 memberTermType = termMap.nestedTermMap.get.inferTermType

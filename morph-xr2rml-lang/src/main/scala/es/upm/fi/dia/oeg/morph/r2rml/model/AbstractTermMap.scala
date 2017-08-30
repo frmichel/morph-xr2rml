@@ -1,5 +1,7 @@
 package es.upm.fi.dia.oeg.morph.r2rml.model
 
+import com.hp.hpl.jena.rdf.model.{RDFNode, Resource}
+import es.upm.fi.dia.oeg.morph.base.exception.MorphException
 import es.upm.fi.dia.oeg.morph.base.{Constants, TemplateUtility}
 import es.upm.fi.dia.oeg.morph.base.path.MixedSyntaxPath
 import org.apache.log4j.Logger
@@ -9,11 +11,78 @@ abstract class AbstractTermMap(
                                 val termType: Option[String],
                                 val datatype: Option[String],
                                 val languageTag: Option[String],
-                                val nestedTermMap: Option[xR2RMLNestedTermMap]
-                              ) {
+                                val nestedTermMap: Option[xR2RMLNestedTermMap],
+                                val refFormulation:String
+                              )
+extends IConstantTermMap with IColumnTermMap with ITemplateTermMap with IReferenceTermMap
+with java.io.Serializable
+{
   val logger = Logger.getLogger(this.getClass().getName());
 
-  def getReferenceFormulation() : String;
+  def this(rdfNode: RDFNode, refForm: String) = {
+
+    this(AbstractTermMap.extractTermMapType(rdfNode),
+      AbstractTermMap.extractTermType(rdfNode),
+      AbstractTermMap.extractDatatype(rdfNode),
+      AbstractTermMap.extractLanguageTag(rdfNode),
+      xR2RMLNestedTermMap.extractNestedTermMap(AbstractTermMap.extractTermMapType(rdfNode), rdfNode, refForm),
+      refForm
+    );
+    this.parse(rdfNode);
+  }
+
+  /**
+    * Decide the type of the term map (constant, column, reference, template) based on its properties,
+    * and assign the value of the appropriate trait member: IConstantTermMap.constantValue, IColumnTermMap.columnName etc.
+    *
+    * If the term map resource has no property (constant, column, reference, template) then it means that this is a
+    * constant term map like "[] rr:predicate ex:name".
+    *
+    * If the node passed in not a resource but a literal, then it means that we have a constant property whose object
+    * is a literal and not an IRI or blank node, like in: "[] rr:object 'any string';"
+    *
+    * @param rdfNode the term map Jena resource
+    */
+  def parse(rdfNode: RDFNode) = {
+
+    if (rdfNode.isLiteral) {
+      // We are in the case of a constant property with a literal object, like "[] rr:object 'NAME'",
+      this.constantValue = rdfNode.toString()
+    } else {
+      val resourceNode = rdfNode.asResource();
+
+      val constantStatement = resourceNode.getProperty(Constants.R2RML_CONSTANT_PROPERTY);
+      if (constantStatement != null)
+        this.constantValue = constantStatement.getObject().toString();
+      else {
+        val columnStatement = resourceNode.getProperty(Constants.R2RML_COLUMN_PROPERTY);
+        if (columnStatement != null)
+          this.columnName = columnStatement.getObject().toString();
+        else {
+          val templateStatement = resourceNode.getProperty(Constants.R2RML_TEMPLATE_PROPERTY);
+          if (templateStatement != null)
+            this.templateString = templateStatement.getObject().toString();
+          else {
+            val refStmt = resourceNode.getProperty(Constants.xR2RML_REFERENCE_PROPERTY);
+            if (refStmt != null)
+              this.reference = refStmt.getObject().toString();
+            else {
+              // We are in the case of a constant property, like "[] rr:predicate ex:name",
+              this.constantValue = rdfNode.toString()
+            }
+          }
+        }
+      }
+    }
+  }
+
+  def hasNestedTermMap() = {
+    if(nestedTermMap == null || nestedTermMap.isEmpty) {
+      false
+    } else { true }
+  }
+
+  def getReferenceFormulation() : String = this.refFormulation;
 
   /**
     *  Parse the mixed syntax path values read from properties xrr:reference or rr:template
@@ -42,11 +111,7 @@ abstract class AbstractTermMap(
     }
   }
 
-	def getReference() : String;
 
-	def getTemplateString(): String;
-
-  def getConstantValue(): String;
 
   def hasRDFCollectionTermType(): Boolean = {
     AbstractTermMap.isRdfCollectionTermType(this.inferTermType)
@@ -143,6 +208,8 @@ abstract class AbstractTermMap(
 }
 
 object AbstractTermMap {
+  val logger = Logger.getLogger(this.getClass().getName());
+
   /**
     * Return true if the term type is one of RDF list, bag, seq, alt
     */
@@ -162,5 +229,99 @@ object AbstractTermMap {
     } else {
       false;
     }
+  }
+
+  /**
+    * Deduce the type of the term map (constant, column, reference, template) based on its properties
+    * @param rdfNode the term map node
+    * @throws es.upm.fi.dia.oeg.morph.base.exception.MorphException in case the term map type cannot be decided
+    */
+  def extractTermMapType(rdfNode: RDFNode) = {
+    rdfNode match {
+      case resource: Resource => {
+        if (resource.getProperty(Constants.R2RML_CONSTANT_PROPERTY) != null) Constants.MorphTermMapType.ConstantTermMap;
+        else if (resource.getProperty(Constants.R2RML_COLUMN_PROPERTY) != null) Constants.MorphTermMapType.ColumnTermMap;
+        else if (resource.getProperty(Constants.R2RML_TEMPLATE_PROPERTY) != null) Constants.MorphTermMapType.TemplateTermMap;
+        else if (resource.getProperty(Constants.xR2RML_REFERENCE_PROPERTY) != null) Constants.MorphTermMapType.ReferenceTermMap;
+        else {
+          val errorMessage = "Invalid term map " + resource.getLocalName() + ". Should have one of rr:constant, rr:column, rr:template or xrr:reference.";
+          logger.error(errorMessage);
+          throw new MorphException(errorMessage);
+        }
+      }
+      case _ => {
+        Constants.MorphTermMapType.ConstantTermMap;
+      }
+    }
+  }
+
+  /**
+    * Extract the value of the rr:termpType property, returns None is no property found
+    */
+  def extractTermType(rdfNode: RDFNode) = {
+    rdfNode match {
+      case resource: Resource => {
+        val termTypeStatement = resource.getProperty(Constants.R2RML_TERMTYPE_PROPERTY);
+        if (termTypeStatement != null) {
+          Some(termTypeStatement.getObject().toString());
+        } else
+          None
+      }
+      case _ => None
+    }
+  }
+
+  def extractDatatype(rdfNode: RDFNode) = {
+    rdfNode match {
+      case resource: Resource => {
+        val datatypeStatement = resource.getProperty(Constants.R2RML_DATATYPE_PROPERTY);
+        if (datatypeStatement != null) {
+          Some(datatypeStatement.getObject().toString());
+        } else
+          None
+      }
+      case _ => None
+    }
+  }
+
+  def extractLanguageTag(rdfNode: RDFNode) = {
+    rdfNode match {
+      case resource: Resource => {
+        val languageStatement = resource.getProperty(Constants.R2RML_LANGUAGE_PROPERTY);
+        if (languageStatement != null) {
+          Some(languageStatement.getObject().toString());
+        } else
+          None
+      }
+      case _ => None
+    }
+  }
+
+
+
+
+  /**
+    * From a, RDF node representing a term map, return a list with the following elements:
+    * <ul>
+    * <li>type of term map (constant, column, reference, template),</li>
+    * <li>term type</li>
+    * <li>optional data type</li>
+    * <li>optional language tag</li>
+    * <li>optional nested term map</li>
+    * </ul>
+    */
+  def extractCoreProperties(rdfNode: RDFNode, refFormulation: String) = {
+    val termMapType = AbstractTermMap.extractTermMapType(rdfNode);
+    val termType = AbstractTermMap.extractTermType(rdfNode);
+    val datatype = AbstractTermMap.extractDatatype(rdfNode);
+    val languageTag = AbstractTermMap.extractLanguageTag(rdfNode);
+    val nestedTM = xR2RMLNestedTermMap.extractNestedTermMap(termMapType, rdfNode, refFormulation);
+
+    if (logger.isTraceEnabled()) logger.trace("Extracted term map core properties: termMapType: " + termMapType + ". termType: "
+      + termType + ". datatype: " + datatype + ". languageTag: " + languageTag
+      + ". nestedTermMap: " + nestedTM)
+
+    val coreProperties = (termMapType, termType, datatype, languageTag, nestedTM)
+    coreProperties;
   }
 }

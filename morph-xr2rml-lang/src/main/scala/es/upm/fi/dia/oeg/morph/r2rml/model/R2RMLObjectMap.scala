@@ -26,7 +26,7 @@ object R2RMLObjectMap {
     val logger = Logger.getLogger(this.getClass().getName());
 
     def apply(rdfNode: RDFNode, refFormulation: String): R2RMLObjectMap = {
-        val coreProperties = R2RMLTermMap.extractCoreProperties(rdfNode);
+        val coreProperties = AbstractTermMap.extractCoreProperties(rdfNode, refFormulation);
         val termMapType = coreProperties._1;
         val termType = coreProperties._2;
         val datatype = coreProperties._3;
@@ -47,7 +47,10 @@ object R2RMLObjectMap {
             
             //default nested term map type is same as its parent
             val nestedTermMapType = termMapType;
-            Some(new xR2RMLNestedTermMap(termMapType, nestedTermMapType, Some(ntmTermType), None, None, None))
+
+            val ntm = new xR2RMLNestedTermMap(termMapType, nestedTermMapType, Some(ntmTermType), None, None, None,
+                refFormulation);
+            Some(ntm)
         } else {
           coreProperties._5;
         }

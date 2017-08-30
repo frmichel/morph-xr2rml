@@ -31,7 +31,7 @@ object R2RMLSubjectMap {
     val logger = Logger.getLogger(this.getClass().getName());
 
     def apply(rdfNode: RDFNode, refFormulation: String): R2RMLSubjectMap = {
-        val coreProperties = R2RMLTermMap.extractCoreProperties(rdfNode);
+        val coreProperties = AbstractTermMap.extractCoreProperties(rdfNode, refFormulation);
         val termMapType = coreProperties._1;
         val termType = coreProperties._2;
         val nestTM = coreProperties._5;

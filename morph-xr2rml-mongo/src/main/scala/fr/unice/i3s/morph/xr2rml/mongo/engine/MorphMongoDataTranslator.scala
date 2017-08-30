@@ -16,7 +16,6 @@ import es.upm.fi.dia.oeg.morph.base.engine.MorphBaseDataTranslator
 import es.upm.fi.dia.oeg.morph.base.exception.MorphException
 import es.upm.fi.dia.oeg.morph.base.path.MixedSyntaxPath
 import es.upm.fi.dia.oeg.morph.base.query.AbstractQuery
-import es.upm.fi.dia.oeg.morph.r2rml.model.R2RMLTermMap
 import es.upm.fi.dia.oeg.morph.r2rml.model.R2RMLTriplesMap
 import es.upm.fi.dia.oeg.morph.r2rml.model.AbstractTermMap
 
@@ -252,27 +251,24 @@ class MorphMongoDataTranslator(val fact: IMorphFactory) extends MorphBaseDataTra
 		//var memberTermType: String = Constants.R2RML_LITERAL_URI
 
 
-		// In case of a collection/container, a nested term map should give the details of term type
-		//, datatype and language or the terms
-		val (collecTermType: Option[String], datatype:Option[String], languageTag:Option[String], memberTermType:String) =
-			termMap.calculateCollectionTermnTypeAndDataTypeAndLanguageTagAndMemberTermType();
+
 
 
 		val result: List[RDFTerm] = termMap.termMapType match {
 
 			// --- Constant-valued term map
 			case Constants.MorphTermMapType.ConstantTermMap => {
-				MorphBaseDataTranslator.translateSingleValue(termMap.getConstantValue(), collecTermType, memberTermType, datatype, languageTag, encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues)
+        this.translateDataWithConstantTermMap(termMap, jsonDoc, encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues);
 			}
 
 			// --- Reference-valued term map
 			case Constants.MorphTermMapType.ReferenceTermMap => {
-				this.translateDataWithReferenceTermMap(termMap, jsonDoc, collecTermType, datatype, languageTag, memberTermType);
+				this.translateDataWithReferenceTermMap(termMap, jsonDoc);
 			}
 
 			// --- Template-valued term map
 			case Constants.MorphTermMapType.TemplateTermMap => {
-				this.transateDataWithTemplateTermMap(termMap, jsonDoc, collecTermType, datatype, languageTag, memberTermType);
+				this.translateDataWithTemplateTermMap(termMap, jsonDoc);
 			}
 
 			case _ => { throw new MorphException("Invalid term map type " + termMap.termMapType) }
@@ -281,9 +277,26 @@ class MorphMongoDataTranslator(val fact: IMorphFactory) extends MorphBaseDataTra
 		result
 	}
 
-	def translateDataWithReferenceTermMap(termMap:AbstractTermMap, jsonDoc: String
-																				, collecTermType: Option[String], datatype:Option[String], languageTag:Option[String], memberTermType:String
-																			 ) : List[RDFTerm] = {
+
+  def translateDataWithConstantTermMap(termMap:AbstractTermMap, jsonDoc: String,
+                                       encodeUnsafeCharsInUri:Boolean, encodeUnsafeCharsInDbValues:Boolean)
+  : List[RDFTerm] = {
+
+    // In case of a collection/container, a nested term map should give the details of term type
+    //, datatype and language or the terms
+    val (collecTermType: Option[String], datatype:Option[String], languageTag:Option[String], memberTermType:String) =
+    termMap.calculateCollectionTermnTypeAndDataTypeAndLanguageTagAndMemberTermType();
+
+    MorphBaseDataTranslator.translateSingleValue(termMap.getConstantValue(), collecTermType, memberTermType, datatype
+      , languageTag, encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues)
+
+  }
+
+	def translateDataWithReferenceTermMap(termMap:AbstractTermMap, jsonDoc: String) : List[RDFTerm] = {
+    // In case of a collection/container, a nested term map should give the details of term type
+    //, datatype and language or the terms
+    val (collecTermType: Option[String], datatype:Option[String], languageTag:Option[String], memberTermType:String) =
+    termMap.calculateCollectionTermnTypeAndDataTypeAndLanguageTagAndMemberTermType();
 
 		val msPath = {
 			if (termMap.getReference() == "$._id")
@@ -296,19 +309,36 @@ class MorphMongoDataTranslator(val fact: IMorphFactory) extends MorphBaseDataTra
 		// Evaluate the value against the mixed syntax path
 		val values: List[Object] = msPath.evaluate(jsonDoc);
 
+    // Generate RDF terms from the values resulting from the evaluation
+    val result = if(termMap.hasNestedTermMap()) {
+      val ntm = termMap.nestedTermMap.get;
+
+      if(ntm.isReferenceValued) {
+        this.translateDataWithReferenceTermMap(ntm, jsonDoc)
+
+      } else if(ntm.isTemplateValued) {
+        this.translateDataWithTemplateTermMap(ntm, jsonDoc)
+
+      } else {
+        throw new MorphException("Unsupported Nested Term Map Type: " + ntm.termMapType )
+      }
 
 
+    } else {
+      MorphBaseDataTranslator.translateMultipleValues(values, collecTermType, memberTermType, datatype
+        , languageTag, encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues);
+    }
 
-		// Generate RDF terms from the values resulting from the evaluation
-		MorphBaseDataTranslator.translateMultipleValues(values, collecTermType, memberTermType, datatype
-			, languageTag, encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues)
+
+    result;
 
 	}
 
-	def transateDataWithTemplateTermMap(termMap:AbstractTermMap, jsonDoc: String
-																			, collecTermType: Option[String], datatype:Option[String], languageTag:Option[String], memberTermType:String
-																		 ) : List[RDFTerm] = {
-
+	def translateDataWithTemplateTermMap(termMap:AbstractTermMap, jsonDoc: String) : List[RDFTerm] = {
+    // In case of a collection/container, a nested term map should give the details of term type
+    //, datatype and language or the terms
+    val (collecTermType: Option[String], datatype:Option[String], languageTag:Option[String], memberTermType:String) =
+    termMap.calculateCollectionTermnTypeAndDataTypeAndLanguageTagAndMemberTermType();
 
 
 		// For each group of the template, compute a list of replacement strings

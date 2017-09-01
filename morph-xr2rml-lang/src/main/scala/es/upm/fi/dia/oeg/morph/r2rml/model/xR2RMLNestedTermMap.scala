@@ -98,8 +98,10 @@ object xR2RMLNestedTermMap {
         val templateStmt = resource.getProperty(Constants.R2RML_TEMPLATE_PROPERTY);
         val referenceStmt = resource.getProperty(Constants.xR2RML_REFERENCE_PROPERTY);
 
+
         if (templateStmt != null && referenceStmt == null) Constants.MorphTermMapType.TemplateTermMap;
         else if (referenceStmt != null && templateStmt == null) Constants.MorphTermMapType.ReferenceTermMap;
+        else if (referenceStmt == null && templateStmt == null) Constants.MorphTermMapType.SimpleNestedTermMap;
         else {
           val errorMessage = "Invalid nested term map " + resource.getLocalName() + ". Should be either template or reference or simple";
           logger.error(errorMessage);

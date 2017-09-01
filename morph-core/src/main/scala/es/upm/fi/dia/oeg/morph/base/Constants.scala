@@ -15,7 +15,7 @@ object Constants {
 
     object MorphTermMapType extends Enumeration {
         type MorphTermMapType = Value
-        val ConstantTermMap, ColumnTermMap, TemplateTermMap, ReferenceTermMap, InvalidTermMapType = Value
+        val ConstantTermMap, ColumnTermMap, TemplateTermMap, ReferenceTermMap, InvalidTermMapType, SimpleNestedTermMap = Value
     }
 
 //    object NestedTermMapType extends Enumeration {

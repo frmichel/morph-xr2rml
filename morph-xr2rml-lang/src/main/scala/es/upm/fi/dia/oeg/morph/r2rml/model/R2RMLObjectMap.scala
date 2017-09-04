@@ -26,25 +26,33 @@ object R2RMLObjectMap {
     val logger = Logger.getLogger(this.getClass().getName());
 
     def apply(rdfNode: RDFNode, refFormulation: String): R2RMLObjectMap = {
-        val coreProperties = R2RMLTermMap.extractCoreProperties(rdfNode);
+        val coreProperties = AbstractTermMap.extractCoreProperties(rdfNode, refFormulation);
         val termMapType = coreProperties._1;
         val termType = coreProperties._2;
         val datatype = coreProperties._3;
         val languageTag = coreProperties._4;
-        var nestedTermMap = coreProperties._5;
+        val extractedNestedTermMap = coreProperties._5;
 
         // A term map with an RDF collection/container term type must have a nested term map.
         // If this is not the case here, define a default nested term type (see xR2RML specification 3.2.1.3):
         // it has term type rr:Literal if the parent term map is column- or reference-valued,
         // it has term type rr:iri if the parent term map is template-valued.
-        if (R2RMLTermMap.isRdfCollectionTermType(termType) && (!nestedTermMap.isDefined)) {
+        val nestedTermMap = if (AbstractTermMap.isRdfCollectionTermType(termType) && (!extractedNestedTermMap.isDefined)) {
             val ntmTermType = termMapType match {
                 case Constants.MorphTermMapType.ColumnTermMap => Constants.R2RML_LITERAL_URI
                 case Constants.MorphTermMapType.ReferenceTermMap => Constants.R2RML_LITERAL_URI
                 case Constants.MorphTermMapType.TemplateTermMap => Constants.R2RML_IRI_URI
                 case _ => Constants.R2RML_LITERAL_URI
             }
-            nestedTermMap = Some(new xR2RMLNestedTermMap(termMapType, Some(ntmTermType), None, None, None))
+            
+            //default nested term map type is same as its parent
+            val nestedTermMapType = termMapType;
+
+            val ntm = new xR2RMLNestedTermMap(termMapType, nestedTermMapType, Some(ntmTermType), None, None, None,
+                refFormulation);
+            Some(ntm)
+        } else {
+          coreProperties._5;
         }
 
         val om = new R2RMLObjectMap(termMapType, termType, datatype, languageTag, nestedTermMap, refFormulation);

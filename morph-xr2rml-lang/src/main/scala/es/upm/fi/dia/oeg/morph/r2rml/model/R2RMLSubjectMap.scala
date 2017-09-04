@@ -31,14 +31,14 @@ object R2RMLSubjectMap {
     val logger = Logger.getLogger(this.getClass().getName());
 
     def apply(rdfNode: RDFNode, refFormulation: String): R2RMLSubjectMap = {
-        val coreProperties = R2RMLTermMap.extractCoreProperties(rdfNode);
+        val coreProperties = AbstractTermMap.extractCoreProperties(rdfNode, refFormulation);
         val termMapType = coreProperties._1;
         val termType = coreProperties._2;
         val nestTM = coreProperties._5;
         if (nestTM.isDefined)
             logger.error("A nested term map cannot be defined in a subject map. Ignoring.")
 
-        if (R2RMLTermMap.isRdfCollectionTermType(termType))
+        if (AbstractTermMap.isRdfCollectionTermType(termType))
             logger.error("A subject map cannot have a term type: " + termType + ". Ignoring.")
 
         // List the optional rr:class properties of the subject map

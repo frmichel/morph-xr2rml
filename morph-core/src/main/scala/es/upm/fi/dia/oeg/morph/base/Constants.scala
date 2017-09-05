@@ -13,16 +13,16 @@ object Constants {
 
     val SEPARATOR = System.getProperty("line.separator")
 
+    /**
+     * Types of term maps apply to both nested term maps and regular term maps.
+     * Only exception: SimpleNestedTermMap is the type of a nested term map with no xrr:reference nor rr:template property inside.
+     * But a nested term map with an xrr:reference resp. rr:template property takes the type ReferenceTermMap resp. TemplateTermMap.
+     */
     object MorphTermMapType extends Enumeration {
         type MorphTermMapType = Value
-        val ConstantTermMap, ColumnTermMap, TemplateTermMap, ReferenceTermMap, InvalidTermMapType = Value
+        val ConstantTermMap, ColumnTermMap, TemplateTermMap, ReferenceTermMap, SimpleNestedTermMap, InvalidTermMapType = Value
     }
 
-//    object NestedTermMapType extends Enumeration {
-//        type NestedTermMapType = Value
-//        val SimpleNestedTermMap, TemplateNestedTermMap, ReferenceNestedTermMap, InvalidNestedTermMapType = Value
-//    }
-        
     object MorphPOS extends Enumeration {
         type MorphPOS = Value
         val sub, pre, obj, graph = Value
@@ -137,7 +137,7 @@ object Constants {
     val OPTIMIZE_SU = "querytranslator.abstract.selfunionelimination";
     val OPTIMIZE_PROPCONDJOIN = "querytranslator.abstract.propagateconditionfromjoin";
     val OPTIMIZE_SPARQL = "querytranslator.sparql.optimize"
-    
+
     val REORDER_STG = "querytranslator.reorderstg";
     val SUBQUERY_ELIMINATION = "querytranslator.subqueryelimination";
     val TRANSJOIN_SUBQUERY_ELIMINATION = "querytranslator.transjoin.subqueryelimination";

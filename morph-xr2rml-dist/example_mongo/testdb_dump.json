@@ -8,15 +8,21 @@ db.createUser( { user: "user", pwd: "user",
 # Add documents to collection students
 db.students.remove( {} )
 db.students.insert([
-    { "FullName": { "FirstNames": ["Paul", "Jack"], 
-      "LastName": "Smith" },
+    { "FullName": { 
+		"FirstNames": ["Paul", "Jack"], 
+		"LastName": "Smith" },
       "Hobbies": [ {"hobby":"Swimming", "place":"pool"}, {"hobby": "Soccer", "place": "stadium"} ] },
-    { "FullName": { "FirstNames": ["Frank", "Francis"], 
-      "LastName": "Underwood" },
+	  
+    { "FullName": { 
+		"FirstNames": ["Frank", "Francis"], 
+		"LastName": "Underwood" },
       "Hobbies": [{"hobby":"Hiking", "place": "Mountain"}, {"hobby":"Basketball", "place": "street"}] },
-    { "FullName": { "FirstNames": ["Weirdo", "\#{[|`\^@]\""], 
-      "LastName": "Foo" },
-      "id": 13, "active": false }
+	  
+    { "FullName": { 
+		"FirstNames": ["Weirdo", "\#{[|`\^@]\""], 
+		"LastName": "Foo" },
+      "id": 13,
+	  "active": false }
 ])
 
 # Add documents to collection movies

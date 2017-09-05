@@ -11,7 +11,7 @@
         xrr:query """db.students.find( { 'FullName' : {$exists: 1} } )""";
     ];
     rr:subjectMap [ 
-    	rr:template "http://example.org/student/{$._id.*}";
+    	rr:template "http://example.org/student/{$._id}";
 		rr:class ex:Student;
     ];
   	# Implicit of a boolean element
@@ -33,14 +33,47 @@
     rr:predicateObjectMap [
     	rr:predicate ex:names;
     	rr:objectMap [
-    		rr:template "{$.FullName.FirstNames.*} {$.FullName.LastName}";
-    		rr:termType xrr:RdfList;
+    		xrr:reference "$.FullName";
     		xrr:nestedTermMap [
-                rr:termType rr:Literal;
-                rr:datatype xsd:string;
+				rr:template "{$.FirstNames.*} {$.LastName}";
+				rr:termType xrr:RdfList;
+				xrr:nestedTermMap [
+					rr:termType rr:Literal;
+					rr:datatype xsd:string;
+				];
             ];
 		];
 	].
+
+   	# --- Generation of a term from a reference with a nested term map wherein terms are assembled as an RDF bag
+	#     and datatyped with an additional nested term map
+    # rr:predicateObjectMap [
+    	# rr:predicate ex:names;
+    	# rr:objectMap [
+    		# xrr:reference "$.FullName";
+    		# xrr:nestedTermMap [
+				# xrr:reference "$.FirstNames.*";
+				# rr:termType xrr:RdfBag;
+				# xrr:nestedTermMap [
+					# rr:termType rr:Literal;
+					# rr:datatype xsd:string;
+				# ];
+            # ];
+		# ];
+	# ].
+
+	#--- Simple nested term map: bag of terms qualified with term type and datatype
+    # rr:predicateObjectMap [
+    	# rr:predicate ex:names;
+    	# rr:objectMap [
+    		# xrr:reference "$.FullName.FirstNames.*";
+			# rr:termType xrr:RdfBag;
+    		# xrr:nestedTermMap [
+				# rr:termType rr:Literal;
+				# rr:datatype xsd:string;
+            # ];
+		# ];
+	# ].
 
     
 # --- Demonstration of a join between documents

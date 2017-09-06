@@ -531,10 +531,10 @@ class MorphBaseTriplePatternBinder(factory: IMorphFactory) {
     /**
      * Check whether we can "live without a given triple pattern tp", that is, if we can still evaluate
      * the query although this triple pattern cannot be evaluated.
-     * 
-     * This happens when tp is either beneath a UNION or in the right part of a left join (optional): 
+     *
+     * This happens when tp is either beneath a UNION or in the right part of a left join (optional):
      * we can compute the rest of the query and we may still get some results.
-     * 
+     *
      * On the contrary, if the query is a join, e.g. a simple BGP, and at least one joined triple pattern
      * of the BGP has no bindings, then for sure we can't evaluate the query.
      *

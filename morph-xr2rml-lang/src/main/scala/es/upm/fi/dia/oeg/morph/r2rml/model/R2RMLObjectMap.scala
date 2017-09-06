@@ -44,16 +44,15 @@ object R2RMLObjectMap {
                 case Constants.MorphTermMapType.TemplateTermMap => Constants.R2RML_IRI_URI
                 case _ => Constants.R2RML_LITERAL_URI
             }
-            
-            //default nested term map type is same as its parent
-            val nestedTermMapType = termMapType;
 
-            val ntm = new xR2RMLNestedTermMap(termMapType, nestedTermMapType, Some(ntmTermType), None, None, None,
-                refFormulation);
+            // The default nested term map has no reference nor template => simple nested term map
+            val nestedTermMapType = Constants.MorphTermMapType.SimpleNestedTermMap
+
+            val ntm = new xR2RMLNestedTermMap(termMapType, nestedTermMapType, Some(ntmTermType), None, None, None, refFormulation);
+            if (logger.isDebugEnabled()) logger.debug("Collection/container term type with no nested term map. Defining default nested term map: " + ntm)
             Some(ntm)
-        } else {
-          coreProperties._5;
-        }
+        } else
+            coreProperties._5;
 
         val om = new R2RMLObjectMap(termMapType, termType, datatype, languageTag, nestedTermMap, refFormulation);
         om.parse(rdfNode);

@@ -157,6 +157,8 @@ object MorphBaseDataTranslator extends java.io.Serializable {
      * @param memberTermType the term type of RDF terms representing the value
      * @param datatype URI of the data type
      * @param language language tag
+     * @param encodeUnsafeCharsInUri
+     * @param encodeUnsafeCharsInDbValues
      * @return a list of one RDF node (cannot be empty)
      */
     def translateSingleValue(

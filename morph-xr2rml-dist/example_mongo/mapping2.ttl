@@ -35,12 +35,12 @@
     rr:predicateObjectMap [
     	rr:predicate ex:names;
     	rr:objectMap [
-    		xrr:reference "$.FullName.";
+    		xrr:reference "$.FullName";
     		rr:termType xrr:RdfList;
     		xrr:nestedTermMap [
                 rr:termType rr:Literal;
                 rr:datatype xsd:string;
-                rr:template "{$.FullName.FirstNames.*} {$.FullName.LastName}";
+                rr:template "{$.FirstNames.*} {$.LastName}";
             ];
 		];
 	].

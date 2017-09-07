@@ -41,6 +41,7 @@
     		xrr:nestedTermMap [
                 rr:termType rr:Literal;
                 rr:datatype xsd:string;
+                #rr:template "{$.newId} {$.FirstNames.*} {$.LastName}";
                 rr:template "{$.FirstNames.*} {$.LastName}";
             ];
 		];

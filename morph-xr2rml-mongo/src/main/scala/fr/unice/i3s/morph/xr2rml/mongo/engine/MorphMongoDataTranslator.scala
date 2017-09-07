@@ -17,7 +17,10 @@ import es.upm.fi.dia.oeg.morph.base.query.AbstractQuery
 import es.upm.fi.dia.oeg.morph.r2rml.model.R2RMLTriplesMap
 import es.upm.fi.dia.oeg.morph.r2rml.model.AbstractTermMap
 
-import scala.util.parsing.json.JSON
+import scala.util.parsing.json.{JSON, JSONObject}
+
+import collection.JavaConverters._
+
 
 /**
   * Utility class to transform a triples map or a MongoDB query into RDF triples
@@ -269,7 +272,8 @@ class MorphMongoDataTranslator(val fact: IMorphFactory)
         val (collecTermType: Option[String], datatype: Option[String], languageTag: Option[String], memberTermType: String) =
             termMap.calculateCollecTermType_DataType_LanguageTag_TermType();
 
-        MorphBaseDataTranslator.translateSingleValue(termMap.getConstantValue(), collecTermType, memberTermType, datatype, languageTag, encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues)
+        MorphBaseDataTranslator.translateSingleValue(termMap.getConstantValue(), collecTermType, memberTermType
+          , datatype, languageTag, encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues)
     }
 
     def translateDataWithReferenceTermMap(termMap: AbstractTermMap, jsonDoc: String): List[RDFTerm] = {
@@ -296,7 +300,7 @@ class MorphMongoDataTranslator(val fact: IMorphFactory)
         throw new MorphException("only JSON object is supported, not a JSON array" + jsonDoc);
       }
 
-     val valuesAsJSON =  jsonDocAsJSON.get.asInstanceOf[Map[String, Any]]
+     val jsonDocAsMap =  jsonDocAsJSON.get.asInstanceOf[Map[String, Any]]
 
         // Generate RDF terms from the values resulting from the evaluation
         if (termMap.hasNestedTermMap()) {
@@ -306,20 +310,36 @@ class MorphMongoDataTranslator(val fact: IMorphFactory)
             // The nested term map just add term type, datatype and/or language tag. Generate the values straight away.
                 MorphBaseDataTranslator.translateMultipleValues(values, collecTermType, memberTermType, datatype, languageTag, encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues);
             else {
-              val valuesWithPushDown = if(ntm.listPushDown != null && !ntm.listPushDown.isEmpty) {
-                values.map(value => {
-                  ntm.listPushDown.map(pushDown => {
-                    val pdReference = valuesAsJSON.get(pushDown.reference)
-                    logger.info("pdReference = " + pdReference)
-                  })
-                  value; //FIX THIS
-                })
-              } else {
+              val valuesWithPushDown = if(ntm.listPushDown != null && !ntm.listPushDown.isEmpty) values.map(value => {
+                val pushedFields:Map[String, Any] = ntm.listPushDown.map(pushDown => {
+                  val pdReference = pushDown.reference;
+                  val pdReferenceKey = pdReference.replaceAllLiterally("$.", "");
+                  val pdReferenceValue:Any = jsonDocAsMap.get(pdReferenceKey).get
+                  logger.info("pdReferenceValue = " + pdReferenceValue)
+
+                  val pdAlias = pushDown.alias
+                  val pdAliasValue:String = if(pdAlias.isDefined) {
+                    pdAlias.get
+                  } else { pdReferenceKey }
+                  logger.info("pdAliasValue = " + pdAliasValue)
+
+                  (pdAliasValue -> pdReferenceValue)
+                }).toMap
+
+                val valueAsJSON = JSON.parseFull(value.toString).get.asInstanceOf[Map[String, Any]]
+
+
+                val newValue = scala.util.parsing.json.JSONObject(valueAsJSON ++ pushedFields).toString()
+                //val newValue = (valueAsJSON ++ pushedFields)
+                newValue
+              }) else {
                 values
               }
 
                 // The nested term map add an iteration within the current document
-                val valuesFromNtm = valuesWithPushDown.flatMap { value =>  this.translateData(ntm, value.asInstanceOf[String]) }
+                val valuesFromNtm = valuesWithPushDown.flatMap {
+                  value =>  this.translateData(ntm, value.asInstanceOf[String])
+                }
                 if (collecTermType.isDefined)
                 // Create the collection/container with that list of nodes
                     MorphBaseDataTranslator.createCollection(collecTermType.get, valuesFromNtm)

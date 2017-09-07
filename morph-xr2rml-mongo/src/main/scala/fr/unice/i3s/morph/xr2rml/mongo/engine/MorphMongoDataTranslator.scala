@@ -1,11 +1,9 @@
 package fr.unice.i3s.morph.xr2rml.mongo.engine
 
 import org.apache.log4j.Logger
-
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype
 import com.hp.hpl.jena.rdf.model.Literal
 import com.hp.hpl.jena.vocabulary.RDF
-
 import es.upm.fi.dia.oeg.morph.base.Constants
 import es.upm.fi.dia.oeg.morph.base.GeneralUtility
 import es.upm.fi.dia.oeg.morph.base.RDFTerm
@@ -19,12 +17,15 @@ import es.upm.fi.dia.oeg.morph.base.query.AbstractQuery
 import es.upm.fi.dia.oeg.morph.r2rml.model.R2RMLTriplesMap
 import es.upm.fi.dia.oeg.morph.r2rml.model.AbstractTermMap
 
+import scala.util.parsing.json.JSON
+
 /**
- * Utility class to transform a triples map or a MongoDB query into RDF triples
- *
- * @author Franck Michel, I3S laboratory
- */
-class MorphMongoDataTranslator(val fact: IMorphFactory) extends MorphBaseDataTranslator(fact) with java.io.Serializable {
+  * Utility class to transform a triples map or a MongoDB query into RDF triples
+  *
+  * @author Franck Michel, I3S laboratory
+  */
+class MorphMongoDataTranslator(val fact: IMorphFactory)
+  extends MorphBaseDataTranslator(fact) with java.io.Serializable {
 
     if (!factory.getConnection.isMongoDB)
         throw new MorphException("Database connection type does not match MongoDB")
@@ -32,21 +33,21 @@ class MorphMongoDataTranslator(val fact: IMorphFactory) extends MorphBaseDataTra
     override val logger = Logger.getLogger(this.getClass().getName());
 
     /**
-     * Query the database using the triples map logical source, and build triples from the result.
-     * Triples are stored in the Jena model of the data materializer.
-     * This method applies to the data materialization approach, not to the query reweriting.
-     *
-     * For each document of the result set:
-     * <ol>
-     * <li>create a subject resource and an optional graph resource if the subject map contains a rr:graph/rr:graphMap property,</li>
-     * <li>loop on each predicate-object map: create a list of resources for the predicates, a list of resources for the objects,
-     * a list of resources from the subject map of a parent object map in case there are referencing object maps,
-     * and a list of resources representing target graphs mentioned in the predicate-object map.</li>
-     * <li>Finally combine all subject, graph, predicate and object resources to generate triples.</li>
-     * </ol>
-     *
-     * @param tm the triples map for which to generate the triples
-     */
+      * Query the database using the triples map logical source, and build triples from the result.
+      * Triples are stored in the Jena model of the data materializer.
+      * This method applies to the data materialization approach, not to the query reweriting.
+      *
+      * For each document of the result set:
+      * <ol>
+      * <li>create a subject resource and an optional graph resource if the subject map contains a rr:graph/rr:graphMap property,</li>
+      * <li>loop on each predicate-object map: create a list of resources for the predicates, a list of resources for the objects,
+      * a list of resources from the subject map of a parent object map in case there are referencing object maps,
+      * and a list of resources representing target graphs mentioned in the predicate-object map.</li>
+      * <li>Finally combine all subject, graph, predicate and object resources to generate triples.</li>
+      * </ol>
+      *
+      * @param tm the triples map for which to generate the triples
+      */
     override def generateRDFTriples(tm: R2RMLTriplesMap): Unit = {
 
         val ls = tm.logicalSource;
@@ -154,7 +155,7 @@ class MorphMongoDataTranslator(val fact: IMorphFactory) extends MorphBaseDataTra
                                 if (!childValues.intersect(parentVal._2).isEmpty) // parentVal._2 is the evaluation of the parent ref
                                     Some(this.translateData(parentTM.subjectMap, parentVal._1)) // parentVal._1 is the JSON document itself
                                 else
-                                    // There was no match: return an empty list so that the final intersection of candidate return nothing
+                                // There was no match: return an empty list so that the final intersection of candidate return nothing
                                     Some(List())
                             }).flatten
                             if (logger.isTraceEnabled()) logger.trace("Join parent candidates: " + joinCond.toString + ", result:" + parentSubjects)
@@ -206,16 +207,16 @@ class MorphMongoDataTranslator(val fact: IMorphFactory) extends MorphBaseDataTra
     }
 
     /**
-     * Generate triples in the context of the query rewriting: run the child and optional parent queries,
-     * and apply the triples map bound to the child query to create RDF triples.
-     *
-     * This assumes that triples maps are normalized, i.e. (1) exactly one predicate-object map with exactly one
-     * predicate map and one object map, (2) each rr:class property of the subject map was translated into an
-     * equivalent normalized triples map.
-     *
-     * @param query an abstract query in which the targetQuery fields must have been set
-     * @throws es.upm.fi.dia.oeg.morph.base.exception.MorphException if one of the atomic abstract queries in this query has no target query
-     */
+      * Generate triples in the context of the query rewriting: run the child and optional parent queries,
+      * and apply the triples map bound to the child query to create RDF triples.
+      *
+      * This assumes that triples maps are normalized, i.e. (1) exactly one predicate-object map with exactly one
+      * predicate map and one object map, (2) each rr:class property of the subject map was translated into an
+      * equivalent normalized triples map.
+      *
+      * @param query an abstract query in which the targetQuery fields must have been set
+      * @throws es.upm.fi.dia.oeg.morph.base.exception.MorphException if one of the atomic abstract queries in this query has no target query
+      */
     override def generateRDFTriples(query: AbstractQuery): Unit = {
         if (!query.isTargetQuerySet)
             throw new MorphException("Target queries not set in " + query)
@@ -230,10 +231,10 @@ class MorphMongoDataTranslator(val fact: IMorphFactory) extends MorphBaseDataTra
     }
 
     /**
-     * Apply a term map to a JSON document, and generate a list of RDF terms:
-     * for each element reference in the term map (reference or template), read values from the document,
-     * then translate those values into RDF terms.
-     */
+      * Apply a term map to a JSON document, and generate a list of RDF terms:
+      * for each element reference in the term map (reference or template), read values from the document,
+      * then translate those values into RDF terms.
+      */
     def translateData(termMap: AbstractTermMap, jsonDoc: String): List[RDFTerm] = {
         if (termMap == null) {
             val errorMessage = "TermMap is null";
@@ -278,7 +279,7 @@ class MorphMongoDataTranslator(val fact: IMorphFactory) extends MorphBaseDataTra
 
         val msPath = {
             if (termMap.getReference() == "$._id")
-                // The MongoDB "_id" field is an ObjectId: retrieve the $oid subfield to get the id value
+            // The MongoDB "_id" field is an ObjectId: retrieve the $oid subfield to get the id value
                 MixedSyntaxPath("$._id.$oid", termMap.getReferenceFormulation())
             else
                 termMap.getMixedSyntaxPaths()(0) // '(0)' because in a reference there is only one mixed syntax path
@@ -287,18 +288,40 @@ class MorphMongoDataTranslator(val fact: IMorphFactory) extends MorphBaseDataTra
         // Evaluate the value against the mixed syntax path
         val values: List[Object] = msPath.evaluate(jsonDoc);
 
+      val jsonDocAsJSON:Option[Any] = JSON.parseFull(jsonDoc);
+      if(!jsonDocAsJSON.isDefined) {
+        throw new MorphException("unable to parse JSON document: " + jsonDoc);
+      }
+      if(jsonDocAsJSON.get.isInstanceOf[List[Any]]) {
+        throw new MorphException("only JSON object is supported, not a JSON array" + jsonDoc);
+      }
+
+     val valuesAsJSON =  jsonDocAsJSON.get.asInstanceOf[Map[String, Any]]
+
         // Generate RDF terms from the values resulting from the evaluation
         if (termMap.hasNestedTermMap()) {
             val ntm = termMap.nestedTermMap.get
 
             if (ntm.isSimpleNestedTermMap)
-                // The nested term map just add term type, datatype and/or language tag. Generate the values straight away. 
+            // The nested term map just add term type, datatype and/or language tag. Generate the values straight away.
                 MorphBaseDataTranslator.translateMultipleValues(values, collecTermType, memberTermType, datatype, languageTag, encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues);
             else {
+              val valuesWithPushDown = if(ntm.listPushDown != null && !ntm.listPushDown.isEmpty) {
+                values.map(value => {
+                  ntm.listPushDown.map(pushDown => {
+                    val pdReference = valuesAsJSON.get(pushDown.reference)
+                    logger.info("pdReference = " + pdReference)
+                  })
+                  value; //FIX THIS
+                })
+              } else {
+                values
+              }
+
                 // The nested term map add an iteration within the current document
-                val valuesFromNtm = values.flatMap { jsonVal => this.translateData(ntm, jsonVal.asInstanceOf[String]) }
+                val valuesFromNtm = valuesWithPushDown.flatMap { value =>  this.translateData(ntm, value.asInstanceOf[String]) }
                 if (collecTermType.isDefined)
-                    // Create the collection/container with that list of nodes
+                // Create the collection/container with that list of nodes
                     MorphBaseDataTranslator.createCollection(collecTermType.get, valuesFromNtm)
                 else
                     valuesFromNtm
@@ -320,7 +343,7 @@ class MorphMongoDataTranslator(val fact: IMorphFactory) extends MorphBaseDataTra
             // For each one, parse it as a mixed syntax path
             tplStrings.map(tplString => {
                 if (tplString == "$._id")
-                    // The MongoDB "_id" field is an ObjectId: retrieve the $oid subfield to get the id value
+                // The MongoDB "_id" field is an ObjectId: retrieve the $oid subfield to get the id value
                     MixedSyntaxPath("$._id.$oid", termMap.getReferenceFormulation())
                 else
                     MixedSyntaxPath(tplString, termMap.getReferenceFormulation())
@@ -352,8 +375,8 @@ class MorphMongoDataTranslator(val fact: IMorphFactory) extends MorphBaseDataTra
     }
 
     /**
-     * Defines the mapping from JSON data types to XSD data types
-     */
+      * Defines the mapping from JSON data types to XSD data types
+      */
     private def inferDataType(value: Object): String = {
         value match {
             case _: java.lang.Byte => XSDDatatype.XSDinteger.getURI()
@@ -373,10 +396,10 @@ class MorphMongoDataTranslator(val fact: IMorphFactory) extends MorphBaseDataTra
     }
 
     /**
-     * Create a JENA literal resource with optional data type and language tag.
-     * This method overrides the base method to enable the mapping between JSON data types
-     * and XSD data types
-     */
+      * Create a JENA literal resource with optional data type and language tag.
+      * This method overrides the base method to enable the mapping between JSON data types
+      * and XSD data types
+      */
     override protected def createLiteralNode(term: RDFTermLiteral): Literal = {
         if (term.language.isDefined)
             factory.getMaterializer.model.createLiteral(term.value.asInstanceOf[String], term.language.get);

@@ -8,6 +8,7 @@ import es.upm.fi.dia.oeg.morph.base.Constants
   */
 class xR2RMLPushDown(val alias:Option[String]) extends IReferenceTermMap {
 
+  override def toString = s"xR2RMLPushDown(alias=$alias, reference=$reference)"
 }
 
 object xR2RMLPushDown {

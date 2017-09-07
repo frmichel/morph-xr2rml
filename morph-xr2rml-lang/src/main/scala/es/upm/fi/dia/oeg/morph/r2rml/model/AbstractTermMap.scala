@@ -191,6 +191,7 @@ abstract class AbstractTermMap(
     AbstractTermMap.isRdfCollectionTermType(this.termType)
   }
 
+  override def toString = s"AbstractTermMap(termMapType=$termMapType, termType=$termType, datatype=$datatype, languageTag=$languageTag, nestedTermMap=$nestedTermMap, refFormulation=$refFormulation, listPushDown=$listPushDown)"
 }
 
 object AbstractTermMap {

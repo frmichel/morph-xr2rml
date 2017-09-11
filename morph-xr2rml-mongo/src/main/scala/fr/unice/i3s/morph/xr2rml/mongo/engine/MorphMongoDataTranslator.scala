@@ -15,13 +15,12 @@ import es.upm.fi.dia.oeg.morph.base.engine.MorphBaseDataTranslator
 import es.upm.fi.dia.oeg.morph.base.exception.MorphException
 import es.upm.fi.dia.oeg.morph.base.path.MixedSyntaxPath
 import es.upm.fi.dia.oeg.morph.base.query.AbstractQuery
-import es.upm.fi.dia.oeg.morph.r2rml.model.R2RMLTriplesMap
-import es.upm.fi.dia.oeg.morph.r2rml.model.AbstractTermMap
+import es.upm.fi.dia.oeg.morph.r2rml.model.{AbstractTermMap, R2RMLTriplesMap, xR2RMLPushDown}
 
 import scala.util.parsing.json.{JSON, JSONObject}
 import collection.JavaConverters._
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
-import com.fasterxml.jackson.databind.node.ObjectNode
+import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
 
 /**
   * Utility class to transform a triples map or a MongoDB query into RDF triples
@@ -57,12 +56,28 @@ class MorphMongoDataTranslator(val fact: IMorphFactory)
   override def generateRDFTriples(tm: R2RMLTriplesMap): Unit = {
 
     val ls = tm.logicalSource;
+    val lsPushDown = ls.listPushDown;
     val sm = tm.subjectMap;
     val poms = tm.predicateObjectMaps;
     val query = factory.getUnfolder.unfoldTriplesMap(tm)
 
     // Execute the query against the database and apply the iterator
-    val childResultSet = factory.getDataSourceReader.executeQueryAndIterator(query, ls.docIterator, None).asInstanceOf[MorphMongoResultSet].resultSet.toList
+    val childWithoutIteratorResultSet:List[String] = factory.getDataSourceReader.execute(query, None)
+      .asInstanceOf[MorphMongoResultSet].resultSet.toList
+
+
+    // Execute the query against the database and apply the iterator
+    val childWithIteratorResultSet = factory.getDataSourceReader.executeQueryAndIterator(query, ls.docIterator, None)
+      .asInstanceOf[MorphMongoResultSet].resultSet.toList
+
+    val childResultSetWithPushDown = for(i <- 0 to childWithIteratorResultSet.size - 1) yield {
+      val childWithoutIteratorString = childWithoutIteratorResultSet(i);
+      val childWithIteratorString = childWithIteratorResultSet(i);
+      val pushDownFields = this.generatePushDownFields(lsPushDown, childWithoutIteratorString);
+      val childWithIteratorWithPushDown = this.insertPushedDownFieldsIntoJsonString(childWithIteratorString, pushDownFields);
+      childWithIteratorWithPushDown;
+    }
+
 
     // Execute the queries of all the parent triples maps (in the join conditions) against the database
     // and apply their iterators. These queries will serve in computing the joins.
@@ -86,9 +101,9 @@ class MorphMongoDataTranslator(val fact: IMorphFactory)
     // Main loop: iterate and process each result document of the result set
     var nbTriples = 0
     var i = 0;
-    for (document <- childResultSet) {
+    for (document <- childResultSetWithPushDown) {
       i = i + 1;
-      if (logger.isDebugEnabled()) logger.debug("Generating triples for document " + i + "/" + childResultSet.size + ": " + document)
+      if (logger.isDebugEnabled()) logger.debug("Generating triples for document " + i + "/" + childResultSetWithPushDown.size + ": " + document)
 
       try {
         // Create the subject resource
@@ -279,8 +294,8 @@ class MorphMongoDataTranslator(val fact: IMorphFactory)
       , datatype, languageTag, encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues)
   }
 
-  def generatePushDownFields(ntm:AbstractTermMap, jsonNode:JsonNode) : Map[String, Any] = {
-    val pushedFields:Map[String, Any] = ntm.listPushDown.map(pushDown => {
+  def generatePushDownFields(listPushDown:List[xR2RMLPushDown], jsonNode:JsonNode) : Map[String, Any] = {
+    val pushedFields:Map[String, Any] = listPushDown.map(pushDown => {
       val pdReference = pushDown.reference;
       //val pdReferenceIDReplaced = this.replaceIDField(pdReference);
       val pdReferenceKey = pdReference.replaceAllLiterally("$.", "")
@@ -288,7 +303,12 @@ class MorphMongoDataTranslator(val fact: IMorphFactory)
 
       //val pdReferenceValue:Any = jsonDocAsMap.get(pdReferenceKey).get
       val pdReferenceValue = if(pdReferenceKey.equals("_id")) {
-        jsonNode.get(pdReferenceKey).get("$oid")
+        val idValue = jsonNode.get(pdReferenceKey);
+        if(idValue == null) {
+          jsonNode.get(pdReferenceKey).get("$oid")
+        } else {
+          idValue
+        }
       } else {
         jsonNode.get(pdReferenceKey)
       }
@@ -312,14 +332,15 @@ class MorphMongoDataTranslator(val fact: IMorphFactory)
     pushedFields
   }
 
-  def generatePushDownFields(ntm:AbstractTermMap, jsonString:String) : Map[String, Any] = {
+  def generatePushDownFields(listPushDown:List[xR2RMLPushDown], jsonString:String) : Map[String, Any] = {
     // create an ObjectMapper instance.
     val mapper = new ObjectMapper
     // use the ObjectMapper to read the json string and create a tree
     val node = mapper.readTree(jsonString)
 
-    this.generatePushDownFields(ntm, node);
+    this.generatePushDownFields(listPushDown, node);
   }
+
 
   def translateDataWithReferenceTermMap(termMap: AbstractTermMap, jsonDoc: String): List[RDFTerm] = {
     val jsonString = jsonDoc.toString;
@@ -339,15 +360,8 @@ class MorphMongoDataTranslator(val fact: IMorphFactory)
     // Evaluate the value against the mixed syntax path
     val values: List[Object] = msPath.evaluate(jsonDoc);
 
-    val jsonDocAsJSON:Option[Any] = JSON.parseFull(jsonDoc);
-    if(!jsonDocAsJSON.isDefined) {
-      throw new MorphException("unable to parse JSON document: " + jsonDoc);
-    }
-    if(jsonDocAsJSON.get.isInstanceOf[List[Any]]) {
-      throw new MorphException("only JSON object is supported, not a JSON array" + jsonDoc);
-    }
 
-    val jsonDocAsMap =  jsonDocAsJSON.get.asInstanceOf[Map[String, Any]]
+
 
     // Generate RDF terms from the values resulting from the evaluation
     if (termMap.hasNestedTermMap()) {
@@ -355,30 +369,15 @@ class MorphMongoDataTranslator(val fact: IMorphFactory)
 
       if (ntm.isSimpleNestedTermMap)
       // The nested term map just add term type, datatype and/or language tag. Generate the values straight away.
-        MorphBaseDataTranslator.translateMultipleValues(values, collecTermType, memberTermType, datatype, languageTag, encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues);
+        MorphBaseDataTranslator.translateMultipleValues(values, collecTermType, memberTermType, datatype, languageTag
+          , encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues);
       else {
-        val pushedFields:Map[String, Any] = this.generatePushDownFields(ntm, jsonNode);
+        val pushedFields:Map[String, Any] = this.generatePushDownFields(ntm.listPushDown, jsonNode);
 
-        val valuesWithPushDown = if(ntm.listPushDown != null && !ntm.listPushDown.isEmpty) values.map(value => {
+        val valuesWithPushDown = if(pushedFields != null && pushedFields.size > 0) values.map(value => {
           val valueString = value.toString;
-          val valueNode = this.mapper.readTree(valueString)
-
-          if(valueNode.isObject) {
-            val valueObjectNode = valueNode.asInstanceOf[ObjectNode]
-            for(pushedFieldKey <- pushedFields.keys) {
-              val pushedFieldValue = pushedFields(pushedFieldKey);
-              valueObjectNode.put(pushedFieldKey, pushedFieldValue.toString.replaceAll("\"", ""));
-            }
-
-
-          } else if(jsonNode.isArray) {
-
-          } else {
-            throw new MorphException("Unsupported type of jsonNode: " + jsonNode);
-          }
-
-          val newValue = valueNode.toString
-          newValue
+          val valueWithPushDown = this.insertPushedDownFieldsIntoJsonString(valueString, pushedFields);
+          valueWithPushDown
         }) else {
           values
         }
@@ -419,6 +418,7 @@ class MorphMongoDataTranslator(val fact: IMorphFactory)
       tplStrings.map(tplString => {
         if (tplString == "$._id")
         // The MongoDB "_id" field is an ObjectId: retrieve the $oid subfield to get the id value
+          //TODO This is not always true, better to put this in the config file as a property.
           MixedSyntaxPath("$._id.$oid", termMap.getReferenceFormulation())
         else
           MixedSyntaxPath(tplString, termMap.getReferenceFormulation())
@@ -488,6 +488,59 @@ class MorphMongoDataTranslator(val fact: IMorphFactory)
         factory.getMaterializer.model.createTypedLiteral(term.value, inferedDT);
     }
   }
+
+  def insertPushedDownFieldsIntoJsonString(jsonString:String, pushedFields:Map[String, Any]): String = {
+    if(jsonString == null) {
+      null
+    } else {
+      val jsonNode = this.mapper.readTree(jsonString)
+      this.insertPushedDownFieldsIntoJsonNode(jsonNode, pushedFields);
+      jsonNode.toString;
+    }
+  }
+
+  def insertPushedDownFieldsIntoListJsonString(listJsonString:List[String], pushedFields:Map[String, Any]): List[String] = {
+    if(listJsonString == null) {
+      null
+    } else {
+      listJsonString.map(jsonString => this.insertPushedDownFieldsIntoJsonString(jsonString, pushedFields) )
+    }
+  }
+
+  def insertPushedDownFieldsIntoJsonNode(jsonNode:JsonNode, pushedFields:Map[String, Any]): Unit = {
+    if(jsonNode != null) {
+      if(jsonNode.isArray) {
+        val arrayNode = jsonNode.asInstanceOf[ArrayNode]
+        this.insertPushedDownFieldsIntoArrayNode(arrayNode, pushedFields)
+      } else if(jsonNode.isObject) {
+        val objectNode = jsonNode.asInstanceOf[ObjectNode];
+        this.insertPushedDownFieldsIntoObjectNode(objectNode, pushedFields)
+      } else {
+        throw new MorphException("Unsupported type of JSON Node : " + jsonNode);
+      }
+    }
+  }
+
+  def insertPushedDownFieldsIntoObjectNode(objectNode:ObjectNode, pushedFields:Map[String, Any]): Unit = {
+    if(objectNode != null) {
+      for(pushedFieldKey <- pushedFields.keys) {
+        val pushedFieldValue = pushedFields(pushedFieldKey);
+        objectNode.put(pushedFieldKey, pushedFieldValue.toString.replaceAll("\"", ""));
+      }
+    }
+
+  }
+
+  def insertPushedDownFieldsIntoArrayNode(arrayNode:ArrayNode, pushedFields:Map[String, Any]): Unit = {
+    if(arrayNode != null) {
+      val it = arrayNode.iterator();
+      while(it.hasNext) {
+        val jsonNode = it.next();
+        this.insertPushedDownFieldsIntoJsonNode(jsonNode, pushedFields);
+      }
+    }
+  }
+
 }
 
 //object MorphMongoDataTranslator extends java.io.Serializable {

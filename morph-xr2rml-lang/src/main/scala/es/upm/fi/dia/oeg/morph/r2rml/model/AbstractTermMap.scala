@@ -284,27 +284,11 @@ object AbstractTermMap {
     }
   }
 
-  def extractPushDownTags(rdfNode: RDFNode) : List[xR2RMLPushDown] = {
-    rdfNode match {
-      case resource: Resource => {
-        val stmtIteratorPushDown = resource.listProperties(Constants.xR2RML_PUSHDOWN_PROPERTY);
-        if (stmtIteratorPushDown != null) {
-          val listPushDown = stmtIteratorPushDown.toList
-          val result:List[xR2RMLPushDown] = listPushDown.map(pushDown => {
-            val resourcePushDown = pushDown.getObject.asResource();
-            xR2RMLPushDown(resourcePushDown)
-          }).toList
-          result
-        } else
-          Nil
-      }
-      case _ => Nil
-    }
 
 
 
 
-  }
+
 
   /**
     * From an RDF node representing a term map, return a list with the following elements:
@@ -322,7 +306,7 @@ object AbstractTermMap {
     val datatype = AbstractTermMap.extractDatatype(rdfNode);
     val languageTag = AbstractTermMap.extractLanguageTag(rdfNode);
     val nestedTM = xR2RMLNestedTermMap.extractNestedTermMap(termMapType, rdfNode, refFormulation);
-    val listPushDown = AbstractTermMap.extractPushDownTags(rdfNode);
+    val listPushDown = xR2RMLPushDown.extractPushDownTags(rdfNode);
 
     if (logger.isTraceEnabled()) logger.trace("Extracted term map core properties: termMapType: " + termMapType + ". termType: "
       + termType + ". datatype: " + datatype + ". languageTag: " + languageTag

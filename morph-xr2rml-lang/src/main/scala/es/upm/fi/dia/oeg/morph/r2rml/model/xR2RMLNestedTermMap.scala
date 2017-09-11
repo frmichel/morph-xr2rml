@@ -128,7 +128,7 @@ object xR2RMLNestedTermMap {
                     // Check if there is a nested term map WITHIN this nested term map
                     val nestedTermMap = extractNestedTermMap(nestedTermMapType, ntmRes, refFormulation)
 
-                    val listPushDown = AbstractTermMap.extractPushDownTags(rdfNode);
+                    val listPushDown = xR2RMLPushDown.extractPushDownTags(rdfNode);
 
                     val ntm = new xR2RMLNestedTermMap(parentTermMapType, nestedTermMapType, termType
                         , datatype, language, nestedTermMap, refFormulation, listPushDown)

@@ -27,6 +27,8 @@ import es.upm.fi.dia.oeg.morph.base.query.GenericQuery
 import fr.unice.i3s.morph.xr2rml.mongo.JongoResultHandler
 import fr.unice.i3s.morph.xr2rml.mongo.MongoDBQuery
 
+import es.upm.fi.dia.oeg.morph.r2rml.model.xR2RMLPushDown
+
 /**
  * Utility class to handle the execution of MongoDB queries
  *
@@ -66,6 +68,10 @@ class MorphMongoDataSourceReader(factory: IMorphFactory) extends MorphBaseDataSo
         new MorphMongoResultSet(results.toList)
     }
 
+    override def executeQueryAndIterator(query: GenericQuery, logSrcIterator: Option[String], limit: Option[Long]): MorphBaseResultSet = {
+      this.executeQueryAndIterator(query, logSrcIterator, limit, Nil)
+    }
+    
     /**
      * Execute a query against the database and apply an rml:iterator on the results.
      *
@@ -78,7 +84,8 @@ class MorphMongoDataSourceReader(factory: IMorphFactory) extends MorphBaseDataSo
      * @param limit optional maximum number of results to retrieve
      * @return a concrete instance of MorphBaseResultSet. Must NOT return null, may return an empty result.
      */
-    override def executeQueryAndIterator(query: GenericQuery, logSrcIterator: Option[String], limit: Option[Long]): MorphBaseResultSet = {
+    override def executeQueryAndIterator(query: GenericQuery, logSrcIterator: Option[String], limit: Option[Long]
+    , listPushDown:List[xR2RMLPushDown]): MorphBaseResultSet = {
 
         // A query is simply and uniquely identified by its concrete string value
         logger.info("Executing query: " + query.concreteQuery + " with limit " + limit)

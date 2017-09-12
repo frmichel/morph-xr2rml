@@ -62,21 +62,8 @@ class MorphMongoDataTranslator(val fact: IMorphFactory)
     val query = factory.getUnfolder.unfoldTriplesMap(tm)
 
     // Execute the query against the database and apply the iterator
-    val childWithoutIteratorResultSet:List[String] = factory.getDataSourceReader.execute(query, None)
+    val childResultSet = factory.getDataSourceReader.executeQueryAndIterator(query, ls.docIterator, None, lsPushDown)
       .asInstanceOf[MorphMongoResultSet].resultSet.toList
-
-
-    // Execute the query against the database and apply the iterator
-    val childWithIteratorResultSet = factory.getDataSourceReader.executeQueryAndIterator(query, ls.docIterator, None)
-      .asInstanceOf[MorphMongoResultSet].resultSet.toList
-
-    val childResultSetWithPushDown = for(i <- 0 to childWithIteratorResultSet.size - 1) yield {
-      val childWithoutIteratorString = childWithoutIteratorResultSet(i);
-      val childWithIteratorString = childWithIteratorResultSet(i);
-      val pushDownFields = this.generatePushDownFields(lsPushDown, childWithoutIteratorString);
-      val childWithIteratorWithPushDown = this.insertPushedDownFieldsIntoJsonString(childWithIteratorString, pushDownFields);
-      childWithIteratorWithPushDown;
-    }
 
 
     // Execute the queries of all the parent triples maps (in the join conditions) against the database
@@ -101,9 +88,9 @@ class MorphMongoDataTranslator(val fact: IMorphFactory)
     // Main loop: iterate and process each result document of the result set
     var nbTriples = 0
     var i = 0;
-    for (document <- childResultSetWithPushDown) {
+    for (document <- childResultSet) {
       i = i + 1;
-      if (logger.isDebugEnabled()) logger.debug("Generating triples for document " + i + "/" + childResultSetWithPushDown.size + ": " + document)
+      if (logger.isDebugEnabled()) logger.debug("Generating triples for document " + i + "/" + childResultSet.size + ": " + document)
 
       try {
         // Create the subject resource
@@ -354,6 +341,7 @@ class MorphMongoDataTranslator(val fact: IMorphFactory)
       if (termMap.getReference() == "$._id")
       // The MongoDB "_id" field is an ObjectId: retrieve the $oid subfield to get the id value
         MixedSyntaxPath("$._id.$oid", termMap.getReferenceFormulation())
+        //TODO this is not always true, better to put as in the property file
       else
         termMap.getMixedSyntaxPaths()(0) // '(0)' because in a reference there is only one mixed syntax path
     }

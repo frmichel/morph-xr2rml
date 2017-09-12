@@ -304,10 +304,11 @@ class MorphMongoDataTranslator(val fact: IMorphFactory)
       //val pdReferenceValue:Any = jsonDocAsMap.get(pdReferenceKey).get
       val pdReferenceValue = if(pdReferenceKey.equals("_id")) {
         val idValue = jsonNode.get(pdReferenceKey);
-        if(idValue == null) {
-          jsonNode.get(pdReferenceKey).get("$oid")
-        } else {
+        val oidValue = idValue.get("$oid");
+        if(oidValue == null) {
           idValue
+        } else {
+          oidValue
         }
       } else {
         jsonNode.get(pdReferenceKey)

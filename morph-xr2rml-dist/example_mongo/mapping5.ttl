@@ -16,8 +16,7 @@
 	];
 	
     rr:subjectMap [ 
-		#rr:template "http://example.org/sliderevision/{$.slideID}-R{$.*.id}"; 
-		rr:template "http://example.org/sliderevision/{$.*.slideID}--R{$.*.id}"; 
+		rr:template "http://example.org/sliderevision/{$.slideID}-R{$.id}"; 
 		rr:termType rr:IRI
 	];
 

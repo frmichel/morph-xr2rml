@@ -10,27 +10,12 @@
     	# Jongo needs strings in singles quotes (difference with MongoDB shell)
         xrr:query """db.students.find( { 'FullName' : {$exists: 1} } )""";
     ];
+	
     rr:subjectMap [ 
     	rr:template "http://example.org/student/{$._id.*}";
 		rr:class ex:Student;
     ];
-  	# Implicit of a boolean element
-    rr:predicateObjectMap [
-    	rr:predicate ex:isActive;
-    	rr:objectMap [ 
-            xrr:reference "$.active";
-        ];
-    ];
-  	# Implicit of a integer element
-    rr:predicateObjectMap [
-    	rr:predicate ex:hasId;
-    	rr:objectMap [ xrr:reference "$.id"; ];
-    ];
-   	# Generation of multiple RDF terms with language tag
-    rr:predicateObjectMap [
-    	rr:predicate ex:activity;
-    	rr:objectMap [ xrr:reference "$.Hobbies.*.hobby"; rr:language "en"; ];
-    ];
+	
    	# Generation of multiple terms from a template, assembled as an RDF list, and datatyped with a nested term map
     rr:predicateObjectMap [
     	rr:predicate ex:names;
@@ -46,41 +31,3 @@
             ];
 		];
 	].
-
-    
-# --- Demonstration of a join between documents
-
-<#Movies>
-    a rr:TriplesMap;
-    xrr:logicalSource [
-        xrr:query "db.movies.find( { movies: { $exists: true} } )";
-        rml:iterator "$.movies.*";
-    ];
-    rr:subjectMap [ 
-        rr:template "http://example.org/movies/{$.title}"; 
-		rr:class ex:Movie;
-    ].
-
-<#Directors>
-    a rr:TriplesMap;
-    xrr:logicalSource [
-        xrr:query "db.movies.find( { directors: { $exists: true} } )";
-        rml:iterator "$.directors.*";
-    ];
-    rr:subjectMap [ rr:template "http://example.org/director/{$.name}"; ];
-    rr:predicateObjectMap [
-        rr:predicate ex:name;
-        rr:objectMap [ xrr:reference "$.name" ];
-    ];
-    rr:predicateObjectMap [
-        rr:predicate ex:directed;
-        rr:objectMap [
-            rr:parentTriplesMap <#Movies>;
-            rr:joinCondition [
-                rr:child "$.movies.*";
-                rr:parent "$.title";
-            ];
-            rr:termType xrr:RdfList;
-        ];
-    ].
-   

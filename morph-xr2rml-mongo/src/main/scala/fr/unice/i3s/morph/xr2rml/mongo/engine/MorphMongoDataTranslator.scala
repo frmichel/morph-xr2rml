@@ -34,8 +34,9 @@ class MorphMongoDataTranslator(val fact: IMorphFactory)
     throw new MorphException("Database connection type does not match MongoDB")
 
   override val logger = Logger.getLogger(this.getClass().getName());
-
+  // create an ObjectMapper instance.
   val mapper = new ObjectMapper
+
 
   /**
     * Query the database using the triples map logical source, and build triples from the result.
@@ -64,6 +65,7 @@ class MorphMongoDataTranslator(val fact: IMorphFactory)
     // Execute the query against the database and apply the iterator
     val childResultSet = factory.getDataSourceReader.executeQueryAndIterator(query, ls.docIterator, None, lsPushDown)
       .asInstanceOf[MorphMongoResultSet].resultSet.toList
+
 
 
     // Execute the queries of all the parent triples maps (in the join conditions) against the database
@@ -281,53 +283,6 @@ class MorphMongoDataTranslator(val fact: IMorphFactory)
       , datatype, languageTag, encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues)
   }
 
-  def generatePushDownFields(listPushDown:List[xR2RMLPushDown], jsonNode:JsonNode) : Map[String, Any] = {
-    val pushedFields:Map[String, Any] = listPushDown.map(pushDown => {
-      val pdReference = pushDown.reference;
-      //val pdReferenceIDReplaced = this.replaceIDField(pdReference);
-      val pdReferenceKey = pdReference.replaceAllLiterally("$.", "")
-      //val pdReferenceKeyIDReplaced = this.replaceIDField(pdReference).replaceAllLiterally("$.", "");
-
-      //val pdReferenceValue:Any = jsonDocAsMap.get(pdReferenceKey).get
-      val pdReferenceValue = if(pdReferenceKey.equals("_id")) {
-        val idValue = jsonNode.get(pdReferenceKey);
-        val oidValue = idValue.get("$oid");
-        if(oidValue == null) {
-          idValue
-        } else {
-          oidValue
-        }
-      } else {
-        jsonNode.get(pdReferenceKey)
-      }
-      logger.info("pdReferenceValue = " + pdReferenceValue)
-
-
-      val pdReferenceValueReplaced = if(pdReferenceValue.isTextual) {
-        pdReferenceValue.toString.replaceAll("\"", "");
-      } else {
-        pdReferenceValue
-      }
-
-      val pdAlias = pushDown.alias
-      val pdAliasValue:String = if(pdAlias.isDefined) {
-        pdAlias.get
-      } else { pdReferenceKey }
-      logger.info("pdAliasValue = " + pdAliasValue)
-
-      (pdAliasValue -> pdReferenceValueReplaced)
-    }).toMap
-    pushedFields
-  }
-
-  def generatePushDownFields(listPushDown:List[xR2RMLPushDown], jsonString:String) : Map[String, Any] = {
-    // create an ObjectMapper instance.
-    val mapper = new ObjectMapper
-    // use the ObjectMapper to read the json string and create a tree
-    val node = mapper.readTree(jsonString)
-
-    this.generatePushDownFields(listPushDown, node);
-  }
 
 
   def translateDataWithReferenceTermMap(termMap: AbstractTermMap, jsonDoc: String): List[RDFTerm] = {
@@ -361,11 +316,11 @@ class MorphMongoDataTranslator(val fact: IMorphFactory)
         MorphBaseDataTranslator.translateMultipleValues(values, collecTermType, memberTermType, datatype, languageTag
           , encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues);
       else {
-        val pushedFields:Map[String, Any] = this.generatePushDownFields(ntm.listPushDown, jsonNode);
+        val pushedFields:Map[String, Any] = xR2RMLPushDown.generatePushDownFieldsFromJsonNode(ntm.listPushDown, jsonNode);
 
         val valuesWithPushDown = if(pushedFields != null && pushedFields.size > 0) values.map(value => {
           val valueString = value.toString;
-          val valueWithPushDown = this.insertPushedDownFieldsIntoJsonString(valueString, pushedFields);
+          val valueWithPushDown = xR2RMLPushDown.insertPushedDownFieldsIntoJsonString(valueString, pushedFields);
           valueWithPushDown
         }) else {
           values
@@ -433,7 +388,8 @@ class MorphMongoDataTranslator(val fact: IMorphFactory)
     } else {
       // Compute the list of template results by making all possible combinations of the replacement values
       val tplResults = TemplateUtility.replaceTemplateGroups(termMap.getTemplateString(), listReplace);
-      val resultAux = MorphBaseDataTranslator.translateMultipleValues(tplResults, collecTermType, memberTermType, datatype, languageTag, encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues);
+      val resultAux = MorphBaseDataTranslator.translateMultipleValues(tplResults, collecTermType, memberTermType
+        , datatype, languageTag, encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues);
       resultAux
     }
   }
@@ -478,57 +434,6 @@ class MorphMongoDataTranslator(val fact: IMorphFactory)
     }
   }
 
-  def insertPushedDownFieldsIntoJsonString(jsonString:String, pushedFields:Map[String, Any]): String = {
-    if(jsonString == null) {
-      null
-    } else {
-      val jsonNode = this.mapper.readTree(jsonString)
-      this.insertPushedDownFieldsIntoJsonNode(jsonNode, pushedFields);
-      jsonNode.toString;
-    }
-  }
-
-  def insertPushedDownFieldsIntoListJsonString(listJsonString:List[String], pushedFields:Map[String, Any]): List[String] = {
-    if(listJsonString == null) {
-      null
-    } else {
-      listJsonString.map(jsonString => this.insertPushedDownFieldsIntoJsonString(jsonString, pushedFields) )
-    }
-  }
-
-  def insertPushedDownFieldsIntoJsonNode(jsonNode:JsonNode, pushedFields:Map[String, Any]): Unit = {
-    if(jsonNode != null) {
-      if(jsonNode.isArray) {
-        val arrayNode = jsonNode.asInstanceOf[ArrayNode]
-        this.insertPushedDownFieldsIntoArrayNode(arrayNode, pushedFields)
-      } else if(jsonNode.isObject) {
-        val objectNode = jsonNode.asInstanceOf[ObjectNode];
-        this.insertPushedDownFieldsIntoObjectNode(objectNode, pushedFields)
-      } else {
-        throw new MorphException("Unsupported type of JSON Node : " + jsonNode);
-      }
-    }
-  }
-
-  def insertPushedDownFieldsIntoObjectNode(objectNode:ObjectNode, pushedFields:Map[String, Any]): Unit = {
-    if(objectNode != null) {
-      for(pushedFieldKey <- pushedFields.keys) {
-        val pushedFieldValue = pushedFields(pushedFieldKey);
-        objectNode.put(pushedFieldKey, pushedFieldValue.toString.replaceAll("\"", ""));
-      }
-    }
-
-  }
-
-  def insertPushedDownFieldsIntoArrayNode(arrayNode:ArrayNode, pushedFields:Map[String, Any]): Unit = {
-    if(arrayNode != null) {
-      val it = arrayNode.iterator();
-      while(it.hasNext) {
-        val jsonNode = it.next();
-        this.insertPushedDownFieldsIntoJsonNode(jsonNode, pushedFields);
-      }
-    }
-  }
 
 }
 

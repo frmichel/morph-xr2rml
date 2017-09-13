@@ -129,19 +129,28 @@ class MorphMongoDataSourceReader(factory: IMorphFactory) extends MorphBaseDataSo
                 val pushedFields:Map[String, Any] = xR2RMLPushDown.generatePushDownFieldsFromJsonString(
                     listPushDown, queryResultElementString);
 
-                val queryResultIterElementStringWithPushDown = xR2RMLPushDown.insertPushedDownFieldsIntoJsonString(
-                    queryResultIterElementString, pushedFields);
-                if(queryResultIterElementStringWithPushDown.isObject) {
-                    List(queryResultIterElementStringWithPushDown.toString)
-                } else {
-                    val queryResultIterElementStringWithPushDownArray =
-                        queryResultIterElementStringWithPushDown.asInstanceOf[ArrayNode];
+                try {
+                    val queryResultIterElementStringWithPushDown = xR2RMLPushDown.insertPushedDownFieldsIntoJsonString(
+                        queryResultIterElementString, pushedFields);
+                    if(queryResultIterElementStringWithPushDown.isObject) {
+                        List(queryResultIterElementStringWithPushDown.toString)
+                    } else {
+                        val queryResultIterElementStringWithPushDownArray =
+                            queryResultIterElementStringWithPushDown.asInstanceOf[ArrayNode];
 
-                    val listQueryResultIter = for(j <- 0 to queryResultIterElementStringWithPushDownArray.size - 1 ) yield {
-                        queryResultIterElementStringWithPushDownArray.get(j).toString
+                        val listQueryResultIter = for(j <- 0 to queryResultIterElementStringWithPushDownArray.size - 1 ) yield {
+                            queryResultIterElementStringWithPushDownArray.get(j).toString
+                        }
+                        listQueryResultIter
                     }
-                    listQueryResultIter
+                } catch {
+                    case e:Exception => {
+                        logger.error(s"Error occured when trying to insert push down values into JSON String $queryResultIterElementString");
+                        List(queryResultIterElementString)
+                    }
                 }
+
+
             })
 
             val queryResultIterWithPushedDownValuesFlat = queryResultIterWithPushedDownValuesNested.toList.flatten;

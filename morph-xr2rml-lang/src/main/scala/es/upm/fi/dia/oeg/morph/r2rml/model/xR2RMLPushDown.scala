@@ -90,7 +90,7 @@ object xR2RMLPushDown {
       } else {
         objectNode.get(pdReferenceKey)
       }
-      logger.info("pdReferenceValue = " + pdReferenceValue)
+//      logger.info("pdReferenceValue = " + pdReferenceValue)
 
 
       val pdReferenceValueReplaced = if(pdReferenceValue.isTextual) {
@@ -103,7 +103,7 @@ object xR2RMLPushDown {
       val pdAliasValue:String = if(pdAlias.isDefined) {
         pdAlias.get
       } else { pdReferenceKey }
-      logger.info("pdAliasValue = " + pdAliasValue)
+      //logger.info("pdAliasValue = " + pdAliasValue)
 
       (pdAliasValue -> pdReferenceValueReplaced)
     }).toMap
@@ -113,9 +113,18 @@ object xR2RMLPushDown {
   def generatePushDownFieldsFromJsonString(listPushDown:List[xR2RMLPushDown], jsonString:String) : Map[String, Any] = {
 
     // use the ObjectMapper to read the json string and create a tree
-    val node:JsonNode = mapper.readTree(jsonString)
+    try {
+      val node:JsonNode = mapper.readTree(jsonString)
+      this.generatePushDownFieldsFromJsonNode(listPushDown, node);
+    } catch {
+      case e:Exception => {
+        logger.error(s"Error occured when trying to generate push down fields from JSON String $jsonString")
+        Map.empty
+      }
+    }
 
-    this.generatePushDownFieldsFromJsonNode(listPushDown, node);
+
+
   }
 
   def insertPushedDownFieldsIntoJsonString(jsonString:String, pushedFields:Map[String, Any]): JsonNode = {

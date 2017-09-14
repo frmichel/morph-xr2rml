@@ -2,19 +2,18 @@ package fr.unice.i3s.morph.xr2rml.mongo.engine
 
 import java.net.URI
 
+import com.fasterxml.jackson.databind.node.ArrayNode
+
 import scala.collection.JavaConversions.asScalaIterator
 import scala.collection.JavaConversions.seqAsJavaList
-
 import org.apache.log4j.Logger
 import org.jongo.Jongo
 import org.jongo.MongoCollection
 import org.jongo.MongoCursor
-
 import com.mongodb.DB
 import com.mongodb.MongoClient
 import com.mongodb.MongoCredential
 import com.mongodb.ServerAddress
-
 import es.upm.fi.dia.oeg.morph.base.Constants
 import es.upm.fi.dia.oeg.morph.base.GeneralUtility
 import es.upm.fi.dia.oeg.morph.base.GenericConnection
@@ -26,6 +25,7 @@ import es.upm.fi.dia.oeg.morph.base.path.JSONPath_PathExpression
 import es.upm.fi.dia.oeg.morph.base.query.GenericQuery
 import fr.unice.i3s.morph.xr2rml.mongo.JongoResultHandler
 import fr.unice.i3s.morph.xr2rml.mongo.MongoDBQuery
+import es.upm.fi.dia.oeg.morph.r2rml.model.xR2RMLPushDown
 
 /**
  * Utility class to handle the execution of MongoDB queries
@@ -66,6 +66,10 @@ class MorphMongoDataSourceReader(factory: IMorphFactory) extends MorphBaseDataSo
         new MorphMongoResultSet(results.toList)
     }
 
+    override def executeQueryAndIterator(query: GenericQuery, logSrcIterator: Option[String], limit: Option[Long]): MorphBaseResultSet = {
+      this.executeQueryAndIterator(query, logSrcIterator, limit, Nil)
+    }
+    
     /**
      * Execute a query against the database and apply an rml:iterator on the results.
      *
@@ -78,13 +82,14 @@ class MorphMongoDataSourceReader(factory: IMorphFactory) extends MorphBaseDataSo
      * @param limit optional maximum number of results to retrieve
      * @return a concrete instance of MorphBaseResultSet. Must NOT return null, may return an empty result.
      */
-    override def executeQueryAndIterator(query: GenericQuery, logSrcIterator: Option[String], limit: Option[Long]): MorphBaseResultSet = {
+    override def executeQueryAndIterator(query: GenericQuery, logSrcIterator: Option[String], limit: Option[Long]
+    , listPushDown:List[xR2RMLPushDown]): MorphBaseResultSet = {
 
         // A query is simply and uniquely identified by its concrete string value
         logger.info("Executing query: " + query.concreteQuery + " with limit " + limit)
         val queryMapId = MorphMongoDataSourceReader.makeQueryMapId(query, logSrcIterator, limit)
         val start = System.currentTimeMillis
-        val queryResult =
+        val queryResult:List[String] =
             if (executedQueries.contains(queryMapId)) {
                 if (logger.isTraceEnabled()) logger.trace("Query retrieved from cache, queryId: " + queryMapId)
                 logger.info("Returning query results from cache.")
@@ -104,14 +109,57 @@ class MorphMongoDataSourceReader(factory: IMorphFactory) extends MorphBaseDataSo
             }
 
         // Apply the iterator to the result set, this creates a new result set
-        val queryResultIter =
+        val queryResultIter:List[String] =
             if (logSrcIterator.isDefined) {
                 val jPath = JSONPath_PathExpression.parseRaw(logSrcIterator.get)
                 queryResult.flatMap(result => jPath.evaluate(result).map(value => value.toString))
             } else queryResult
 
         logger.info("Query returned " + queryResult.size + " result(s), " + queryResultIter.size + " result(s) after applying the iterator, in: " + (System.currentTimeMillis - start) + " ms.");
-        new MorphMongoResultSet(queryResultIter)
+        val queryResultIterWithPushedDownValues:List[String] = if(queryResult.size == queryResultIter.size) {
+            val listQueryResult = for(i <- 0 to queryResult.size - 1 ) yield {
+                queryResult(i)
+            }
+
+            var i=0
+            val queryResultIterWithPushedDownValuesNested = listQueryResult.map(queryResultElementString => {
+                val queryResultIterElementString:String = queryResultIter(i);
+                i = i+1;
+
+                val pushedFields:Map[String, Any] = xR2RMLPushDown.generatePushDownFieldsFromJsonString(
+                    listPushDown, queryResultElementString);
+
+                try {
+                    val queryResultIterElementStringWithPushDown = xR2RMLPushDown.insertPushedDownFieldsIntoJsonString(
+                        queryResultIterElementString, pushedFields);
+                    if(queryResultIterElementStringWithPushDown.isObject) {
+                        List(queryResultIterElementStringWithPushDown.toString)
+                    } else {
+                        val queryResultIterElementStringWithPushDownArray =
+                            queryResultIterElementStringWithPushDown.asInstanceOf[ArrayNode];
+
+                        val listQueryResultIter = for(j <- 0 to queryResultIterElementStringWithPushDownArray.size - 1 ) yield {
+                            queryResultIterElementStringWithPushDownArray.get(j).toString
+                        }
+                        listQueryResultIter
+                    }
+                } catch {
+                    case e:Exception => {
+                        logger.error(s"Error occured when trying to insert push down values into JSON String $queryResultIterElementString");
+                        List(queryResultIterElementString)
+                    }
+                }
+
+
+            })
+
+            val queryResultIterWithPushedDownValuesFlat = queryResultIterWithPushedDownValuesNested.toList.flatten;
+            queryResultIterWithPushedDownValuesFlat
+        } else {
+            queryResultIter
+        }
+
+        new MorphMongoResultSet(queryResultIterWithPushedDownValues.toList)
     }
 
     override def setTimeout(timeout: Int) {

@@ -3,6 +3,7 @@ package es.upm.fi.dia.oeg.morph.base.engine
 import es.upm.fi.dia.oeg.morph.base.GenericConnection
 import es.upm.fi.dia.oeg.morph.base.MorphBaseResultSet
 import es.upm.fi.dia.oeg.morph.base.query.GenericQuery
+import es.upm.fi.dia.oeg.morph.r2rml.model.xR2RMLPushDown
 
 /**
  * A data source reader is used to execute queries against the target database
@@ -31,6 +32,9 @@ abstract class MorphBaseDataSourceReader(val factory: IMorphFactory) {
      */
     def executeQueryAndIterator(query: GenericQuery, logSrcIterator: Option[String], limit: Option[Long]): MorphBaseResultSet
 
+    def executeQueryAndIterator(query: GenericQuery, logSrcIterator: Option[String], limit: Option[Long]
+    , listPushDown:List[xR2RMLPushDown]): MorphBaseResultSet
+        
     def setTimeout(timeout: Int)
 
     def closeConnection()

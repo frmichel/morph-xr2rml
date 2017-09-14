@@ -1,0 +1,33 @@
+@prefix xrr: <http://i3s.unice.fr/xr2rml#> .
+@prefix rr:  <http://www.w3.org/ns/r2rml#> .
+@prefix ex:  <http://example.com/> .
+@prefix rml: <http://semweb.mmlab.be/ns/rml#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<#Students>
+    a rr:TriplesMap;
+    xrr:logicalSource [
+    	# Jongo needs strings in singles quotes (difference with MongoDB shell)
+        xrr:query """db.students.find( { 'FullName' : {$exists: 1} } )""";
+    ];
+	
+    rr:subjectMap [ 
+    	rr:template "http://example.org/student/{$._id.*}";
+		rr:class ex:Student;
+    ];
+	
+   	# Generation of multiple terms from a template, assembled as an RDF list, and datatyped with a nested term map
+    rr:predicateObjectMap [
+    	rr:predicate ex:names;
+    	rr:objectMap [
+    		xrr:reference "$.FullName";
+    		xrr:pushDown [ xrr:reference "$._id"; xrr:as "newId" ] ;
+    		rr:termType xrr:RdfList;
+    		xrr:nestedTermMap [
+                rr:termType rr:Literal;
+                rr:datatype xsd:string;
+                rr:template "{$.newId} {$.FirstNames.*} {$.LastName}";
+                #rr:template "{$.FirstNames.*} {$.LastName}";
+            ];
+		];
+	].

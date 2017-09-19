@@ -1,0 +1,33 @@
+@prefix xrr: <http://i3s.unice.fr/xr2rml#> .
+@prefix rr:  <http://www.w3.org/ns/r2rml#> .
+@prefix ex:  <http://example.com/> .
+@prefix rml: <http://semweb.mmlab.be/ns/rml#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<#SlideRevisionInDeckRevision>
+    a rr:TriplesMap;
+	
+    xrr:logicalSource [ 
+		#xrr:query """db.slides2.find( '_id' : 29935 )""" ;
+		xrr:query """db.slides2.find( )""" ;
+		#rml:iterator "$.revisions.*";
+		rml:iterator "$.revisions";
+		xrr:pushDown [ xrr:reference "$._id"; xrr:as "slideID" ] ;		
+	];
+	
+    rr:subjectMap [ 
+		rr:template "http://example.org/sliderevision/{$.slideID}-R{$.id}"; 
+		rr:termType rr:IRI
+	];
+
+	
+    rr:predicateObjectMap [
+        rr:predicate ex:inDeckRevision;
+        rr:objectMap [
+            xrr:reference "$.usage.*";
+            xrr:nestedTermMap [
+                rr:template "http://example.org/deckrevision/{$.id}-R{$.revision}"; # local fields only within a usage, no need to push anything down
+            ];
+        ];
+	]
+.

@@ -1,0 +1,54 @@
+@prefix rr:    <http://www.w3.org/ns/r2rml#> .
+@prefix rml:   <http://semweb.mmlab.be/ns/rml#> .
+@prefix ex:    <http://example.com/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix xrr:   <http://i3s.unice.fr/xr2rml#> .
+
+<http://example.org/student/59673b5eccea36ed7a559189>
+        a            ex:Student ;
+        ex:hasId     "13"^^xsd:decimal ;
+        ex:isActive  false ;
+        ex:names     "#{[|`^@]\" Foo"^^xsd:string , "Weirdo Foo"^^xsd:string .
+
+<http://example.org/movies/West%20Side%20Story>
+        a       ex:Movie .
+
+<http://example.org/student/59673b5eccea36ed7a559187>
+        a            ex:Student ;
+        ex:activity  "Soccer"@en , "Swimming"@en ;
+        ex:names     "Jack Smith"^^xsd:string , "Paul Smith"^^xsd:string .
+
+<http://example.org/movies/2046>
+        a       ex:Movie .
+
+<http://example.org/movies/In%20the%20Mood%20for%20Love>
+        a       ex:Movie .
+
+<http://example.org/student/59673b5eccea36ed7a559188>
+        a            ex:Student ;
+        ex:activity  "Basketball"@en , "Hiking"@en ;
+        ex:names     "Francis Underwood"^^xsd:string , "Frank Underwood"^^xsd:string .
+
+<http://example.org/director/Wong%20Kar-wai>
+        ex:directed  [ a       <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> ;
+                       <http://www.w3.org/1999/02/22-rdf-syntax-ns#first>
+                               <http://example.org/movies/2046> ;
+                       <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest>
+                               ( <http://example.org/movies/In%20the%20Mood%20for%20Love> )
+                     ] ;
+        ex:name      "Wong Kar-wai" .
+
+<http://example.org/director/Woody%20Allen>
+        ex:directed  [ a       <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> ;
+                       <http://www.w3.org/1999/02/22-rdf-syntax-ns#first>
+                               <http://example.org/movies/Manhattan> ;
+                       <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest>
+                               ( <http://example.org/movies/Annie%20Hall> )
+                     ] ;
+        ex:name      "Woody Allen" .
+
+<http://example.org/movies/Manhattan>
+        a       ex:Movie .
+
+<http://example.org/movies/Annie%20Hall>
+        a       ex:Movie .

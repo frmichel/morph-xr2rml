@@ -51,9 +51,11 @@ class xR2RMLNestedTermMap(
     /** optional nested term map within this nested term map */
     _nestedTermMap: Option[xR2RMLNestedTermMap],
 
-    _refFormulation: String)
-
-        extends AbstractTermMap(_termMapType, _termType, _datatype, _languageTag, _nestedTermMap, _refFormulation) {
+    _refFormulation: String
+    
+    , override val listPushDown:List[xR2RMLPushDown]
+)
+extends AbstractTermMap(_termMapType, _termType, _datatype, _languageTag, _nestedTermMap, _refFormulation, listPushDown) {
 
     override val logger = Logger.getLogger(this.getClass().getName());
 
@@ -126,7 +128,10 @@ object xR2RMLNestedTermMap {
                     // Check if there is a nested term map WITHIN this nested term map
                     val nestedTermMap = extractNestedTermMap(nestedTermMapType, ntmRes, refFormulation)
 
-                    val ntm = new xR2RMLNestedTermMap(parentTermMapType, nestedTermMapType, termType, datatype, language, nestedTermMap, refFormulation)
+                    val listPushDown = xR2RMLPushDown.extractPushDownTags(rdfNode);
+
+                    val ntm = new xR2RMLNestedTermMap(parentTermMapType, nestedTermMapType, termType
+                        , datatype, language, nestedTermMap, refFormulation, listPushDown)
                     ntm.parse(ntmRes)
 
                     if (logger.isTraceEnabled()) logger.trace("Created nested term map: " + ntm)

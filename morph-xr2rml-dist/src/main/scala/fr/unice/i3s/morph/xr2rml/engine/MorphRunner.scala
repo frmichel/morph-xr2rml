@@ -24,8 +24,11 @@ import fr.unice.i3s.morph.xr2rml.server.SparqlEndpoint
  * @author Franck Michel, I3S laboratory
  */
 object MorphRunner {
+    val logger = Logger.getLogger(this.getClass())
 
     def main(args: Array[String]) {
+
+
         val overrideLlog4j = System.getProperty("log4j.configuration")
         val log4jfile =
             if (overrideLlog4j != null && !overrideLlog4j.isEmpty)
@@ -38,11 +41,12 @@ object MorphRunner {
         println("Loading log4j configuration: " + log4jfile)
         PropertyConfigurator.configure(log4jfile)
 
-        val logger = Logger.getLogger(this.getClass())
+        val whereami = System.getProperty("user.dir")
+        logger.info("whereami      = " + whereami)
 
         try {
             // Default config dir and file
-            var configDir = "example_mysql"
+            var configDir = "example_mongo"
             var configFile = "morph.properties"
 
             // Parse the command line arguments

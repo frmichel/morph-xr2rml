@@ -34,13 +34,11 @@
     	rr:predicate ex:names;
     	rr:objectMap [
     		xrr:reference "$.FullName";
+			xrr:pushDown [ xrr:expression "$._id"; xrr:asField "newId" ] ;
     		xrr:nestedTermMap [
-				rr:template "{$.FirstNames.*} {$.LastName}";
-				rr:termType xrr:RdfList;
-				xrr:nestedTermMap [
+				rr:template "{$.newId} {$.FirstNames.*} {$.LastName}";
 					rr:termType rr:Literal;
 					rr:datatype xsd:string;
-				];
             ];
 		];
 	].

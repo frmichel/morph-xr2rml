@@ -272,8 +272,8 @@ object Constants {
     val xR2RML_REFERENCE_URI = xR2RML_NS + "reference";
     val xR2RML_REFERENCE_PROPERTY = ResourceFactory.createProperty(xR2RML_REFERENCE_URI);
 
-  val xR2RML_PUSHDOWN_URI = xR2RML_NS + "pushDown";
-  val xR2RML_PUSHDOWN_PROPERTY = ResourceFactory.createProperty(xR2RML_PUSHDOWN_URI);
+    val xR2RML_PUSHDOWN_URI = xR2RML_NS + "pushDown";
+    val xR2RML_PUSHDOWN_PROPERTY = ResourceFactory.createProperty(xR2RML_PUSHDOWN_URI);
 
     val xR2RML_AS_URI = xR2RML_NS + "as";
     val xR2RML_AS_PROPERTY = ResourceFactory.createProperty(xR2RML_AS_URI);

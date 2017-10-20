@@ -27,6 +27,9 @@ class R2RMLRefObjectMap(
         this.parentTriplesMapResource.toString() + ": " + joinConditions;
     }
 
+    /**
+     * Return true if the term type is a native R2RML term type, i.e. one of IRI, literal or blank node
+     */
     def isR2RMLTermType(): Boolean = {
         if (termType.isDefined) {
             val tt = termType.get

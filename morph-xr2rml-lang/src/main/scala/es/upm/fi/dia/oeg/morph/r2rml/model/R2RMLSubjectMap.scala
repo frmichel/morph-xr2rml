@@ -12,7 +12,7 @@ import es.upm.fi.dia.oeg.morph.base.Constants
 class R2RMLSubjectMap(
     termMapType: Constants.MorphTermMapType.Value,
     termType: Option[String],
-    
+
     /** IRIs of classes defined with the rr:class property */
     val classURIs: Set[String],
 
@@ -20,10 +20,9 @@ class R2RMLSubjectMap(
     val graphMaps: Set[R2RMLGraphMap],
 
     /** Reference formulation from the logical source */
-    refFormulaion: String
-    
-    , override val listPushDown:List[xR2RMLPushDown]
-)
+    refFormulaion: String,
+
+    listPushDown: List[xR2RMLPushDown])
 
         extends R2RMLTermMap(termMapType, termType, None, None, None, refFormulaion, listPushDown) {
 
@@ -39,7 +38,7 @@ object R2RMLSubjectMap {
         val termType = coreProperties._2;
         val nestTM = coreProperties._5;
         val listPushDown = coreProperties._6;
-        
+
         if (nestTM.isDefined)
             logger.error("A nested term map cannot be defined in a subject map. Ignoring.")
 

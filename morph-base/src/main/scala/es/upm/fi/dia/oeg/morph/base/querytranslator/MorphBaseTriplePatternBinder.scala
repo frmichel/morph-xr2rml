@@ -348,8 +348,7 @@ class MorphBaseTriplePatternBinder(factory: IMorphFactory) {
                 var incompatible: Boolean =
                     (tpTerm.isLiteral && termType != Constants.R2RML_LITERAL_URI) ||
                         (tpTerm.isURI && termType != Constants.R2RML_IRI_URI) ||
-                        (tpTerm.isBlank && (termType != Constants.R2RML_BLANKNODE_URI && 
-                            !termMap.isRdfCollectionTermType))
+                        (tpTerm.isBlank && (termType != Constants.R2RML_BLANKNODE_URI && !termMap.isRdfCollectionTermType))
 
                 if (tpTerm.isLiteral) {
                     // Check language tag

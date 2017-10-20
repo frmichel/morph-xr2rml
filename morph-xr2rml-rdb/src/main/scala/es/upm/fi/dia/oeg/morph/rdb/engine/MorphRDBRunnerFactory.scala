@@ -43,8 +43,7 @@ class MorphRDBRunnerFactory extends MorphBaseRunnerFactory {
         val rdbTMs: Iterable[RDBR2RMLTriplesMap] = this.getMappingDocument.triplesMaps.map { tm =>
             val rdbLS = tm.getLogicalSource match {
                 case tab: xR2RMLTable => new RDBxR2RMLTable(tab.tableName, tab.listPushDown)
-                case qry: xR2RMLQuery => new RDBxR2RMLQuery(qry.query, qry.refFormulation
-                    , qry.docIterator, qry.uniqueRefs, qry.listPushDown)
+                case qry: xR2RMLQuery => new RDBxR2RMLQuery(qry.query, qry.refFormulation, qry.docIterator, qry.uniqueRefs, qry.listPushDown)
                 case _ => throw new Exception("Unsupported type of Logical Source: " + tm.getLogicalSource)
             }
             rdbLS.buildMetaData(optMetaData)

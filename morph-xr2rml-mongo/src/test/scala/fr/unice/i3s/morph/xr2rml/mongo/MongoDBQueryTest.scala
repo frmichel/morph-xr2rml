@@ -77,8 +77,7 @@ class MongoDBQueryTest {
     @Test def testMostSpecificQuery3 {
         println("------------------------------------------------- testMostSpecificQuery2")
 
-        var ls1 = new xR2RMLQuery("db.taxref3.find( { $where:'this.codeTaxon == this.codeReference' } )", "JSONPath"
-            , None, Set.empty, Nil)
+        var ls1 = new xR2RMLQuery("db.taxref3.find( { $where:'this.codeTaxon == this.codeReference' } )", "JSONPath", None, Set.empty, Nil)
         var ls2 = new xR2RMLQuery("db.taxref3.find( {$where: 'this.codeTaxon == this.codeReference', 'spm' : {$ne: ''}, 'spm': {$ne: null} } )", "JSONPath", None, Set.empty, Nil)
 
         var mostSpec = MongoDBQuery.mostSpecificQuery(ls1, ls2)

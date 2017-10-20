@@ -1,185 +1,191 @@
 package es.upm.fi.dia.oeg.morph.r2rml.model
 
-import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
-import com.fasterxml.jackson.databind.node.{ArrayNode, ObjectNode}
-import com.hp.hpl.jena.rdf.model.{RDFNode, Resource, Statement}
-import es.upm.fi.dia.oeg.morph.base.Constants
-import es.upm.fi.dia.oeg.morph.base.exception.MorphException
+import scala.collection.JavaConversions.asScalaBuffer
+
 import org.apache.log4j.Logger
 
-import scala.collection.JavaConversions._
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.node.ArrayNode
+import com.fasterxml.jackson.databind.node.ObjectNode
+import com.hp.hpl.jena.rdf.model.RDFNode
+import com.hp.hpl.jena.rdf.model.Resource
+
+import es.upm.fi.dia.oeg.morph.base.Constants
+import es.upm.fi.dia.oeg.morph.base.exception.MorphException
 /**
-  * Created by freddy on 06/09/2017.
-  */
-class xR2RMLPushDown(val alias:Option[String]) extends IReferenceTermMap {
-  override def toString = s"xR2RMLPushDown(alias=$alias, reference=$reference)"
+ * @author Freddy on 06/09/2017
+ * @author Franck Michel, additions 20/10/2017
+ *
+ * A xrr:pushDown element can appear either within the logical source along with an rml:iterator,
+ * or within a term map that has a nested term map.
+ * It pushed a field of the root document or in fact at the current iteration level), into
+ * documents of the sub-iteration level, may this new iteration be entailed by the rml:iterator
+ * or by a nested term map.
+ *
+ * An xR2RMLPushDown has an xr:reference property whose object is an data element reference,
+ * and an xrr:as (alias) property whose object is the name of the created element.
+ * If the xrr:as is omitted, then the field is pushed down with the same name.
+ */
+class xR2RMLPushDown(val alias: Option[String]) extends IReferenceTermMap {
 
-
+    override def toString = s"xR2RMLPushDown(alias=$alias, reference=$reference)"
 }
 
 object xR2RMLPushDown {
-  private val logger = Logger.getLogger(this.getClass().getName());
+    private val logger = Logger.getLogger(this.getClass().getName());
 
-  // create an ObjectMapper instance.
-  val mapper = new ObjectMapper
-
-
-  def apply(resource: Resource) : xR2RMLPushDown = {
-    val asStmt = resource.getProperty(Constants.xR2RML_AS_PROPERTY)
-    val asString = if (asStmt == null) None else Some(asStmt.getObject().toString())
-    val pushDownObject = new xR2RMLPushDown(asString);
-
-    val referenceStmt = resource.getProperty(Constants.xR2RML_REFERENCE_PROPERTY)
-    val referenceString = if (referenceStmt == null) None else Some(referenceStmt.getObject().toString())
-    pushDownObject.reference = referenceString.getOrElse(null);
-
-    pushDownObject
-  }
-
-  def extractPushDownTags(resource: Resource) : List[xR2RMLPushDown] = {
-    val stmtIteratorPushDown = resource.listProperties(Constants.xR2RML_PUSHDOWN_PROPERTY);
-    if (stmtIteratorPushDown != null) {
-      val listPushDown = stmtIteratorPushDown.toList
-      val result: List[xR2RMLPushDown] = listPushDown.map(pushDown => {
-        val resourcePushDown = pushDown.getObject.asResource();
-        xR2RMLPushDown(resourcePushDown)
-      }).toList
-      result
-    } else
-      Nil
-  }
-
-  def extractPushDownTags(rdfNode: RDFNode) : List[xR2RMLPushDown] = {
-    rdfNode match {
-      case resource: Resource => { xR2RMLPushDown.extractPushDownTags(resource) }
-      case _ => Nil
-    }
-  }
-
-  def generatePushDownFieldsFromJsonNode(listPushDown:List[xR2RMLPushDown], jsonNode:JsonNode) : Map[String, Any] = {
-    val result = if(jsonNode.isObject) {
-      val objectNode = jsonNode.asInstanceOf[ObjectNode];
-      val pushedFields = this.generatePushDownFieldsFromObjectNode(listPushDown, objectNode);
-      pushedFields;
-    } else if(jsonNode.isArray) {
-      throw new MorphException("Pushing down fields/values from a JSON array is not supported!");
-    } else {
-      throw new MorphException(s"Unsupported JSON type found when pushing down fields/values: $jsonNode")
-    }
-
-    result
-  }
-
-
-  def generatePushDownFieldsFromObjectNode(listPushDown:List[xR2RMLPushDown], objectNode:ObjectNode) : Map[String, Any] = {
-    val pushedFields:Map[String, Any] = listPushDown.map(pushDown => {
-      val pdReference = pushDown.reference;
-      //val pdReferenceIDReplaced = this.replaceIDField(pdReference);
-      val pdReferenceKey = pdReference.replaceAllLiterally("$.", "")
-      //val pdReferenceKeyIDReplaced = this.replaceIDField(pdReference).replaceAllLiterally("$.", "");
-
-      //val pdReferenceValue:Any = jsonDocAsMap.get(pdReferenceKey).get
-      val pdReferenceValue = if(pdReferenceKey.equals("_id")) {
-        val idValue = objectNode.get(pdReferenceKey);
-        val oidValue = idValue.get("$oid");
-        if(oidValue == null) {
-          idValue
-        } else {
-          oidValue
-        }
-      } else {
-        objectNode.get(pdReferenceKey)
-      }
-//      logger.info("pdReferenceValue = " + pdReferenceValue)
-
-
-      val pdReferenceValueReplaced = if(pdReferenceValue.isTextual) {
-        pdReferenceValue.toString.replaceAll("\"", "");
-      } else {
-        pdReferenceValue
-      }
-
-      val pdAlias = pushDown.alias
-      val pdAliasValue:String = if(pdAlias.isDefined) {
-        pdAlias.get
-      } else { pdReferenceKey }
-      //logger.info("pdAliasValue = " + pdAliasValue)
-
-      (pdAliasValue -> pdReferenceValueReplaced)
-    }).toMap
-    pushedFields
-  }
-
-  def generatePushDownFieldsFromJsonString(listPushDown:List[xR2RMLPushDown], jsonString:String) : Map[String, Any] = {
-
-    // use the ObjectMapper to read the json string and create a tree
-    try {
-      val node:JsonNode = mapper.readTree(jsonString)
-      this.generatePushDownFieldsFromJsonNode(listPushDown, node);
-    } catch {
-      case e:Exception => {
-        logger.error(s"Error occured when trying to generate push down fields from JSON String $jsonString")
-        Map.empty
-      }
-    }
-
-
-
-  }
-
-  def insertPushedDownFieldsIntoJsonString(jsonString:String, pushedFields:Map[String, Any]): JsonNode = {
     val mapper = new ObjectMapper
 
-    if(jsonString == null) {
-      null
-    } else {
-      val jsonNode = mapper.readTree(jsonString)
-      this.insertPushedDownFieldsIntoJsonNode(jsonNode, pushedFields);
-      jsonNode;
-    }
-  }
+    /**
+     * Constructor. The xrr:as is optional but xrr:reference is mandatory.
+     * @throws MorphException in case there is no xrr:reference in the PushDown.
+     */
+    def apply(resource: Resource): xR2RMLPushDown = {
+        val asStmt = resource.getProperty(Constants.xR2RML_AS_PROPERTY)
+        val asString =
+            if (asStmt == null) {
+                if (logger.isDebugEnabled()) logger.debug("PushDown element without any xrr:as property: " + resource)
+                None
+            } else Some(asStmt.getObject().toString())
 
-  def insertPushedDownFieldsIntoListJsonString(listJsonString:List[String], pushedFields:Map[String, Any]): List[JsonNode] = {
-    if(listJsonString == null) {
-      null
-    } else {
-      listJsonString.map(jsonString => this.insertPushedDownFieldsIntoJsonString(jsonString, pushedFields) )
-    }
-  }
+        val pushDownObject = new xR2RMLPushDown(asString);
 
-  def insertPushedDownFieldsIntoJsonNode(jsonNode:JsonNode, pushedFields:Map[String, Any]): Unit = {
-    if(jsonNode != null) {
-      if(jsonNode.isArray) {
-        val arrayNode = jsonNode.asInstanceOf[ArrayNode]
-        this.insertPushedDownFieldsIntoArrayNode(arrayNode, pushedFields)
-      } else if(jsonNode.isObject) {
-        val objectNode = jsonNode.asInstanceOf[ObjectNode];
-        this.insertPushedDownFieldsIntoObjectNode(objectNode, pushedFields)
-      } else {
-        throw new MorphException("Unsupported type of JSON Node : " + jsonNode);
-      }
-    }
-  }
+        val referenceStmt = resource.getProperty(Constants.xR2RML_REFERENCE_PROPERTY)
+        val referenceString = if (referenceStmt == null)
+            throw new MorphException("Invalid mapping definition: the object of an xrr:pushDown property must have an xrr:reference property: " + resource.toString)
+        else referenceStmt.getObject().toString()
+        pushDownObject.reference = referenceString
 
-  def insertPushedDownFieldsIntoObjectNode(objectNode:ObjectNode, pushedFields:Map[String, Any]): Unit = {
-    if(objectNode != null) {
-      for(pushedFieldKey <- pushedFields.keys) {
-        val pushedFieldValue = pushedFields(pushedFieldKey);
-        objectNode.put(pushedFieldKey, pushedFieldValue.toString.replaceAll("\"", ""));
-      }
+        pushDownObject
     }
 
-  }
-
-  def insertPushedDownFieldsIntoArrayNode(arrayNode:ArrayNode, pushedFields:Map[String, Any]): Unit = {
-    if(arrayNode != null) {
-      val it = arrayNode.iterator();
-      while(it.hasNext) {
-        val jsonNode = it.next();
-        this.insertPushedDownFieldsIntoJsonNode(jsonNode, pushedFields);
-      }
+    /**
+     * Parse xrr:pushDown properties and return a list of xR2RMLPushDown instances.
+     * @return Empty list if there is no xrr:pushDown property
+     */
+    def extractPushDownTags(rdfNode: RDFNode): List[xR2RMLPushDown] = {
+        rdfNode match {
+            case resource: Resource => {
+                val stmtIterator = resource.listProperties(Constants.xR2RML_PUSHDOWN_PROPERTY);
+                if (stmtIterator != null) {
+                    val listPushDown = stmtIterator.toList
+                    val result = listPushDown.map(
+                        pushDown => xR2RMLPushDown(pushDown.getObject.asResource())
+                    )
+                    result.toList
+                } else
+                    List.empty
+            }
+            case _ => List.empty
+        }
     }
-  }
 
+    /**
+     * Apply a set of xR2RMLPushDown instances against a JSON document and return a map of pairs (alias name, alias value).
+     * One pair is generated for each xR2RMLPushDown instance.
+     *
+     * @example An xR2RMLPushDown instance representing this:<br>
+     * <code>[] xrr:pushDown [ xrr:reference "$.field1"; xrr:as "field2" ]</code><br>
+     * will return a map with one pair ("field2", "value of $.field1 in the JSON document").
+     *
+     * @return Empty map if the list of PushDowns is empty but cannot return null. Empty map in case any error occurs.
+     */
+    def generatePushDownFieldsFromJsonString(listPushDown: List[xR2RMLPushDown], jsonString: String): Map[String, Any] = {
 
+        if (listPushDown.isEmpty) Map.empty
+        else {
+            try {
+                // Use the ObjectMapper to read the JSON string and create a tree
+                val node: JsonNode = mapper.readTree(jsonString)
+
+                if (node.isObject) {
+                    this.generatePushDownFieldsFromObjectNode(listPushDown, node.asInstanceOf[ObjectNode])
+                } else if (node.isArray)
+                    throw new MorphException(s"Pushing down fields/values from a JSON array is not supported. Document: $node");
+                else
+                    throw new MorphException(s"Unsupported JSON node type found when pushing down fields/values: $node")
+            } catch {
+                case e: Exception => {
+                    logger.error(s"Error occured when trying to generate push down fields from JSON String: $jsonString")
+                    logger.error(e.getMessage)
+                    Map.empty
+                }
+            }
+        }
+    }
+
+    /**
+     * Apply a set of xR2RMLPushDown instances against a JSON node and return a map of pairs (alias name, alias value).
+     * One pair is generated for each xR2RMLPushDown instance.
+     *
+     * @example An xR2RMLPushDown instance representing this:<br>
+     * <code>[] xrr:pushDown [ xrr:reference "$.field1"; xrr:as "field2" ]</code><br>
+     * will return a map with one pair ("field2", "value of $.field1 in the JSON node").
+     *
+     * @return Empty map if the list of PushDowns is empty but cannot return null. Empty map in case any error occurs.
+     */
+    private def generatePushDownFieldsFromObjectNode(listPushDown: List[xR2RMLPushDown], objectNode: ObjectNode): Map[String, Any] = {
+
+        val pushedFields: Map[String, Any] = listPushDown.map(pushDown => {
+
+            val pdReferenceKey = pushDown.reference.replaceAllLiterally("$.", "")
+
+            // Evaluate the reference against the document
+            val pdReferenceValue =
+                if (pdReferenceKey.equals("_id")) {
+                    // Field _id is an ObjectId with a field $oid
+                    val idValue = objectNode.get(pdReferenceKey)
+                    val oidValue = idValue.get("$oid")
+                    if (oidValue == null) idValue else oidValue
+                } else
+                    objectNode.get(pdReferenceKey)
+
+            val pdReferenceValueReplaced =
+                if (pdReferenceValue.isTextual) pdReferenceValue.toString.replaceAll("\"", "");
+                else pdReferenceValue
+
+            // Use the xrr:as property if provided, otherwise use the name of the field whose value is pushed
+            val pdAlias = pushDown.alias.getOrElse(pdReferenceKey)
+
+            (pdAlias -> pdReferenceValueReplaced)
+        }).toMap
+        if (logger.isDebugEnabled()) logger.debug("Map of fields pushed down: " + pushedFields)
+        pushedFields
+    }
+
+    /**
+     * Insert a list of fields into a JSON document passed as a string
+     * @return the new JSON document as a JsonNode
+     */
+    def insertPushedDownFieldsIntoJsonString(jsonString: String, pushedFields: Map[String, Any]): JsonNode = {
+        val mapper = new ObjectMapper
+        val jsonNode = mapper.readTree(jsonString)
+        if (jsonNode == null)
+            logger.error("xrr:pushDown ignored because JSON string cannot be converted to a JSON document: " + jsonString)
+        else
+            this.insertPushedDownFieldsIntoJsonNode(jsonNode, pushedFields)
+        jsonNode
+    }
+
+    private def insertPushedDownFieldsIntoJsonNode(jsonNode: JsonNode, pushedFields: Map[String, Any]): Unit = {
+        if (jsonNode.isArray)
+            this.insertPushedDownFieldsIntoArrayNode(jsonNode.asInstanceOf[ArrayNode], pushedFields)
+        else if (jsonNode.isObject)
+            this.insertPushedDownFieldsIntoObjectNode(jsonNode.asInstanceOf[ObjectNode], pushedFields)
+        else
+            throw new MorphException("Unexpected type of JSON Node : " + jsonNode)
+    }
+
+    private def insertPushedDownFieldsIntoObjectNode(objectNode: ObjectNode, pushedFields: Map[String, Any]): Unit = {
+        for ((pushedFieldKey, pushedFieldValue) <- pushedFields)
+            objectNode.put(pushedFieldKey, pushedFieldValue.toString.replaceAll("\"", ""))
+    }
+
+    private def insertPushedDownFieldsIntoArrayNode(arrayNode: ArrayNode, pushedFields: Map[String, Any]): Unit = {
+        val it = arrayNode.iterator();
+        while (it.hasNext) {
+            this.insertPushedDownFieldsIntoJsonNode(it.next(), pushedFields);
+        }
+    }
 }

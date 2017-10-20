@@ -4,48 +4,6 @@
 @prefix rml: <http://semweb.mmlab.be/ns/rml#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<#Students>
-    a rr:TriplesMap;
-    xrr:logicalSource [
-    	# Jongo needs strings in singles quotes (difference with MongoDB shell)
-        xrr:query """db.students.find( { 'FullName' : {$exists: 1} } )""";
-    ];
-    rr:subjectMap [ 
-    	rr:template "http://example.org/student/{$._id.*}";
-		rr:class ex:Student;
-    ];
-  	# Implicit of a boolean element
-    rr:predicateObjectMap [
-    	rr:predicate ex:isActive;
-    	rr:objectMap [ 
-            xrr:reference "$.active";
-        ];
-    ];
-  	# Implicit of a integer element
-    rr:predicateObjectMap [
-    	rr:predicate ex:hasId;
-    	rr:objectMap [ xrr:reference "$.id"; ];
-    ];
-   	# Generation of multiple RDF terms with language tag
-    rr:predicateObjectMap [
-    	rr:predicate ex:activity;
-    	rr:objectMap [ xrr:reference "$.Hobbies.*.hobby"; rr:language "en"; ];
-    ];
-   	# Generation of multiple terms from a template, assembled as an RDF list, and datatyped with a nested term map
-    rr:predicateObjectMap [
-    	rr:predicate ex:names;
-    	rr:objectMap [
-    		xrr:reference "$.FullName";
-    		rr:termType xrr:RdfList;
-    		xrr:nestedTermMap [
-                rr:termType rr:Literal;
-                rr:datatype xsd:string;
-                rr:template "{$.FirstNames.*} {$.LastName}";
-            ];
-		];
-	].
-
-    
 # --- Demonstration of a join between documents
 
 <#Movies>

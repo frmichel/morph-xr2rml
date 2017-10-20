@@ -10,7 +10,6 @@
     xrr:logicalSource [ 
 		#xrr:query """db.slides2.find( '_id' : 29935 )""" ;
 		xrr:query """db.slides2.find( )""" ;
-		#rml:iterator "$.revisions.*";
 		rml:iterator "$.revisions";
 		xrr:pushDown [ xrr:reference "$._id"; xrr:as "slideID" ] ;		
 	];
@@ -25,9 +24,6 @@
         rr:predicate ex:inDeckRevision;
         rr:objectMap [
             xrr:reference "$.usage.*";
-            xrr:nestedTermMap [
-                rr:template "http://example.org/deckrevision/{$.id}-R{$.revision}"; # local fields only within a usage, no need to push anything down
-            ];
+            xrr:nestedTermMap [ rr:template "http://example.org/deckrevision/{$.id}-R{$.revision}" ];
         ];
-	]
-.
+	].

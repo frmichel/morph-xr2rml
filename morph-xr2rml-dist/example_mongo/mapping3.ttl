@@ -4,19 +4,20 @@
 @prefix rml: <http://semweb.mmlab.be/ns/rml#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
+# --- Demonstration of the pushDown feature: select a field of the root document and push it 
+#     down in sub-documents during the iteration within a nested term map
+
 <#Students>
     a rr:TriplesMap;
     xrr:logicalSource [
-    	# Jongo needs strings in singles quotes (difference with MongoDB shell)
         xrr:query """db.students.find( { 'FullName' : {$exists: 1} } )""";
     ];
 	
     rr:subjectMap [ 
-    	rr:template "http://example.org/student/{$._id.*}";
+    	rr:template "http://example.org/student/{$._id}";
 		rr:class ex:Student;
     ];
 	
-   	# Generation of multiple terms from a template, assembled as an RDF list, and datatyped with a nested term map
     rr:predicateObjectMap [
     	rr:predicate ex:names;
     	rr:objectMap [
@@ -27,7 +28,6 @@
                 rr:termType rr:Literal;
                 rr:datatype xsd:string;
                 rr:template "{$.newId} {$.FirstNames.*} {$.LastName}";
-                #rr:template "{$.FirstNames.*} {$.LastName}";
             ];
 		];
 	].

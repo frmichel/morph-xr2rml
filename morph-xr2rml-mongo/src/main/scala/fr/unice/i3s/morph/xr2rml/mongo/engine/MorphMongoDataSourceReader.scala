@@ -2,18 +2,20 @@ package fr.unice.i3s.morph.xr2rml.mongo.engine
 
 import java.net.URI
 
-import com.fasterxml.jackson.databind.node.ArrayNode
-
 import scala.collection.JavaConversions.asScalaIterator
 import scala.collection.JavaConversions.seqAsJavaList
+
 import org.apache.log4j.Logger
 import org.jongo.Jongo
 import org.jongo.MongoCollection
 import org.jongo.MongoCursor
+
+import com.fasterxml.jackson.databind.node.ArrayNode
 import com.mongodb.DB
 import com.mongodb.MongoClient
 import com.mongodb.MongoCredential
 import com.mongodb.ServerAddress
+
 import es.upm.fi.dia.oeg.morph.base.Constants
 import es.upm.fi.dia.oeg.morph.base.GeneralUtility
 import es.upm.fi.dia.oeg.morph.base.GenericConnection
@@ -23,9 +25,10 @@ import es.upm.fi.dia.oeg.morph.base.engine.IMorphFactory
 import es.upm.fi.dia.oeg.morph.base.engine.MorphBaseDataSourceReader
 import es.upm.fi.dia.oeg.morph.base.path.JSONPath_PathExpression
 import es.upm.fi.dia.oeg.morph.base.query.GenericQuery
+import es.upm.fi.dia.oeg.morph.r2rml.model.xR2RMLPushDown
 import fr.unice.i3s.morph.xr2rml.mongo.JongoResultHandler
 import fr.unice.i3s.morph.xr2rml.mongo.MongoDBQuery
-import es.upm.fi.dia.oeg.morph.r2rml.model.xR2RMLPushDown
+import es.upm.fi.dia.oeg.morph.base.exception.MorphException
 
 /**
  * Utility class to handle the execution of MongoDB queries
@@ -67,11 +70,11 @@ class MorphMongoDataSourceReader(factory: IMorphFactory) extends MorphBaseDataSo
     }
 
     override def executeQueryAndIterator(query: GenericQuery, logSrcIterator: Option[String], limit: Option[Long]): MorphBaseResultSet = {
-      this.executeQueryAndIterator(query, logSrcIterator, limit, Nil)
+        this.executeQueryAndIterator(query, logSrcIterator, limit, Nil)
     }
-    
+
     /**
-     * Execute a query against the database and apply an rml:iterator on the results.
+     * Execute a query against the database; apply the optional rml:iterator and xrr:pushDown on the results.
      *
      * Results of the query may be saved to a cache (config) to avoid doing the same query several times
      * in case we need it again later (in case of referencing object map).
@@ -80,16 +83,17 @@ class MorphMongoDataSourceReader(factory: IMorphFactory) extends MorphBaseDataSo
      * @param query the GenericQuery that encapsulates a target database query
      * @param logSrcIterator optional xR2RML logical source rml:iterator
      * @param limit optional maximum number of results to retrieve
+     * @param listPushDown optional list of xR2RMLPushDown's from the logical source
      * @return a concrete instance of MorphBaseResultSet. Must NOT return null, may return an empty result.
      */
-    override def executeQueryAndIterator(query: GenericQuery, logSrcIterator: Option[String], limit: Option[Long]
-    , listPushDown:List[xR2RMLPushDown]): MorphBaseResultSet = {
+    override def executeQueryAndIterator(query: GenericQuery, logSrcIterator: Option[String], limit: Option[Long], listPushDown: List[xR2RMLPushDown]): MorphBaseResultSet = {
 
-        // A query is simply and uniquely identified by its concrete string value
+        //--- A query is simply and uniquely identified by its concrete string value
         logger.info("Executing query: " + query.concreteQuery + " with limit " + limit)
         val queryMapId = MorphMongoDataSourceReader.makeQueryMapId(query, logSrcIterator, limit)
-        val start = System.currentTimeMillis
-        val queryResult:List[String] =
+        var start = System.currentTimeMillis
+
+        val mongoResults: List[String] =
             if (executedQueries.contains(queryMapId)) {
                 if (logger.isTraceEnabled()) logger.trace("Query retrieved from cache, queryId: " + queryMapId)
                 logger.info("Returning query results from cache.")
@@ -99,7 +103,7 @@ class MorphMongoDataSourceReader(factory: IMorphFactory) extends MorphBaseDataSo
                 val resultSet = this.execute(query, limit).asInstanceOf[MorphMongoResultSet].resultSet.toList
 
                 // Save the result of this query in case it is asked again later (in a join)
-                // @todo USE WITH CARE: this would need to be strongly improved with the use of a real cache library,
+                // @TODO USE WITH CARE: this would need to be strongly improved with the use of a real cache library,
                 // and memory-consumption-based eviction.
                 if (factory.getProperties.cacheQueryResult) {
                     executedQueries += (queryMapId -> resultSet)
@@ -107,59 +111,54 @@ class MorphMongoDataSourceReader(factory: IMorphFactory) extends MorphBaseDataSo
                 }
                 resultSet
             }
+        logger.info("Query returned " + mongoResults.size + " result(s), in: " + (System.currentTimeMillis - start) + " ms.")
 
-        // Apply the iterator to the result set, this creates a new result set
-        val queryResultIter:List[String] =
+        //--- Apply the optional iterator and pushDown properties
+        start = System.currentTimeMillis
+        val globalResult: List[String] =
             if (logSrcIterator.isDefined) {
+                // Apply the iterator to the result set, this creates a new result set
                 val jPath = JSONPath_PathExpression.parseRaw(logSrcIterator.get)
-                queryResult.flatMap(result => jPath.evaluate(result).map(value => value.toString))
-            } else queryResult
+                val queryResultIter = mongoResults.flatMap(mongoResult => {
 
-        logger.info("Query returned " + queryResult.size + " result(s), " + queryResultIter.size + " result(s) after applying the iterator, in: " + (System.currentTimeMillis - start) + " ms.");
-        val queryResultIterWithPushedDownValues:List[String] = if(queryResult.size == queryResultIter.size) {
-            val listQueryResult = for(i <- 0 to queryResult.size - 1 ) yield {
-                queryResult(i)
-            }
+                    // Apply the iterator to the result set, this creates a new result set
+                    val mongoResultIter = jPath.evaluate(mongoResult).map(value => value.toString)
 
-            var i=0
-            val queryResultIterWithPushedDownValuesNested = listQueryResult.map(queryResultElementString => {
-                val queryResultIterElementString:String = queryResultIter(i);
-                i = i+1;
+                    if (listPushDown.isEmpty)
+                        mongoResultIter
+                    else {
+                        // Compute the values of fields to push down using the initial MongoDB document (before the iterator)
+                        val pushedFields: Map[String, Any] = xR2RMLPushDown.generatePushDownFieldsFromJsonString(listPushDown, mongoResult);
 
-                val pushedFields:Map[String, Any] = xR2RMLPushDown.generatePushDownFieldsFromJsonString(
-                    listPushDown, queryResultElementString);
+                        // Push down fields into each of the result documents
+                        val mongoResultIterPushDown = mongoResultIter.flatMap(resultIter => {
+                            try {
+                                val resultPushDown = xR2RMLPushDown.insertPushedDownFieldsIntoJsonString(resultIter, pushedFields)
 
-                try {
-                    val queryResultIterElementStringWithPushDown = xR2RMLPushDown.insertPushedDownFieldsIntoJsonString(
-                        queryResultIterElementString, pushedFields);
-                    if(queryResultIterElementStringWithPushDown.isObject) {
-                        List(queryResultIterElementStringWithPushDown.toString)
-                    } else {
-                        val queryResultIterElementStringWithPushDownArray =
-                            queryResultIterElementStringWithPushDown.asInstanceOf[ArrayNode];
-
-                        val listQueryResultIter = for(j <- 0 to queryResultIterElementStringWithPushDownArray.size - 1 ) yield {
-                            queryResultIterElementStringWithPushDownArray.get(j).toString
-                        }
-                        listQueryResultIter
+                                if (resultPushDown.isObject)
+                                    List(resultPushDown.toString)
+                                else if (resultPushDown.isArray) {
+                                    val resultArray = resultPushDown.asInstanceOf[ArrayNode].iterator().toList
+                                    resultArray.map(res => res.toString)
+                                } else throw new MorphException("Unexpected type of JSON Node: " + resultPushDown);
+                            } catch {
+                                case e: Exception => {
+                                    logger.error(s"Error occured when trying to insert push down values into JSON document: $mongoResultIter.")
+                                    logger.error(e.getMessage)
+                                    List(resultIter)
+                                }
+                            }
+                        })
+                        mongoResultIterPushDown
                     }
-                } catch {
-                    case e:Exception => {
-                        logger.error(s"Error occured when trying to insert push down values into JSON String $queryResultIterElementString");
-                        List(queryResultIterElementString)
-                    }
-                }
+                })
+                logger.info("Iterator and optional pushDown properties returned " + queryResultIter.size + " result(s) in: " + (System.currentTimeMillis - start) + " ms.")
+                queryResultIter
+            } else
+                // If there is no iterator, then there should not be any pushDown property
+                mongoResults
 
-
-            })
-
-            val queryResultIterWithPushedDownValuesFlat = queryResultIterWithPushedDownValuesNested.toList.flatten;
-            queryResultIterWithPushedDownValuesFlat
-        } else {
-            queryResultIter
-        }
-
-        new MorphMongoResultSet(queryResultIterWithPushedDownValues.toList)
+        new MorphMongoResultSet(globalResult)
     }
 
     override def setTimeout(timeout: Int) {

@@ -49,7 +49,7 @@ object R2RMLObjectMap {
             // The default nested term map has no reference nor template => simple nested term map
             val nestedTermMapType = Constants.MorphTermMapType.SimpleNestedTermMap
 
-            val ntm = new xR2RMLNestedTermMap(termMapType, nestedTermMapType, Some(ntmTermType), None, None, None, refFormulation, listPushDown);
+            val ntm = new xR2RMLNestedTermMap(termMapType, nestedTermMapType, Some(ntmTermType), None, None, None, refFormulation, List.empty)
             if (logger.isDebugEnabled()) logger.debug("Collection/container term type with no nested term map. Defining default nested term map: " + ntm)
             Some(ntm)
         } else

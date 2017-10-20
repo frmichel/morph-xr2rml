@@ -33,11 +33,10 @@ class MorphRDBDataSourceReader(factory: IMorphFactory) extends MorphBaseDataSour
         throw new MorphException("Unsupported method.")
     }
 
-    override def executeQueryAndIterator(query: GenericQuery, logSrcIterator: Option[String], limit: Option[Long]
-    , listPushDown:List[xR2RMLPushDown]): MorphBaseResultSet = {
+    override def executeQueryAndIterator(query: GenericQuery, logSrcIterator: Option[String], limit: Option[Long], listPushDown: List[xR2RMLPushDown]): MorphBaseResultSet = {
         throw new MorphException("Unsupported method.")
     }
-        
+
     override def setTimeout(timeout: Int) {
         this.timeout = timeout
     }

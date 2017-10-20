@@ -1,0 +1,32 @@
+@prefix rr:    <http://www.w3.org/ns/r2rml#> .
+@prefix rml:   <http://semweb.mmlab.be/ns/rml#> .
+@prefix ex:    <http://example.com/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix xrr:   <http://i3s.unice.fr/xr2rml#> .
+
+<http://example.org/student/547f2a2b31f7a44bec07b21f>
+        a         ex:Student ;
+        ex:names  [ a       <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> ;
+                    <http://www.w3.org/1999/02/22-rdf-syntax-ns#first>
+                            "547f2a2b31f7a44bec07b21f Paul Smith"^^xsd:string ;
+                    <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest>
+                            ( "547f2a2b31f7a44bec07b21f Jack Smith"^^xsd:string )
+                  ] .
+
+<http://example.org/student/547f2a2b31f7a44bec07b221>
+        a         ex:Student ;
+        ex:names  [ a       <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> ;
+                    <http://www.w3.org/1999/02/22-rdf-syntax-ns#first>
+                            "547f2a2b31f7a44bec07b221 Weirdo Foo"^^xsd:string ;
+                    <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest>
+                            ( "547f2a2b31f7a44bec07b221 #{[|`^@]\" Foo"^^xsd:string )
+                  ] .
+
+<http://example.org/student/547f2a2b31f7a44bec07b220>
+        a         ex:Student ;
+        ex:names  [ a       <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> ;
+                    <http://www.w3.org/1999/02/22-rdf-syntax-ns#first>
+                            "547f2a2b31f7a44bec07b220 Frank Underwood"^^xsd:string ;
+                    <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest>
+                            ( "547f2a2b31f7a44bec07b220 Francis Underwood"^^xsd:string )
+                  ] .

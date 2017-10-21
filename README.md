@@ -116,8 +116,8 @@ In directories `morph-xr2rml-dist/example_mysql` and `morph-xr2rml-dist/example_
 
 - `testdb_dump.sql` is a dump of the MySQL test database. You may import it into a MySQL instance by running command `mysql -u root -p test < testdb_dump.sql`;
 - `morph.properties` provides database connection details;
-- `mapping1.ttl` and `mapping2.ttl` contain example xR2RML mapping graphs;
-- `result1.txt` and `result2.txt` respectively contain the expected result of applying these mappings to that database;
+- `mapping.ttl` contains an example xR2RML mapping graph;
+- `result.txt` contains the expected result of applying this mapping to that database;
 - `query.sparql` (in directory `example_mysql_rewriting` only) contains a SPARQL query to be executed against the test database.
 
 Edit `morph.properties` and change the database url, name, user and password with appropriate values.

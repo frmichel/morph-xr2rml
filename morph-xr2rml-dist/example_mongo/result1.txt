@@ -1,0 +1,72 @@
+@prefix rr:    <http://www.w3.org/ns/r2rml#> .
+@prefix rml:   <http://semweb.mmlab.be/ns/rml#> .
+@prefix ex:    <http://example.com/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix xrr:   <http://i3s.unice.fr/xr2rml#> .
+
+<http://example.org/student/547f2a2b31f7a44bec07b221>
+        a               ex:Student , ex:Trainee ;
+        ex:first_names  [ a       <http://www.w3.org/1999/02/22-rdf-syntax-ns#Bag> ;
+                          <http://www.w3.org/1999/02/22-rdf-syntax-ns#_1>
+                                  "Weirdo"^^xsd:string ;
+                          <http://www.w3.org/1999/02/22-rdf-syntax-ns#_2>
+                                  "#{[|`^@]\""^^xsd:string
+                        ] ;
+        ex:hasId        "13"^^xsd:decimal ;
+        ex:isActive     false ;
+        ex:names        [ a       <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> ;
+                          <http://www.w3.org/1999/02/22-rdf-syntax-ns#first>
+                                  "Weirdo Foo"^^xsd:string ;
+                          <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest>
+                                  ( "#{[|`^@]\" Foo"^^xsd:string )
+                        ] ;
+        ex:namesAlt     [ a       <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> ;
+                          <http://www.w3.org/1999/02/22-rdf-syntax-ns#first>
+                                  "Weirdo Foo"^^xsd:string ;
+                          <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest>
+                                  ( "#{[|`^@]\" Foo"^^xsd:string )
+                        ] .
+
+<http://example.org/student/547f2a2b31f7a44bec07b220>
+        a               ex:Student , ex:Trainee ;
+        ex:activity     "Basketball"@en , "Hiking"@en ;
+        ex:first_names  [ a       <http://www.w3.org/1999/02/22-rdf-syntax-ns#Bag> ;
+                          <http://www.w3.org/1999/02/22-rdf-syntax-ns#_1>
+                                  "Frank"^^xsd:string ;
+                          <http://www.w3.org/1999/02/22-rdf-syntax-ns#_2>
+                                  "Francis"^^xsd:string
+                        ] ;
+        ex:names        [ a       <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> ;
+                          <http://www.w3.org/1999/02/22-rdf-syntax-ns#first>
+                                  "Frank Underwood"^^xsd:string ;
+                          <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest>
+                                  ( "Francis Underwood"^^xsd:string )
+                        ] ;
+        ex:namesAlt     [ a       <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> ;
+                          <http://www.w3.org/1999/02/22-rdf-syntax-ns#first>
+                                  "Frank Underwood"^^xsd:string ;
+                          <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest>
+                                  ( "Francis Underwood"^^xsd:string )
+                        ] .
+
+<http://example.org/student/547f2a2b31f7a44bec07b21f>
+        a               ex:Student , ex:Trainee ;
+        ex:activity     "Soccer"@en , "Swimming"@en ;
+        ex:first_names  [ a       <http://www.w3.org/1999/02/22-rdf-syntax-ns#Bag> ;
+                          <http://www.w3.org/1999/02/22-rdf-syntax-ns#_1>
+                                  "Paul"^^xsd:string ;
+                          <http://www.w3.org/1999/02/22-rdf-syntax-ns#_2>
+                                  "Jack"^^xsd:string
+                        ] ;
+        ex:names        [ a       <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> ;
+                          <http://www.w3.org/1999/02/22-rdf-syntax-ns#first>
+                                  "Paul Smith"^^xsd:string ;
+                          <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest>
+                                  ( "Jack Smith"^^xsd:string )
+                        ] ;
+        ex:namesAlt     [ a       <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> ;
+                          <http://www.w3.org/1999/02/22-rdf-syntax-ns#first>
+                                  "Paul Smith"^^xsd:string ;
+                          <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest>
+                                  ( "Jack Smith"^^xsd:string )
+                        ] .

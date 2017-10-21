@@ -27,7 +27,8 @@ abstract class xR2RMLLogicalSource(
         val logicalTableType: Constants.LogicalTableType.Value,
         val refFormulation: String,
         val docIterator: Option[String],
-        val uniqueRefs: Set[String]) {
+        val uniqueRefs: Set[String],
+        val listPushDown: List[xR2RMLPushDown]) {
 
     var alias: String = null;
 
@@ -73,6 +74,7 @@ object xR2RMLLogicalSource {
                     if (uniqRefStmts != null)
                         uniqRefStmts.map(_.getObject.toString).toSet
                     else Set.empty
+                val listPushDown = xR2RMLPushDown.extractPushDownTags(resource);
 
                 val source: String =
                     if (tableNameStmt != null)
@@ -110,7 +112,7 @@ object xR2RMLLogicalSource {
                         throw new Exception(msg);
                     }
 
-                    new xR2RMLTable(tableName)
+                    new xR2RMLTable(tableName, listPushDown)
 
                 } else if (sqlQueryStmt != null) {
 
@@ -132,12 +134,12 @@ object xR2RMLLogicalSource {
                         throw new Exception(msg);
                     }
 
-                    new xR2RMLQuery(queryStr, refFormulation, readIterator(resource), uniqueRefs)
+                    new xR2RMLQuery(queryStr, refFormulation, readIterator(resource), uniqueRefs, listPushDown)
 
                 } else if (queryStmt != null) {
                     // xR2RML query
                     val queryStr = queryStmt.getObject.toString.trim;
-                    new xR2RMLQuery(queryStr, refFormulation, readIterator(resource), uniqueRefs)
+                    new xR2RMLQuery(queryStr, refFormulation, readIterator(resource), uniqueRefs, listPushDown)
 
                 } else {
                     val errorMessage = "Missing logical source property: rr:tableName, rr:sqlQuery or xrr:query";

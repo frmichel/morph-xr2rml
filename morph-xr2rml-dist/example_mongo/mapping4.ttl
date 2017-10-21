@@ -1,0 +1,30 @@
+@prefix xrr: <http://i3s.unice.fr/xr2rml#> .
+@prefix rr:  <http://www.w3.org/ns/r2rml#> .
+@prefix ex:  <http://example.com/> .
+@prefix rml: <http://semweb.mmlab.be/ns/rml#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# --- Demonstration of the pushDown feature in the logical source: select a field of the 
+#     root document and push it dwon into the sub-documents entailed from the rml:iterator
+
+<#Students>
+    a rr:TriplesMap;
+
+    xrr:logicalSource [
+        xrr:query """db.students.find( { 'FullName' : {$exists: 1} } )""";
+        rml:iterator "$.FullName";
+        xrr:pushDown [ xrr:reference "$._id"; xrr:as "newId" ] ;
+    ];
+
+    rr:subjectMap [ 
+    	rr:template "http://example.org/student/{$.newId}";
+		rr:class ex:Student;
+    ];
+ 
+    rr:predicateObjectMap [
+    	rr:predicate ex:names;
+    	rr:objectMap [
+			rr:termType rr:Literal;
+            rr:template "{$.newId} {$.FirstNames.*} {$.LastName}";
+		];
+	].

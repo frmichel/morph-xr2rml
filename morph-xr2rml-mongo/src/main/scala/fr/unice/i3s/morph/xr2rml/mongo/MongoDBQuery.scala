@@ -13,7 +13,7 @@ import es.upm.fi.dia.oeg.morph.r2rml.model.xR2RMLQuery
  * 'collection' is the collection name while <code>{ 'a': { \$exists: true} }</code> is the query string
  *
  * Optionally, an iterator of the logical source can be set after object creation.
- * 
+ *
  * @author Franck Michel, I3S laboratory
  */
 class MongoDBQuery(
@@ -60,7 +60,7 @@ object MongoDBQuery {
      * Create a MongoDBQuery with no iterator.
      *
      * A query string looks like this: <code>db.myCollection.find({ 'a': { \$exists: true} })</code>.
-     * 
+     *
      * This method returns a MongoDBQuery instance where collection = myCollection
      * and query string = <code>{ 'a': { \$exists: true} }</code>
      */
@@ -118,7 +118,7 @@ object MongoDBQuery {
 
         val q = mostSpecificQuery(mq1.query, mq2.query)
         if (q.isDefined)
-            Some(new xR2RMLQuery(q.get, q1.refFormulation, q1.docIterator, q1.uniqueRefs union q2.uniqueRefs))
+            Some(new xR2RMLQuery(q.get, q1.refFormulation, q1.docIterator, q1.uniqueRefs union q2.uniqueRefs, q1.listPushDown ++ q2.listPushDown))
         else None
     }
 

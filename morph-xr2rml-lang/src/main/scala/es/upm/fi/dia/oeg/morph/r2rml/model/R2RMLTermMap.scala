@@ -19,9 +19,11 @@ abstract class R2RMLTermMap(
     override val nestedTermMap: Option[xR2RMLNestedTermMap],
 
     /** Reference formulation from the logical source */
-    override val refFormulation: String)
+    override val refFormulation: String,
 
-        extends AbstractTermMap(termMapType, termType, datatype, languageTag, nestedTermMap, refFormulation) {
+    override val listPushDown: List[xR2RMLPushDown])
+
+        extends AbstractTermMap(termMapType, termType, datatype, languageTag, nestedTermMap, refFormulation, listPushDown) {
 
     /**
      * Return the list of references (strings) referenced by the term map.
@@ -158,22 +160,22 @@ object R2RMLTermMap {
                     val stmtObject = mapStatement.getObject()
                     termPos match {
                         case Constants.MorphPOS.sub => {
-                            val sm = new R2RMLSubjectMap(Constants.MorphTermMapType.ConstantTermMap, Some(Constants.R2RML_IRI_URI), Set.empty, Set.empty, refFormulation);
+                            val sm = new R2RMLSubjectMap(Constants.MorphTermMapType.ConstantTermMap, Some(Constants.R2RML_IRI_URI), Set.empty, Set.empty, refFormulation, Nil);
                             sm.parse(stmtObject)
                             Some(sm)
                         }
                         case Constants.MorphPOS.pre => {
-                            val pm = new R2RMLPredicateMap(Constants.MorphTermMapType.ConstantTermMap, Some(Constants.R2RML_IRI_URI), refFormulation);
+                            val pm = new R2RMLPredicateMap(Constants.MorphTermMapType.ConstantTermMap, Some(Constants.R2RML_IRI_URI), refFormulation, Nil);
                             pm.parse(stmtObject)
                             Some(pm);
                         }
                         case Constants.MorphPOS.obj => {
-                            val om = new R2RMLObjectMap(Constants.MorphTermMapType.ConstantTermMap, Some(Constants.R2RML_LITERAL_URI), None, None, None, refFormulation);
+                            val om = new R2RMLObjectMap(Constants.MorphTermMapType.ConstantTermMap, Some(Constants.R2RML_LITERAL_URI), None, None, None, refFormulation, Nil);
                             om.parse(stmtObject)
                             Some(om)
                         }
                         case Constants.MorphPOS.graph => {
-                            val gm = new R2RMLGraphMap(Constants.MorphTermMapType.ConstantTermMap, Some(Constants.R2RML_IRI_URI), None, None, refFormulation);
+                            val gm = new R2RMLGraphMap(Constants.MorphTermMapType.ConstantTermMap, Some(Constants.R2RML_IRI_URI), None, None, refFormulation, Nil);
                             gm.parse(stmtObject)
                             if (Constants.R2RML_DEFAULT_GRAPH_URI.equals(gm.getOriginalValue)) {
                                 None

@@ -7,13 +7,14 @@ import com.hp.hpl.jena.rdf.model.RDFNode
 import org.apache.log4j.Logger
 
 class R2RMLGraphMap(
-    termMapType: Constants.MorphTermMapType.Value,
-    termType: Option[String],
-    datatype: Option[String],
-    languageTag: Option[String],
-    refFormulation: String)
+    override val termMapType: Constants.MorphTermMapType.Value,
+    override val termType: Option[String],
+    override val datatype: Option[String],
+    override val languageTag: Option[String],
+    override val refFormulation: String,
+    override val listPushDown: List[xR2RMLPushDown])
 
-        extends R2RMLTermMap(termMapType, termType, datatype, languageTag, None, refFormulation) {
+        extends R2RMLTermMap(termMapType, termType, datatype, languageTag, None, refFormulation, listPushDown) {
 
     val inferredTermType = this.inferTermType;
     if (inferredTermType != null && !inferredTermType.equals(Constants.R2RML_IRI_URI)) {
@@ -31,6 +32,7 @@ object R2RMLGraphMap {
         val datatype = coreProperties._3;
         val languageTag = coreProperties._4;
         val nestTM = coreProperties._5;
+        val listPushDown = coreProperties._6;
 
         if (nestTM.isDefined)
             logger.error("A nested term map cannot be defined in a subject map. Ignoring.")
@@ -38,7 +40,7 @@ object R2RMLGraphMap {
         if (AbstractTermMap.isRdfCollectionTermType(termType))
             logger.error("A subject map cannot have a term type: " + termType + ". Ignoring.")
 
-        val gm = new R2RMLGraphMap(termMapType, termType, datatype, languageTag, refFormulation);
+        val gm = new R2RMLGraphMap(termMapType, termType, datatype, languageTag, refFormulation, listPushDown);
         gm.parse(rdfNode)
         gm;
     }

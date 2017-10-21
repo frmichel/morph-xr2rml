@@ -11,6 +11,7 @@ import es.upm.fi.dia.oeg.morph.base.sql.ISqlQuery
 import es.upm.fi.dia.oeg.morph.base.MorphProperties
 import es.upm.fi.dia.oeg.morph.r2rml.model.RDBR2RMLMappingDocument
 import es.upm.fi.dia.oeg.morph.base.engine.IMorphFactory
+import es.upm.fi.dia.oeg.morph.r2rml.model.xR2RMLPushDown
 
 /**
  * This class is used in case of the query rewriting access method,
@@ -29,6 +30,10 @@ class MorphRDBDataSourceReader(factory: IMorphFactory) extends MorphBaseDataSour
     }
 
     override def executeQueryAndIterator(query: GenericQuery, logSrcIterator: Option[String], limit: Option[Long]): MorphBaseResultSet = {
+        throw new MorphException("Unsupported method.")
+    }
+
+    override def executeQueryAndIterator(query: GenericQuery, logSrcIterator: Option[String], limit: Option[Long], listPushDown: List[xR2RMLPushDown]): MorphBaseResultSet = {
         throw new MorphException("Unsupported method.")
     }
 

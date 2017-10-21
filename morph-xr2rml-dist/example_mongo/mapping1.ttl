@@ -1,0 +1,78 @@
+@prefix xrr: <http://i3s.unice.fr/xr2rml#> .
+@prefix rr:  <http://www.w3.org/ns/r2rml#> .
+@prefix ex:  <http://example.com/> .
+@prefix rml: <http://semweb.mmlab.be/ns/rml#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<#Students>
+    a rr:TriplesMap;
+    xrr:logicalSource [
+    	# Jongo needs strings in singles quotes (difference with MongoDB shell)
+        xrr:query """db.students.find( { 'FullName' : {$exists: 1} } )""";
+    ];
+    rr:subjectMap [ 
+    	rr:template "http://example.org/student/{$._id}";
+		rr:class ex:Student, ex:Trainee;
+    ];
+  	# Implicit conversion of a boolean element
+    rr:predicateObjectMap [
+    	rr:predicate ex:isActive;
+    	rr:objectMap [ xrr:reference "$.active" ];
+    ];
+  	# Implicit conversion of a integer element
+    rr:predicateObjectMap [
+    	rr:predicate ex:hasId;
+    	rr:objectMap [ xrr:reference "$.id"; ];
+    ];
+   	# Generation of multiple RDF terms with language tag
+    rr:predicateObjectMap [
+    	rr:predicate ex:activity;
+    	rr:objectMap [ xrr:reference "$.Hobbies.*.hobby"; rr:language "en"; ];
+    ];
+	
+	#--- Simple nested term map: bag of terms qualified with term type and datatype
+    rr:predicateObjectMap [
+    	rr:predicate ex:first_names;
+    	rr:objectMap [
+    		xrr:reference "$.FullName.FirstNames.*";
+			rr:termType xrr:RdfBag;
+    		xrr:nestedTermMap [
+				rr:termType rr:Literal;
+				rr:datatype xsd:string;
+            ];
+		];
+	];
+    
+   	# Generation of multiple terms from a template, assembled as an RDF list,
+	# and datatyped with a nested term map
+    rr:predicateObjectMap [
+    	rr:predicate ex:names;
+    	rr:objectMap [
+			rr:template "{$.FullName.FirstNames.*} {$.FullName.LastName}";
+			rr:termType xrr:RdfList;
+			xrr:nestedTermMap [
+				rr:termType rr:Literal;
+				rr:datatype xsd:string;
+			];
+		];
+	];
+	
+   	# Generation of multiple terms from a template, assembled as an RDF list,
+	# and datatyped with a nested term map.
+	# The result is the same as in the previous predicateObjectMap but using a nested term map
+	# to first select FullName elements (this is artificial since here there is only one
+	# FullName element.
+    rr:predicateObjectMap [
+    	rr:predicate ex:namesAlt;
+    	rr:objectMap [
+    		xrr:reference "$.FullName";
+    		xrr:nestedTermMap [
+				rr:template "{$.FirstNames.*} {$.LastName}";
+				rr:termType xrr:RdfList;
+				xrr:nestedTermMap [
+					rr:termType rr:Literal;
+					rr:datatype xsd:string;
+				];
+            ];
+		];
+	].

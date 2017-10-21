@@ -184,7 +184,9 @@ object MorphBaseDataTranslator extends java.io.Serializable {
      * @return a list of one RDF node, possibly empty
      */
     def translateMultipleValues(
-        values: List[Object], collecTermType: Option[String], memberTermType: String, datatype: Option[String], languageTag: Option[String],
+        values: List[Object],
+        collecTermType: Option[String],
+        memberTermType: String, datatype: Option[String], languageTag: Option[String],
         encodeUnsafeCharsInUri: Boolean, encodeUnsafeCharsInDbValues: Boolean): List[RDFTerm] = {
 
         if (values.isEmpty) return List()

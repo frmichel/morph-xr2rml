@@ -15,13 +15,16 @@ import es.upm.fi.dia.oeg.morph.base.sql.MorphTableMetaData
  * In an RDB, this is typically the primary key but it is possible to get this information using table metadata.
  * In MongoDB, the "_id" field is unique thus reference "$._id" is unique, but there is no way to know whether
  * some other fields are unique.
+ * @param listPushDown the list of xrr:pushDown annotations as isntances of xR2RMLPushDown
  */
 abstract class RDBxR2RMLLogicalSource(
     logicalTableType: Constants.LogicalTableType.Value,
     refFormulation: String,
     docIterator: Option[String],
-    uniqueRefs: Set[String])
-        extends xR2RMLLogicalSource(logicalTableType, refFormulation, docIterator, uniqueRefs) {
+    uniqueRefs: Set[String],
+    listPushDown: List[xR2RMLPushDown])
+
+        extends xR2RMLLogicalSource(logicalTableType, refFormulation, docIterator, uniqueRefs, listPushDown) {
 
     var tableMetaData: Option[MorphTableMetaData] = None;
 

@@ -10,11 +10,12 @@ import com.hp.hpl.jena.rdf.model.Resource
 import es.upm.fi.dia.oeg.morph.base.Constants
 
 class R2RMLPredicateMap(
-    termMapType: Constants.MorphTermMapType.Value,
-    termType: Option[String],
-    refFormulation: String)
+    override val termMapType: Constants.MorphTermMapType.Value,
+    override val termType: Option[String],
+    override val refFormulation: String,
+    override val listPushDown: List[xR2RMLPushDown])
 
-        extends R2RMLTermMap(termMapType, termType, None, None, None, refFormulation) {
+        extends R2RMLTermMap(termMapType, termType, None, None, None, refFormulation, listPushDown) {
 
     var termtype = this.inferTermType
 }
@@ -27,6 +28,7 @@ object R2RMLPredicateMap {
         val termMapType = coreProperties._1;
         val termType = coreProperties._2;
         val nestTM = coreProperties._5;
+        val listPushDown = coreProperties._6;
 
         if (nestTM.isDefined)
             logger.error("A nested term map cannot be defined in a subject map. Ignoring.")
@@ -34,7 +36,7 @@ object R2RMLPredicateMap {
         if (AbstractTermMap.isRdfCollectionTermType(termType))
             logger.error("A subject map cannot have a term type: " + termType + ". Ignoring.")
 
-        val pm = new R2RMLPredicateMap(termMapType, termType, refFormulation);
+        val pm = new R2RMLPredicateMap(termMapType, termType, refFormulation, listPushDown);
         pm.parse(rdfNode);
         pm;
     }

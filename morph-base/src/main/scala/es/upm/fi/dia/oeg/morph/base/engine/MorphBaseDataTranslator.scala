@@ -40,6 +40,8 @@ abstract class MorphBaseDataTranslator(val factory: IMorphFactory) {
 
     val encodeUnsafeCharsInDbValues = factory.getProperties.encodeUnsafeCharsInDbValues
 
+    val literalTrim = factory.getProperties.literalTrim
+
     /**
      * Entry point of the materialization approach:<br>
      * Loop on all triples maps of the mapping graph and generate triples in the data materializer model,
@@ -163,10 +165,10 @@ object MorphBaseDataTranslator extends java.io.Serializable {
      */
     def translateSingleValue(
         dbValue: Object, collecTermType: Option[String], memberTermType: String, datatype: Option[String], language: Option[String],
-        encodeUnsafeCharsInUri: Boolean, encodeUnsafeCharsInDbValues: Boolean): List[RDFTerm] = {
+        encodeUnsafeCharsInUri: Boolean, encodeUnsafeCharsInDbValues: Boolean, literalTrim: Boolean): List[RDFTerm] = {
 
         translateMultipleValues(List(dbValue), collecTermType, memberTermType, datatype, language,
-            encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues)
+            encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues, literalTrim)
     }
 
     /**
@@ -187,14 +189,14 @@ object MorphBaseDataTranslator extends java.io.Serializable {
         values: List[Object],
         collecTermType: Option[String],
         memberTermType: String, datatype: Option[String], languageTag: Option[String],
-        encodeUnsafeCharsInUri: Boolean, encodeUnsafeCharsInDbValues: Boolean): List[RDFTerm] = {
+        encodeUnsafeCharsInUri: Boolean, encodeUnsafeCharsInDbValues: Boolean, literalTrim: Boolean): List[RDFTerm] = {
 
         if (values.isEmpty) return List()
 
         // Convert values into RDF nodes
         val valuesAsRdfTerms = translateMultipleValues(
             values, memberTermType, datatype, languageTag,
-            encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues)
+            encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues, literalTrim)
 
         val result: List[RDFTerm] =
             if (collecTermType.isDefined)
@@ -216,7 +218,7 @@ object MorphBaseDataTranslator extends java.io.Serializable {
      */
     def translateMultipleValues(
         values: List[Object], termType: String, datatype: Option[String], languageTag: Option[String],
-        encodeUnsafeCharsInUri: Boolean, encodeUnsafeCharsInDbValues: Boolean): List[RDFTerm] = {
+        encodeUnsafeCharsInUri: Boolean, encodeUnsafeCharsInDbValues: Boolean, literalTrim: Boolean): List[RDFTerm] = {
 
         val result: List[RDFTerm] =
             // Create one RDF term for each of the values: the flatMap eliminates None elements, thus the result can be empty
@@ -225,7 +227,7 @@ object MorphBaseDataTranslator extends java.io.Serializable {
                 else {
                     val node = termType match {
                         case Constants.R2RML_IRI_URI => this.createIRI(value, encodeUnsafeCharsInUri)
-                        case Constants.R2RML_LITERAL_URI => this.createLiteral(value, datatype, languageTag)
+                        case Constants.R2RML_LITERAL_URI => this.createLiteral(value, datatype, languageTag, literalTrim)
                         case Constants.R2RML_BLANKNODE_URI => new RDFTermBlankNode(GeneralUtility.encodeUrl(value.toString))
                     }
                     Some(node)
@@ -250,11 +252,16 @@ object MorphBaseDataTranslator extends java.io.Serializable {
      *
      * @throws es.upm.fi.dia.oeg.morph.base.exception.MorphException
      */
-    protected def createLiteral(value: Object, datatype: Option[String], language: Option[String]): RDFTerm = {
+    protected def createLiteral(value: Object, datatype: Option[String], language: Option[String], literalTrim: Boolean): RDFTerm = {
         try {
             val encodedValue =
                 if (value == null) "" // case when the database returned NULL
-                else GeneralUtility.encodeLiteral(value.toString())
+                else {
+                    if (literalTrim)
+                        GeneralUtility.encodeLiteral(value.toString().trim())
+                    else
+                        GeneralUtility.encodeLiteral(value.toString())
+                }
 
             val dataT: String = datatype.getOrElse(null)
             val valueConverted =
@@ -268,7 +275,7 @@ object MorphBaseDataTranslator extends java.io.Serializable {
                 } else
                     encodedValue
 
-            new RDFTermLiteral(value, datatype, language)
+            new RDFTermLiteral(valueConverted, datatype, language)
         } catch {
             case e: MorphException => {
                 val msg = "Error creating literal term: " + value

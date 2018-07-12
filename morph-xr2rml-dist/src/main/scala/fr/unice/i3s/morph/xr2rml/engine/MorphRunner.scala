@@ -20,7 +20,7 @@ import fr.unice.i3s.morph.xr2rml.server.SparqlEndpoint
  * It expects two input parameters: the configuration directory (option --configDir) and the
  * configuration file name (option --configFile) that must be located in the configuration directory.
  * The configuration file lists, among others, the name of the mapping file and the output file.
- * 
+ *
  * @author Franck Michel, I3S laboratory
  */
 object MorphRunner {
@@ -32,7 +32,7 @@ object MorphRunner {
             if (overrideLlog4j != null && !overrideLlog4j.isEmpty)
                 new URL(overrideLlog4j)
             else {
-                println("To override log4j configuration add JVM option: -Dlog4j.configuration=file:/home/.../your_log4j.properties" )
+                println("To override log4j configuration add JVM option: -Dlog4j.configuration=file:/home/.../your_log4j.properties")
                 this.getClass.getClassLoader.getResource("xr2rml-log4j.properties")
             }
 
@@ -52,16 +52,29 @@ object MorphRunner {
             val options: org.apache.commons.cli.Options = new org.apache.commons.cli.Options()
             options.addOption("d", "configDir", true, "Configuration directory")
             options.addOption("f", "configFile", true, "Configuration file name. Must be located within the configuration directory")
+            options.addOption("m", "mappingFile", true, "xR2RML mapping file name. Overrides the properties file.")
+            options.addOption("o", "output", true, "Output file name. Overrides the properties file.")
 
             val parser: CommandLineParser = new BasicParser()
             val cmd: CommandLine = parser.parse(options, args)
             if (cmd.hasOption("d")) configDir = cmd.getOptionValue("d")
             if (cmd.hasOption("f")) configFile = cmd.getOptionValue("f")
-            logger.info("properties Directory = " + configDir)
-            logger.info("properties File      = " + configFile)
+
+            logger.info("properties directory = " + configDir)
+            logger.info("properties file      = " + configFile)
+
+            val properties = MorphProperties(configDir, configFile)
+            // Override mapping and output files
+            if (cmd.hasOption("m")) {
+                properties.mappingDocumentFilePath = cmd.getOptionValue("m")
+                logger.info("Mapping file = " + properties.mappingDocumentFilePath)
+            }
+            if (cmd.hasOption("o")) {
+                properties.outputFilePath = cmd.getOptionValue("o")
+                logger.info("Output file = " + properties.outputFilePath)
+            }
 
             // Initialize the runner factory
-            val properties = MorphProperties(configDir, configFile)
             MorphBaseRunnerFactory.initFactory(properties)
 
             if (properties.serverActive) {

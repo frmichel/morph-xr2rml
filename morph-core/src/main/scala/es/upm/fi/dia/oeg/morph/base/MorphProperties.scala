@@ -42,6 +42,8 @@ class MorphProperties extends java.util.Properties {
 
     //batch upgrade
     var literalRemoveStrangeChars: Boolean = true;
+    var literalTrim: Boolean = true;
+    
     var encodeUnsafeCharsInUri: Boolean = true;
     var encodeUnsafeCharsInDbValues: Boolean = true;
     var transformString: Option[String] = None;
@@ -197,6 +199,9 @@ class MorphProperties extends java.util.Properties {
 
         this.literalRemoveStrangeChars = this.readBoolean(Constants.REMOVE_STRANGE_CHARS_FROM_LITERAL, true);
         logger.info("Remove Strange Chars From Literal Column = " + this.literalRemoveStrangeChars);
+
+        this.literalTrim = this.readBoolean(Constants.TRIM_LITERAL, true);
+        logger.info("Trim heading/tailing spaces from literal Column = " + this.literalTrim);
 
         this.encodeUnsafeCharsInUri = this.readBoolean(Constants.ENCODE_UNSAFE_CHARS_IN_URI, true);
         logger.info("URL-encode reserved chars IRI tempalte string = " + this.encodeUnsafeCharsInUri);

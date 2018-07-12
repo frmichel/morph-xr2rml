@@ -276,7 +276,7 @@ class MorphMongoDataTranslator(val fact: IMorphFactory)
         val (collecTermType: Option[String], datatype: Option[String], languageTag: Option[String], memberTermType: String) =
             termMap.calculateCollecTermType_DataType_LanguageTag_TermType();
 
-        MorphBaseDataTranslator.translateSingleValue(termMap.getConstantValue(), collecTermType, memberTermType, datatype, languageTag, encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues)
+        MorphBaseDataTranslator.translateSingleValue(termMap.getConstantValue(), collecTermType, memberTermType, datatype, languageTag, encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues, literalTrim)
     }
 
     private def translateDataWithReferenceTermMap(termMap: AbstractTermMap, jsonDoc: String): List[RDFTerm] = {
@@ -300,7 +300,7 @@ class MorphMongoDataTranslator(val fact: IMorphFactory)
             val ntm = termMap.nestedTermMap.get
             if (ntm.isSimpleNestedTermMap)
                 // A simple nested term map just adds a term type, datatype and/or language tag. Generate the values straight away.
-                MorphBaseDataTranslator.translateMultipleValues(values, collecTermType, memberTermType, datatype, languageTag, encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues);
+                MorphBaseDataTranslator.translateMultipleValues(values, collecTermType, memberTermType, datatype, languageTag, encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues, literalTrim);
             else {
                 // Reference-valued or template-valued nested term map
                 val valuesWithPushDown =
@@ -321,7 +321,7 @@ class MorphMongoDataTranslator(val fact: IMorphFactory)
                     valuesFromNtm
             }
         } else
-            MorphBaseDataTranslator.translateMultipleValues(values, collecTermType, memberTermType, datatype, languageTag, encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues);
+            MorphBaseDataTranslator.translateMultipleValues(values, collecTermType, memberTermType, datatype, languageTag, encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues, literalTrim);
     }
 
     private def translateDataWithTemplateTermMap(termMap: AbstractTermMap, jsonDoc: String): List[RDFTerm] = {
@@ -364,7 +364,7 @@ class MorphMongoDataTranslator(val fact: IMorphFactory)
         } else {
             // Compute the list of template results by making all possible combinations of the replacement values
             val tplResults = TemplateUtility.replaceTemplateGroups(termMap.getTemplateString(), listReplace);
-            val resultAux = MorphBaseDataTranslator.translateMultipleValues(tplResults, collecTermType, memberTermType, datatype, languageTag, encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues);
+            val resultAux = MorphBaseDataTranslator.translateMultipleValues(tplResults, collecTermType, memberTermType, datatype, languageTag, encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues, literalTrim);
             resultAux
         }
     }

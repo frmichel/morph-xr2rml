@@ -278,7 +278,7 @@ class MorphRDBDataTranslator(factory: IMorphFactory) extends MorphBaseDataTransl
 
             // --- Constant-valued term map
             case Constants.MorphTermMapType.ConstantTermMap => {
-                MorphBaseDataTranslator.translateSingleValue(termMap.constantValue, collecTermType, memberTermType, datatype, languageTag, encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues)
+                MorphBaseDataTranslator.translateSingleValue(termMap.constantValue, collecTermType, memberTermType, datatype, languageTag, encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues, literalTrim)
             }
 
             // --- Column-valued term map
@@ -296,7 +296,7 @@ class MorphRDBDataTranslator(factory: IMorphFactory) extends MorphBaseDataTransl
                     }
 
                 // Generate the RDF terms
-                MorphBaseDataTranslator.translateSingleValue(dbValue, collecTermType, memberTermType, datatype, languageTag, encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues)
+                MorphBaseDataTranslator.translateSingleValue(dbValue, collecTermType, memberTermType, datatype, languageTag, encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues, literalTrim)
             }
 
             // --- Reference-valued term map
@@ -324,7 +324,7 @@ class MorphRDBDataTranslator(factory: IMorphFactory) extends MorphBaseDataTransl
                             None
                         else dt
                     }
-                MorphBaseDataTranslator.translateMultipleValues(values, collecTermType, memberTermType, datatype, languageTag, encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues)
+                MorphBaseDataTranslator.translateMultipleValues(values, collecTermType, memberTermType, datatype, languageTag, encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues, literalTrim)
             }
 
             // --- Template-valued term map
@@ -368,7 +368,7 @@ class MorphRDBDataTranslator(factory: IMorphFactory) extends MorphBaseDataTransl
                 } else {
                     // Compute the list of template results by making all possible combinations of the replacement values
                     val tplResults = TemplateUtility.replaceTemplateGroups(termMap.templateString, lstRep)
-                    MorphBaseDataTranslator.translateMultipleValues(tplResults, collecTermType, memberTermType, datatype, languageTag, encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues)
+                    MorphBaseDataTranslator.translateMultipleValues(tplResults, collecTermType, memberTermType, datatype, languageTag, encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues, literalTrim)
                 }
             }
 

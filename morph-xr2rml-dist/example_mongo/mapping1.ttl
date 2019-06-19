@@ -27,7 +27,22 @@
    	# Generation of multiple RDF terms with language tag
     rr:predicateObjectMap [
     	rr:predicate ex:activity;
-    	rr:objectMap [ xrr:reference "$.Hobbies.*.hobby"; rr:language "en"; ];
+    	rr:objectMap [ xrr:reference "$.Hobbies.*.hobby"; rr:language "en" ];
+    ];
+	
+   	# Generation of multiple RDF terms with variable language tag per term.
+    # Almost the same as above but with nested term map to iterate on each hobby separately
+    rr:predicateObjectMap [
+    	rr:predicate ex:activityWithVariableLang;
+    	rr:objectMap [ 
+            xrr:reference "$.Hobbies.*";
+            xrr:nestedTermMap [
+				rr:termType rr:Literal;
+                xrr:reference "$.hobby";
+                rr:language "en";
+                xrr:languageReference "$.lang"; 
+            ]
+        ]
     ];
 	
 	#--- Simple nested term map: bag of terms qualified with term type and datatype

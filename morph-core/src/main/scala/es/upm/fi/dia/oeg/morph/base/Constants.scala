@@ -258,6 +258,9 @@ object Constants {
     val R2RML_LANGUAGE_URI = R2RML_NS + "language";
     val R2RML_LANGUAGE_PROPERTY = ResourceFactory.createProperty(R2RML_LANGUAGE_URI);
 
+    val R2RML_LANGUAGE_MAP_URI = xR2RML_NS + "languageReference";
+    val R2RML_LANGUAGE_MAP_PROPERTY = ResourceFactory.createProperty(R2RML_LANGUAGE_MAP_URI);
+
     //--- TermMap Types
     val R2RML_CONSTANT_URI = R2RML_NS + "constant";
     val R2RML_CONSTANT_PROPERTY = ResourceFactory.createProperty(R2RML_CONSTANT_URI);

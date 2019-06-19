@@ -14,6 +14,7 @@ abstract class R2RMLTermMap(
     override val termType: Option[String],
     override val datatype: Option[String],
     override val languageTag: Option[String],
+    override val languageMap: Option[String],
 
     /** The nested term map is mandatory in the case term type is an RDF collection/container */
     override val nestedTermMap: Option[xR2RMLNestedTermMap],
@@ -23,7 +24,7 @@ abstract class R2RMLTermMap(
 
     override val listPushDown: List[xR2RMLPushDown])
 
-        extends AbstractTermMap(termMapType, termType, datatype, languageTag, nestedTermMap, refFormulation, listPushDown) {
+        extends AbstractTermMap(termMapType, termType, datatype, languageTag, languageMap, nestedTermMap, refFormulation, listPushDown) {
 
     /**
      * Return the list of references (strings) referenced by the term map.
@@ -170,12 +171,12 @@ object R2RMLTermMap {
                             Some(pm);
                         }
                         case Constants.MorphPOS.obj => {
-                            val om = new R2RMLObjectMap(Constants.MorphTermMapType.ConstantTermMap, Some(Constants.R2RML_LITERAL_URI), None, None, None, refFormulation, Nil);
+                            val om = new R2RMLObjectMap(Constants.MorphTermMapType.ConstantTermMap, Some(Constants.R2RML_LITERAL_URI), None, None, None, None, refFormulation, Nil);
                             om.parse(stmtObject)
                             Some(om)
                         }
                         case Constants.MorphPOS.graph => {
-                            val gm = new R2RMLGraphMap(Constants.MorphTermMapType.ConstantTermMap, Some(Constants.R2RML_IRI_URI), None, None, refFormulation, Nil);
+                            val gm = new R2RMLGraphMap(Constants.MorphTermMapType.ConstantTermMap, Some(Constants.R2RML_IRI_URI), None, None, None, refFormulation, Nil);
                             gm.parse(stmtObject)
                             if (Constants.R2RML_DEFAULT_GRAPH_URI.equals(gm.getOriginalValue)) {
                                 None

@@ -15,7 +15,7 @@ class R2RMLPredicateMap(
     override val refFormulation: String,
     override val listPushDown: List[xR2RMLPushDown])
 
-        extends R2RMLTermMap(termMapType, termType, None, None, None, refFormulation, listPushDown) {
+        extends R2RMLTermMap(termMapType, termType, None, None, None, None, refFormulation, listPushDown) {
 
     var termtype = this.inferTermType
 }
@@ -25,16 +25,16 @@ object R2RMLPredicateMap {
 
     def apply(rdfNode: RDFNode, refFormulation: String): R2RMLPredicateMap = {
         val coreProperties = AbstractTermMap.extractCoreProperties(rdfNode, refFormulation);
-        val termMapType = coreProperties._1;
-        val termType = coreProperties._2;
-        val nestTM = coreProperties._5;
-        val listPushDown = coreProperties._6;
+        val termMapType = coreProperties.getTermMapType
+        val termType = coreProperties.getTermType
+        val nestTM = coreProperties.getNestedTM
+        val listPushDown = coreProperties.getListPushDown
 
         if (nestTM.isDefined)
-            logger.error("A nested term map cannot be defined in a subject map. Ignoring.")
+            logger.error("A nested term map cannot be defined in a predicate map. Ignoring.")
 
         if (AbstractTermMap.isRdfCollectionTermType(termType))
-            logger.error("A subject map cannot have a term type: " + termType + ". Ignoring.")
+            logger.error("A predicate map cannot have a term type: " + termType + ". Ignoring.")
 
         val pm = new R2RMLPredicateMap(termMapType, termType, refFormulation, listPushDown);
         pm.parse(rdfNode);

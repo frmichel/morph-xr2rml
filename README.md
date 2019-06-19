@@ -1,6 +1,6 @@
 # What is it?
 
-Morph-xR2RML is an implementation of the [xR2RML mapping language](https://hal.archives-ouvertes.fr/hal-01141686) that enables the description of mappings from relational or non relational databases to RDF. xR2RML is an extension of [R2RML](http://www.w3.org/TR/r2rml/) and [RML](http://semweb.mmlab.be/rml/spec.html).
+Morph-xR2RML is an implementation of the [xR2RML mapping language](http://i3s.unice.fr/~fmichel/xr2rml_specification.html) that enables the description of mappings from relational or non relational databases to RDF. xR2RML is an extension of [R2RML](http://www.w3.org/TR/r2rml/) and [RML](http://semweb.mmlab.be/rml/spec.html).
 
 Morph-xR2RML comes with connectors for relational databases (MySQL, PostgreSQL, MonetDB) and the MongoDB NoSQL document store.
 Two running modes are available:
@@ -15,23 +15,6 @@ The SPARQL-to-SQL rewriting is an adaptation of the former Morph-RDB implementat
 #### SPARQL-to-MongoDB
 The SPARQL-to-MongoDB rewriting is a fully new component, it supports the SELECT, ASK, CONSTRUCT and DESCRIBE query forms.
 
-
-## Changes
-
-#### 2018-05-31: add run options
-Options `--output` and `--mappingFile` can be used to override the output.file.path and mappingdocument.file properties respectively.
-
-Add configuration parameter `literal.trim` set to true to trim the literal values read from the database.
-
-#### 2017-10-25: new property xrr:pushDown 
-Property xrr:pushDown extends the mapping possibilities when defining iterations within a document (pull request #3 by Freddy Priyatna, to fulfill a need of the [SlideWiki project](https://slidewiki.eu/)). 
-When iterating in a sub-part of a document (e.g. a JSON array), that property helps use values of fields that are higher in the document hierarchy, hence not accessible inside this sub-part of the document. See complete description in [2]. Implemented for the MongoDB database.
-Example: a property ```xrr:pushDown [ xrr:reference "$.id"; xrr:as "newId"]``` can be defined either in the logical source together with an  rml:iterator, or within a referenced-valued term map that has a nested term map.
-  - In a logical source: the xrr:reference "$.id" is evaluated against the current document, then the iterator is applied and in each document that comes out of the iterator, a new field ("newID" in this example) is added.
-  - In a reference-valued term map, the xrr:reference "$.id" is evaluated against the document of the current iteration, and a new field ("newID" in this example) is added inside the documents that are passed to the nested term map.
-
-#### 2017-09-05: full implementation of the nested term maps
-Complex nested term maps (nested term map that embed another nested term map) are now enabled, thus allowing to deal with any level of nested documents (pull request #1 by Freddy Priyatna). Implemented for the MongoDB database.
 
 
 ## Publications
@@ -51,11 +34,12 @@ https://hal.archives-ouvertes.fr/hal-01245883.
 
 [6] F. Michel, C. Faron-Zucker, and J. Montagnat. A Mapping-Based Method to Query MongoDB Documents with SPARQL. In *27th International Conference on Database and Expert Systems Applications (DEXA 2016)*, 2016.
 
+
 ## Limitations
 
 ##### xR2RML Language support
 - The generation of RDF collection and containers is supported in all cases (from a list of values resulting of the evaluation of a mixed syntax path typically, from the result of a join query implied by a referencing object map), except in the case of a regular R2RML join query applied to a relational database: the result of the join SQL query cannot be translated into an RDF collection or container.
-- Named graphs are supported although they are not printed out in Turtle. It would be quite easy to extend it with a N-Quad serialization to allow for writing triples in named graphs. 
+- Named graphs are supported although they are not printed out in Turtle which does not support named graphs. It would be quite easy to extend it with a N-Quad or Trig serialization to allow for writing triples in named graphs.
 
 The former limitation on NestedTermMaps was lifted in Sept. 2017. All types of NestedTermMaps are now fully implemented, so that any complex iterations and collection/container nesting can be defined.
 

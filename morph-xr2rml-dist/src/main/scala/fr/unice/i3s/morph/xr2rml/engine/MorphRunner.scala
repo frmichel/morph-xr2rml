@@ -67,12 +67,13 @@ object MorphRunner {
             // Override mapping and output files
             if (cmd.hasOption("m")) {
                 properties.mappingDocumentFilePath = cmd.getOptionValue("m")
-                logger.info("Mapping file = " + properties.mappingDocumentFilePath)
             }
+            logger.info("Mapping file = " + properties.mappingDocumentFilePath)
+            
             if (cmd.hasOption("o")) {
                 properties.outputFilePath = cmd.getOptionValue("o")
-                logger.info("Output file = " + properties.outputFilePath)
             }
+            logger.info("Output file = " + properties.outputFilePath)
 
             // Initialize the runner factory
             MorphBaseRunnerFactory.initFactory(properties)

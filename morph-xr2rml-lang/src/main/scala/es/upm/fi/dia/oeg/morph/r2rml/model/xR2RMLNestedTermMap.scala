@@ -47,6 +47,7 @@ class xR2RMLNestedTermMap(
     _termType: Option[String],
     _datatype: Option[String],
     _languageTag: Option[String],
+    _languageMap: Option[String],
 
     /** optional nested term map within this nested term map */
     _nestedTermMap: Option[xR2RMLNestedTermMap],
@@ -54,12 +55,12 @@ class xR2RMLNestedTermMap(
     _refFormulation: String,
     _listPushDown: List[xR2RMLPushDown])
     
-        extends AbstractTermMap(_termMapType, _termType, _datatype, _languageTag, _nestedTermMap, _refFormulation, _listPushDown) {
+        extends AbstractTermMap(_termMapType, _termType, _datatype, _languageTag, _languageMap, _nestedTermMap, _refFormulation, _listPushDown) {
 
     override val logger = Logger.getLogger(this.getClass().getName());
 
     override def toString(): String = {
-        "NestedTermMap[termMapType: " + termMapType.toString() + " , termType:" + termType + ", datatype:" + datatype + ", language:" + languageTag + ", listPushDown:" + listPushDown + "]";
+        "NestedTermMap[termMapType: " + termMapType.toString() + " , termType:" + termType + ", datatype:" + datatype + ", language:" + languageTag + ", languageMap:" + languageMap + ", listPushDown:" + listPushDown + "]";
     }
 }
 
@@ -122,6 +123,9 @@ object xR2RMLNestedTermMap {
                     val langStmt = ntmRes.getProperty(Constants.R2RML_LANGUAGE_PROPERTY)
                     val language = if (langStmt == null) None else Some(langStmt.getObject().toString())
 
+                    val langMapStmt = ntmRes.getProperty(Constants.R2RML_LANGUAGE_MAP_PROPERTY)
+                    val languageMap = if (langMapStmt == null) None else Some(langMapStmt.getObject().toString())
+
                     val nestedTermMapType = xR2RMLNestedTermMap.extractNestedTermMapType(ntmRes)
 
                     val listPushDown = xR2RMLPushDown.extractPushDownTags(ntmRes);
@@ -129,7 +133,7 @@ object xR2RMLNestedTermMap {
                     // Check if there is a nested term map WITHIN this nested term map
                     val nestedTermMap = extractNestedTermMap(nestedTermMapType, ntmRes, refFormulation)
 
-                    val ntm = new xR2RMLNestedTermMap(parentTermMapType, nestedTermMapType, termType, datatype, language, nestedTermMap, refFormulation, listPushDown)
+                    val ntm = new xR2RMLNestedTermMap(parentTermMapType, nestedTermMapType, termType, datatype, language, languageMap, nestedTermMap, refFormulation, listPushDown)
                     ntm.parse(ntmRes)
 
                     if (logger.isTraceEnabled()) logger.trace("Created nested term map: " + ntm)

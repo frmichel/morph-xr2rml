@@ -13,11 +13,12 @@ class R2RMLObjectMap(override val termMapType: Constants.MorphTermMapType.Value,
                      override val termType: Option[String],
                      override val datatype: Option[String],
                      override val languageTag: Option[String],
+                     override val languageMap: Option[String],
                      override val nestedTermMap: Option[xR2RMLNestedTermMap],
                      override val refFormulation: String,
                      override val listPushDown: List[xR2RMLPushDown])
 
-        extends R2RMLTermMap(termMapType, termType, datatype, languageTag, nestedTermMap, refFormulation, listPushDown) {
+        extends R2RMLTermMap(termMapType, termType, datatype, languageTag, languageMap, nestedTermMap, refFormulation, listPushDown) {
 
     var termtype = this.inferTermType
 }
@@ -27,12 +28,14 @@ object R2RMLObjectMap {
 
     def apply(rdfNode: RDFNode, refFormulation: String): R2RMLObjectMap = {
         val coreProperties = AbstractTermMap.extractCoreProperties(rdfNode, refFormulation);
-        val termMapType = coreProperties._1;
-        val termType = coreProperties._2;
-        val datatype = coreProperties._3;
-        val languageTag = coreProperties._4;
-        val extractedNestedTermMap = coreProperties._5;
-        val listPushDown = coreProperties._6;
+        
+        val termMapType = coreProperties.getTermMapType
+        val termType = coreProperties.getTermType
+        val datatype = coreProperties.getDatatype
+        val languageTag = coreProperties.getLanguageTag
+        val languageMap = coreProperties.getLanguageMap
+        val extractedNestedTermMap = coreProperties.getNestedTM
+        val listPushDown = coreProperties.getListPushDown
 
         // A term map with an RDF collection/container term type must have a nested term map.
         // If this is not the case here, define a default nested term type (see xR2RML specification 3.2.1.3):
@@ -49,13 +52,13 @@ object R2RMLObjectMap {
             // The default nested term map has no reference nor template => simple nested term map
             val nestedTermMapType = Constants.MorphTermMapType.SimpleNestedTermMap
 
-            val ntm = new xR2RMLNestedTermMap(termMapType, nestedTermMapType, Some(ntmTermType), None, None, None, refFormulation, List.empty)
+            val ntm = new xR2RMLNestedTermMap(termMapType, nestedTermMapType, Some(ntmTermType), None, None, None, None, refFormulation, List.empty)
             if (logger.isDebugEnabled()) logger.debug("Collection/container term type with no nested term map. Defining default nested term map: " + ntm)
             Some(ntm)
         } else
-            coreProperties._5;
+            coreProperties.getNestedTM;
 
-        val om = new R2RMLObjectMap(termMapType, termType, datatype, languageTag, nestedTermMap, refFormulation, listPushDown);
+        val om = new R2RMLObjectMap(termMapType, termType, datatype, languageTag, languageMap, nestedTermMap, refFormulation, listPushDown);
         om.parse(rdfNode);
         om;
     }

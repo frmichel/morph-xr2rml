@@ -66,7 +66,10 @@ object MongoDBQuery {
      */
     def parseQueryString(q: String, stripCurlyBracket: Boolean): MongoDBQuery = {
 
-        val query = GeneralUtility.cleanString(q)
+        // Fix 20190618: this cleanString removes all spaces which is a pb we search for a string that contains one...
+        //val query = GeneralUtility.cleanString(q)
+        val query = q.trim()
+        
         var tokens = query.trim.split("\\.")
         if (!tokens(0).equals("db")) {
             logger.error("Invalid query string: " + query)
@@ -77,7 +80,7 @@ object MongoDBQuery {
         // The query string starts after the '(' and finished before the trailing ')'
         tokens = query.split("\\(")
         var queryStr = tokens(1).substring(0, tokens(1).length - 1).trim
-
+        
         if (stripCurlyBracket)
             if (queryStr.startsWith("{") && queryStr.endsWith("}"))
                 queryStr = queryStr.substring(1, queryStr.length - 1).trim

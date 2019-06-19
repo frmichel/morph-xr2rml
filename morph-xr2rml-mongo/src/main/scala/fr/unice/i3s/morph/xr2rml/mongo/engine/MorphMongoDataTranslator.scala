@@ -27,7 +27,7 @@ import es.upm.fi.dia.oeg.morph.r2rml.model.xR2RMLPushDown
  * @author Franck Michel, I3S laboratory
  */
 class MorphMongoDataTranslator(val fact: IMorphFactory)
-        extends MorphBaseDataTranslator(fact) with java.io.Serializable {
+    extends MorphBaseDataTranslator(fact) with java.io.Serializable {
 
     if (!factory.getConnection.isMongoDB)
         throw new MorphException("Database connection type does not match MongoDB")
@@ -60,7 +60,7 @@ class MorphMongoDataTranslator(val fact: IMorphFactory)
         val poms = tm.predicateObjectMaps;
         val query = factory.getUnfolder.unfoldTriplesMap(tm)
 
-        // Execute the query against the database and apply the optional iterator and pushDown properties 
+        // Execute the query against the database and apply the optional iterator and pushDown properties
         val childResultSet = factory.getDataSourceReader
             .executeQueryAndIterator(query, ls.docIterator, None, ls.listPushDown)
             .asInstanceOf[MorphMongoResultSet].resultSet.toList
@@ -272,17 +272,24 @@ class MorphMongoDataTranslator(val fact: IMorphFactory)
     }
 
     private def translateDataWithConstantTermMap(termMap: AbstractTermMap, jsonDoc: String): List[RDFTerm] = {
-
-        val (collecTermType: Option[String], datatype: Option[String], languageTag: Option[String], memberTermType: String) =
-            termMap.calculateCollecTermType_DataType_LanguageTag_TermType();
+        val termProps = termMap.calculateCollecTermProperties()
+        val collecTermType = termProps.getCollectionTermType
+        val memberTermType = termProps.getTermType
+        val datatype = termProps.getDatatype
+        val languageTag = termProps.getLanguageTag
+        val languageMap = termProps.getLanguageMap
 
         MorphBaseDataTranslator.translateSingleValue(termMap.getConstantValue(), collecTermType, memberTermType, datatype, languageTag, encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues, literalTrim)
     }
 
     private def translateDataWithReferenceTermMap(termMap: AbstractTermMap, jsonDoc: String): List[RDFTerm] = {
 
-        val (collecTermType: Option[String], datatype: Option[String], languageTag: Option[String], memberTermType: String) =
-            termMap.calculateCollecTermType_DataType_LanguageTag_TermType();
+        val termProps = termMap.calculateCollecTermProperties()
+        val collecTermType = termProps.getCollectionTermType
+        val memberTermType = termProps.getTermType
+        val datatype = termProps.getDatatype
+        val languageTag = termProps.getLanguageTag
+        val languageMap = termProps.getLanguageMap
 
         val msPath =
             if (termMap.getReference() == "$._id")
@@ -292,6 +299,23 @@ class MorphMongoDataTranslator(val fact: IMorphFactory)
             else
                 termMap.getMixedSyntaxPaths()(0) // '(0)' because in a reference there is only one mixed syntax path
 
+        // Language tag can be given statically with rr:language or as a reference with xrr:languageReference
+        // If the xrr:languageReference is provided but returns nothing, then the rr:language is returned if it was provided
+        val calculatedLanguageTag: Option[String] =
+            if (languageMap.isDefined && languageMap.get.nonEmpty) {
+                val langMsPath = MixedSyntaxPath(languageMap.get, termMap.getReferenceFormulation())
+                val languageTags: List[Object] = langMsPath.evaluate(jsonDoc)
+                if (languageTags.isEmpty)
+                    languageTag
+                else {
+                    if (languageTags.size > 1)
+                        logger.warn("Reference language tag " + languageMap.get + " returned more than one value. Keeping only the first one.")
+                    Some(languageTags.head.toString)
+                }
+            } else
+                languageTag
+        if (logger.isTraceEnabled) logger.trace("Calculated language tag: " + calculatedLanguageTag)
+
         // Evaluate the value against the mixed syntax path
         val values: List[Object] = msPath.evaluate(jsonDoc)
 
@@ -300,7 +324,7 @@ class MorphMongoDataTranslator(val fact: IMorphFactory)
             val ntm = termMap.nestedTermMap.get
             if (ntm.isSimpleNestedTermMap)
                 // A simple nested term map just adds a term type, datatype and/or language tag. Generate the values straight away.
-                MorphBaseDataTranslator.translateMultipleValues(values, collecTermType, memberTermType, datatype, languageTag, encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues, literalTrim);
+                MorphBaseDataTranslator.translateMultipleValues(values, collecTermType, memberTermType, datatype, calculatedLanguageTag, encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues, literalTrim);
             else {
                 // Reference-valued or template-valued nested term map
                 val valuesWithPushDown =
@@ -321,13 +345,17 @@ class MorphMongoDataTranslator(val fact: IMorphFactory)
                     valuesFromNtm
             }
         } else
-            MorphBaseDataTranslator.translateMultipleValues(values, collecTermType, memberTermType, datatype, languageTag, encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues, literalTrim);
+            MorphBaseDataTranslator.translateMultipleValues(values, collecTermType, memberTermType, datatype, calculatedLanguageTag, encodeUnsafeCharsInUri, encodeUnsafeCharsInDbValues, literalTrim);
     }
 
     private def translateDataWithTemplateTermMap(termMap: AbstractTermMap, jsonDoc: String): List[RDFTerm] = {
 
-        val (collecTermType: Option[String], datatype: Option[String], languageTag: Option[String], memberTermType: String) =
-            termMap.calculateCollecTermType_DataType_LanguageTag_TermType();
+        val termProps = termMap.calculateCollecTermProperties()
+        val collecTermType = termProps.getCollectionTermType
+        val memberTermType = termProps.getTermType
+        val datatype = termProps.getDatatype
+        val languageTag = termProps.getLanguageTag
+        val languageMap = termProps.getLanguageMap
 
         // For each capturing group of the template, compute a list of replacement strings
         val msPaths = {

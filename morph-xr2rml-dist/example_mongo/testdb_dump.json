@@ -11,12 +11,12 @@ db.students.insert([
     { "FullName": { 
 		"FirstNames": ["Paul", "Jack"], 
 		"LastName": "Smith" },
-      "Hobbies": [ {"hobby":"Swimming", "place":"pool"}, {"hobby": "Soccer", "place": "stadium"} ] },
+      "Hobbies": [ {"hobby":"Swimming", "place":"pool"}, {"hobby": "Calcio", "place": "stadium", "lang": "it"} ] },
 	  
     { "FullName": { 
 		"FirstNames": ["Frank", "Francis"], 
 		"LastName": "Underwood" },
-      "Hobbies": [{"hobby":"Hiking", "place": "Mountain"}, {"hobby":"Basketball", "place": "street"}] },
+      "Hobbies": [{"hobby":"Hiking", "place": "Mountain"}, {"hobby":"Basketball", "place": "street", "lang": "fr"}] },
 	  
     { "FullName": { 
 		"FirstNames": ["Weirdo", "\#{[|`\^@]\""], 

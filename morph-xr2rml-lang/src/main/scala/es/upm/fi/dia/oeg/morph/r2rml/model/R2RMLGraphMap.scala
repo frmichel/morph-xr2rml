@@ -11,10 +11,11 @@ class R2RMLGraphMap(
     override val termType: Option[String],
     override val datatype: Option[String],
     override val languageTag: Option[String],
+    override val languageMap: Option[String],
     override val refFormulation: String,
     override val listPushDown: List[xR2RMLPushDown])
 
-        extends R2RMLTermMap(termMapType, termType, datatype, languageTag, None, refFormulation, listPushDown) {
+        extends R2RMLTermMap(termMapType, termType, datatype, languageTag, languageMap, None, refFormulation, listPushDown) {
 
     val inferredTermType = this.inferTermType;
     if (inferredTermType != null && !inferredTermType.equals(Constants.R2RML_IRI_URI)) {
@@ -27,20 +28,21 @@ object R2RMLGraphMap {
 
     def apply(rdfNode: RDFNode, refFormulation: String): R2RMLGraphMap = {
         val coreProperties = AbstractTermMap.extractCoreProperties(rdfNode, refFormulation);
-        val termMapType = coreProperties._1;
-        val termType = coreProperties._2;
-        val datatype = coreProperties._3;
-        val languageTag = coreProperties._4;
-        val nestTM = coreProperties._5;
-        val listPushDown = coreProperties._6;
-
+        val termMapType = coreProperties.getTermMapType
+        val termType = coreProperties.getTermType
+        val datatype = coreProperties.getDatatype
+        val languageTag = coreProperties.getLanguageTag
+        val languageMap = coreProperties.getLanguageMap
+        val nestTM = coreProperties.getNestedTM
+        val listPushDown = coreProperties.getListPushDown
+        
         if (nestTM.isDefined)
             logger.error("A nested term map cannot be defined in a subject map. Ignoring.")
 
         if (AbstractTermMap.isRdfCollectionTermType(termType))
             logger.error("A subject map cannot have a term type: " + termType + ". Ignoring.")
 
-        val gm = new R2RMLGraphMap(termMapType, termType, datatype, languageTag, refFormulation, listPushDown);
+        val gm = new R2RMLGraphMap(termMapType, termType, datatype, languageTag, languageMap, refFormulation, listPushDown);
         gm.parse(rdfNode)
         gm;
     }

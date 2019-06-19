@@ -24,7 +24,7 @@ class R2RMLSubjectMap(
 
     listPushDown: List[xR2RMLPushDown])
 
-        extends R2RMLTermMap(termMapType, termType, None, None, None, refFormulaion, listPushDown) {
+        extends R2RMLTermMap(termMapType, termType, None, None, None, None, refFormulaion, listPushDown) {
 
     var termtype = this.inferTermType
 }
@@ -34,10 +34,10 @@ object R2RMLSubjectMap {
 
     def apply(rdfNode: RDFNode, refFormulation: String): R2RMLSubjectMap = {
         val coreProperties = AbstractTermMap.extractCoreProperties(rdfNode, refFormulation);
-        val termMapType = coreProperties._1;
-        val termType = coreProperties._2;
-        val nestTM = coreProperties._5;
-        val listPushDown = coreProperties._6;
+        val termMapType = coreProperties.getTermMapType
+        val termType = coreProperties.getTermType
+        val nestTM = coreProperties.getNestedTM
+        val listPushDown = coreProperties.getListPushDown
 
         if (nestTM.isDefined)
             logger.error("A nested term map cannot be defined in a subject map. Ignoring.")

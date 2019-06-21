@@ -143,7 +143,7 @@ object R2RMLTriplesMap {
         // --- Predicate-Object Maps
         logger.trace("Parsing predicate-object maps")
         val pomStmts = tmResource.listProperties(Constants.R2RML_PREDICATEOBJECTMAP_PROPERTY);
-        val predicateObjectMaps = if (pomStmts != null) {
+        val predicateObjectMaps: Iterable[R2RMLPredicateObjectMap] = if (pomStmts != null) {
             pomStmts.toList().map(pomStmt => {
                 val pomObjectRes = pomStmt.getObject().asInstanceOf[Resource]
                 val predicateObjectMap = R2RMLPredicateObjectMap(pomObjectRes, logSource.refFormulation)

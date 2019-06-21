@@ -12,6 +12,7 @@ import com.hp.hpl.jena.rdf.model.RDFNode
 import com.hp.hpl.jena.rdf.model.Resource
 import com.hp.hpl.jena.vocabulary.RDF
 import java.nio.file.Path
+import java.util.regex.Pattern
 
 object GeneralUtility {
     val logger = Logger.getLogger("GeneralUtility");
@@ -277,7 +278,38 @@ object GeneralUtility {
             (stmtType.getObject == RDF.Seq))
     }
 
+    /**
+     * Remove any blank character from the string
+     */
     def cleanString(str: String) = str.trim.replaceAll("\\s", "")
+
+    /**
+     * Remove any blank character from the string except when blanks characters are within double/single quotes
+     */
+    def cleanStringExceptWithinQuotes(str: String) = {
+
+        // Match:
+        // 1- [^"']+ : any string without single/double quote
+        // 2- "([^"]|(?<=[\\])")*" : any string within double quotes, that either contains no double-quote or an escaped double-quote e.g. "a\"b"
+        //    "(?:[^"]|(?<=[\\])")*" is the same but the "?:" just means that the inside is not a capturing group
+        // 3- '([^']|(?<=[\\])')*' : any string within single quotes, that either contains no single-quote or an escaped single-quote e.g. 'a\'b'
+        val regex = Pattern.compile("""[^"']+|("(?:[^"]|(?<=[\\])")*")|('(?:[^']|(?<=[\\])')*')""")
+        val matcher = regex.matcher(str.trim)
+
+        val sb: StringBuffer = new StringBuffer()
+        while (matcher.find()) {
+            if (matcher.group(1) != null)
+                // Add double-quoted string without any change
+                sb.append(matcher.group(1))
+            else if (matcher.group(2) != null)
+                // Add single-quoted string without any change
+                sb.append(matcher.group(2))
+            else
+                // Add unquoted string after removing all blanks
+                sb.append(matcher.group().replaceAll("""\s""", ""))
+        }
+        sb.toString()
+    }
 
     /**
      * Get an available random file name in the specified directory
@@ -291,7 +323,7 @@ object GeneralUtility {
     def createRandomFile(dir: String, prefix: String = "", suffix: String = "", maxTries: Int = 10, nameSize: Int = 6): Option[File] = {
         val alphabet = ('a' to 'z') ++ ('A' to 'Z') ++ ('0' to '9')
 
-        def generateName = (1 to nameSize).map(_ => alphabet(Random.nextInt(alphabet.size))).mkString
+            def generateName = (1 to nameSize).map(_ => alphabet(Random.nextInt(alphabet.size))).mkString
 
         val dirPath = new File(dir).toPath
         var newFile: File = null

@@ -29,6 +29,7 @@ class MorphBaseTriplePatternBindingsTest {
             Some(Constants.R2RML_LITERAL_URI), // term type
             None, // data type
             None, // language tag
+            None, // language map
             None, // xR2RMLNestedTermMap]
             "JSONPath" // Reference formulation
             , Nil //PushDown
@@ -69,6 +70,7 @@ class MorphBaseTriplePatternBindingsTest {
             Some(Constants.R2RML_LITERAL_URI), // term type
             None, // data type
             None, // language tag
+            None, // language map
             None, "JSONPath", Nil) // xR2RMLNestedTermMap, Reference formulation, PushDown
         termMap.setConstantValue("3")
         assertTrue(triplePatternBinder.compatible(termMap, literal))
@@ -80,6 +82,7 @@ class MorphBaseTriplePatternBindingsTest {
             Some(Constants.R2RML_LITERAL_URI), // term type
             Some("http://www.w3.org/2001/XMLSchema#int"), // data type
             None, // language tag
+            None, // language map
             None, "JSONPath", Nil) // xR2RMLNestedTermMap, Reference formulation, PushDown
         termMap.setConstantValue("3")
         assertTrue(triplePatternBinder.compatible(termMap, literal_dt))
@@ -92,6 +95,7 @@ class MorphBaseTriplePatternBindingsTest {
             Some(Constants.R2RML_LITERAL_URI), // term type
             None, // data type
             Some("fr"), // language tag
+            None, // language map
             None, "JSONPath", Nil) // xR2RMLNestedTermMap, Reference formulation, PushDown
         termMap.setConstantValue("3")
         assertTrue(triplePatternBinder.compatible(termMap, literal_lang))
@@ -111,6 +115,7 @@ class MorphBaseTriplePatternBindingsTest {
             Constants.MorphTermMapType.ConstantTermMap, // term map type
             Some(Constants.R2RML_IRI_URI), // term type
             None, None, // data type, language tag
+            None, // language map
             None, "JSONPath", Nil) // xR2RMLNestedTermMap, Reference formulation, PushDown
         termMap.setConstantValue("http://example.org/%20starring")
         assertTrue(triplePatternBinder.compatible(termMap, iri))
@@ -132,6 +137,7 @@ class MorphBaseTriplePatternBindingsTest {
             Constants.MorphTermMapType.ReferenceTermMap, // term map type
             Some(Constants.R2RML_LITERAL_URI), // term type
             None, None, // data type, language tag
+            None, // language map
             None, "JSONPath", Nil) // xR2RMLNestedTermMap, Reference formulation, PushDown
         assertTrue(triplePatternBinder.compatible(termMap, literal))
         assertFalse(triplePatternBinder.compatible(termMap, literal_lang))
@@ -144,6 +150,7 @@ class MorphBaseTriplePatternBindingsTest {
             Some(Constants.R2RML_LITERAL_URI), // term type
             Some("http://www.w3.org/2001/XMLSchema#string"), // data type
             None, // language tag
+            None, // language map
             None, "JSONPath", Nil) // xR2RMLNestedTermMap, Reference formulation, PushDown
         assertTrue(triplePatternBinder.compatible(termMap, literal_dt))
         assertFalse(triplePatternBinder.compatible(termMap, literal))
@@ -154,6 +161,7 @@ class MorphBaseTriplePatternBindingsTest {
             Some(Constants.R2RML_LITERAL_URI), // term type
             None, // data type
             Some("fr"), // language tag
+            None, // language map
             None, "JSONPath", Nil) // xR2RMLNestedTermMap, Reference formulation, PushDown
         assertTrue(triplePatternBinder.compatible(termMap, literal_lang))
         assertFalse(triplePatternBinder.compatible(termMap, literal_langde))
@@ -171,6 +179,7 @@ class MorphBaseTriplePatternBindingsTest {
             Constants.MorphTermMapType.ReferenceTermMap, // term map type
             Some(Constants.R2RML_IRI_URI), // term type
             None, None, // data type, language tag
+            None, // language map
             None, "JSONPath", Nil) // xR2RMLNestedTermMap, Reference formulation, PushDown
         assertTrue(triplePatternBinder.compatible(termMap, iri))
         assertFalse(triplePatternBinder.compatible(termMap, literal))
@@ -190,6 +199,7 @@ class MorphBaseTriplePatternBindingsTest {
             Constants.MorphTermMapType.TemplateTermMap, // term map type
             Some(Constants.R2RML_LITERAL_URI), // term type
             None, None, // data type, language tag
+            None, // language map
             None, "JSONPath", Nil) // xR2RMLNestedTermMap, Reference formulation, PushDown
         termMap.templateString = "http://example.org/{$.toto.*}/{$.x[5]}"
         assertTrue(triplePatternBinder.compatible(termMap, literal))
@@ -212,6 +222,7 @@ class MorphBaseTriplePatternBindingsTest {
             Constants.MorphTermMapType.TemplateTermMap, // term map type
             Some(Constants.R2RML_IRI_URI), // term type
             None, None, // data type, language tag
+            None, // language map
             None, "JSONPath", Nil) // xR2RMLNestedTermMap, Reference formulation, PushDown
         termMap.templateString = "http://example.org/{$.toto.*}/{$.x[5]}"
         assertTrue(triplePatternBinder.compatible(termMap, iri))
@@ -229,6 +240,7 @@ class MorphBaseTriplePatternBindingsTest {
             Constants.MorphTermMapType.ConstantTermMap, // term map type
             Some(Constants.R2RML_IRI_URI), // term type
             None, None, // data type, language tag
+            None, // language map
             None, "JSONPath", Nil) // xR2RMLNestedTermMap, Reference formulation, PushDown
         assertTrue(triplePatternBinder.compatibleTermMaps(termMap1, termMap1))
 
@@ -236,6 +248,7 @@ class MorphBaseTriplePatternBindingsTest {
             Constants.MorphTermMapType.ReferenceTermMap, // term map type
             Some(Constants.R2RML_IRI_URI), // term type
             None, None, // data type, language tag
+            None, // language map
             None, "JSONPath", Nil) // xR2RMLNestedTermMap, Reference formulation, PushDown
         assertTrue(triplePatternBinder.compatibleTermMaps(termMap1, termMap2))
 
@@ -243,6 +256,7 @@ class MorphBaseTriplePatternBindingsTest {
             Constants.MorphTermMapType.TemplateTermMap, // term map type
             Some(Constants.R2RML_IRI_URI), // term type
             None, None, // data type, language tag
+            None, // language map
             None, "JSONPath", Nil) // xR2RMLNestedTermMap, Reference formulation, PushDown
         assertTrue(triplePatternBinder.compatibleTermMaps(termMap1, termMap2))
     }
@@ -255,6 +269,7 @@ class MorphBaseTriplePatternBindingsTest {
             Constants.MorphTermMapType.ReferenceTermMap, // term map type
             Some(Constants.R2RML_LITERAL_URI), // term type
             None, None, // data type, language tag
+            None, // language map
             None, "JSONPath", Nil) // xR2RMLNestedTermMap, Reference formulation, PushDown
         assertTrue(triplePatternBinder.compatibleTermMaps(termMap1, termMap1))
 
@@ -262,6 +277,7 @@ class MorphBaseTriplePatternBindingsTest {
             Constants.MorphTermMapType.ReferenceTermMap, // term map type
             Some(Constants.R2RML_LITERAL_URI), // term type
             None, Some("fr"), // data type, language tag
+            None, // language map
             None, "JSONPath", Nil) // xR2RMLNestedTermMap, Reference formulation, PushDown
         assertTrue(triplePatternBinder.compatibleTermMaps(termMap2, termMap2))
         assertFalse(triplePatternBinder.compatibleTermMaps(termMap1, termMap2))
@@ -270,6 +286,7 @@ class MorphBaseTriplePatternBindingsTest {
             Constants.MorphTermMapType.ReferenceTermMap, // term map type
             Some(Constants.R2RML_LITERAL_URI), // term type
             Some("http://www.w3.org/2001/XMLSchema#string"), None, // data type, language tag
+            None, // language map
             None, "JSONPath", Nil) // xR2RMLNestedTermMap, Reference formulation, PushDown
         assertTrue(triplePatternBinder.compatibleTermMaps(termMap2, termMap2))
         assertFalse(triplePatternBinder.compatibleTermMaps(termMap1, termMap2))
@@ -283,6 +300,7 @@ class MorphBaseTriplePatternBindingsTest {
             Constants.MorphTermMapType.ReferenceTermMap, // term map type
             Some(Constants.R2RML_LITERAL_URI), // term type
             None, None, // data type, language tag
+            None, // language map
             None, "JSONPath", Nil) // xR2RMLNestedTermMap, Reference formulation, PushDown
 
         // Language tags, data types
@@ -290,6 +308,7 @@ class MorphBaseTriplePatternBindingsTest {
             Constants.MorphTermMapType.ReferenceTermMap, // term map type
             Some(Constants.R2RML_IRI_URI), // term type
             None, None, // data type, language tag
+            None, // language map
             None, "JSONPath", Nil) // xR2RMLNestedTermMap, Reference formulation, PushDown
         assertTrue(triplePatternBinder.compatibleTermMaps(termMap2, termMap2))
         assertFalse(triplePatternBinder.compatibleTermMaps(termMap1, termMap2))
@@ -298,6 +317,7 @@ class MorphBaseTriplePatternBindingsTest {
             Constants.MorphTermMapType.ReferenceTermMap, // term map type
             Some(Constants.R2RML_BLANKNODE_URI), // term type
             None, None, // data type, language tag
+            None, // language map
             None, "JSONPath", Nil) // xR2RMLNestedTermMap, Reference formulation, PushDown
         assertTrue(triplePatternBinder.compatibleTermMaps(termMap2, termMap2))
         assertFalse(triplePatternBinder.compatibleTermMaps(termMap1, termMap2))

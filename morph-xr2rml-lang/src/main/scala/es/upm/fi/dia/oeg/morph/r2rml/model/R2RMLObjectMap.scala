@@ -9,16 +9,17 @@ import com.hp.hpl.jena.rdf.model.Resource
 
 import es.upm.fi.dia.oeg.morph.base.Constants
 
-class R2RMLObjectMap(override val termMapType: Constants.MorphTermMapType.Value,
-                     override val termType: Option[String],
-                     override val datatype: Option[String],
-                     override val languageTag: Option[String],
-                     override val languageMap: Option[String],
-                     override val nestedTermMap: Option[xR2RMLNestedTermMap],
-                     override val refFormulation: String,
-                     override val listPushDown: List[xR2RMLPushDown])
+class R2RMLObjectMap(
+    override val termMapType: Constants.MorphTermMapType.Value,
+    override val termType: Option[String],
+    override val datatype: Option[String],
+    override val languageTag: Option[String],
+    override val languageMap: Option[String],
+    override val nestedTermMap: Option[xR2RMLNestedTermMap],
+    override val refFormulation: String,
+    override val listPushDown: List[xR2RMLPushDown])
 
-        extends R2RMLTermMap(termMapType, termType, datatype, languageTag, languageMap, nestedTermMap, refFormulation, listPushDown) {
+    extends R2RMLTermMap(termMapType, termType, datatype, languageTag, languageMap, nestedTermMap, refFormulation, listPushDown) {
 
     var termtype = this.inferTermType
 }
@@ -28,7 +29,7 @@ object R2RMLObjectMap {
 
     def apply(rdfNode: RDFNode, refFormulation: String): R2RMLObjectMap = {
         val coreProperties = AbstractTermMap.extractCoreProperties(rdfNode, refFormulation);
-        
+
         val termMapType = coreProperties.getTermMapType
         val termType = coreProperties.getTermType
         val datatype = coreProperties.getDatatype

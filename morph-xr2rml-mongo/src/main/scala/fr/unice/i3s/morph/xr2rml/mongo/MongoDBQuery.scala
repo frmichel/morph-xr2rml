@@ -66,9 +66,10 @@ object MongoDBQuery {
      */
     def parseQueryString(q: String, stripCurlyBracket: Boolean): MongoDBQuery = {
 
-        // Fix 20190618: this cleanString removes all spaces which is a pb we search for a string that contains one...
-        //val query = GeneralUtility.cleanString(q)
-        val query = q.trim()
+        // Fix 20190618: the cleanString removes all spaces. This is a pb when the string contains 
+        // a quoted string with spaces, e.g. " Foo ' Bar' " should be cleaned as "Foo' Bar '".
+        // val query = GeneralUtility.cleanString(q)
+        val query = GeneralUtility.cleanStringExceptWithinQuotes(q)
         
         var tokens = query.trim.split("\\.")
         if (!tokens(0).equals("db")) {

@@ -1,12 +1,13 @@
 package es.upm.fi.dia.oeg.morph.base
 
+import java.io.File
+
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 import com.hp.hpl.jena.rdf.model.ModelFactory
 import com.hp.hpl.jena.rdf.model.RDFNode
-import java.io.File
 
 class GeneralUtilityTest {
 
@@ -94,12 +95,12 @@ class GeneralUtilityTest {
         println("------------------ TestCreateRandomFile ------------------")
 
         val dir = new File("/tmp").mkdirs
-        
+
         var f = GeneralUtility.createRandomFile("/tmp", "", "")
         assertTrue(f.isDefined)
         println(f.get)
         assertFalse(f.get.exists)
-        f.get.createNewFile        
+        f.get.createNewFile
         assertTrue(f.get.canWrite)
         f.get.delete()
 
@@ -107,8 +108,38 @@ class GeneralUtilityTest {
         assertTrue(f.isDefined)
         println(f.get)
         assertFalse(f.get.exists)
-        f.get.createNewFile        
+        f.get.createNewFile
         assertTrue(f.get.canWrite)
         f.get.delete()
     }
+
+    @Test def TestCleanString() {
+        println("------------------ TestCleanStringExceptWithinQuotes ------------------")
+
+        var str = """ ab """
+        var res = GeneralUtility.cleanStringExceptWithinQuotes(str)
+        println(res)
+        assertTrue(res == "ab")
+
+        str = """ "a b" """
+        res = GeneralUtility.cleanStringExceptWithinQuotes(str)
+        println(res)
+        assertTrue(res == "\"a b\"")
+
+        str = """a "b \" c" d"""
+        res = GeneralUtility.cleanStringExceptWithinQuotes(str)
+        println(res)
+        assertTrue(res == """a"b \" c"d""")
+
+        str = """ 'a b' """
+        res = GeneralUtility.cleanStringExceptWithinQuotes(str)
+        println(res)
+        assertTrue(res == "'a b'")
+
+        str = """a 'b \' c' d"""
+        res = GeneralUtility.cleanStringExceptWithinQuotes(str)
+        println(res)
+        assertTrue(res == """a'b \' c'd""")
+    }
+
 }

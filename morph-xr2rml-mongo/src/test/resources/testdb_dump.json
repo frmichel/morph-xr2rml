@@ -1,0 +1,23 @@
+# Create a test user used by xR2RML to read in the MongoDB instance
+use test
+db.createUser( { user: "user", pwd: "user", 
+      roles: [ { role: "readWrite", db: "test" } ]
+    }
+)
+
+# Add documents to collection test
+db.test.remove( {} )
+db.test.insert([
+    { 
+        "Firstname": "Paul",
+        "Lastname": "Smith" 
+    },
+    { 
+        "Firstname": "Jack",
+        "Lastname": "O'Connel"
+    },
+    { 
+        "Firstname": "foo",
+        "Lastname": "foo 'bar  '' "
+    }	  
+])

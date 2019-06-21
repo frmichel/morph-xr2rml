@@ -1,9 +1,10 @@
 # Changelog
 
-## 2019-06-21: add support for queries MongoDB queries containing values with escaped single quotes
+## 2019-06-21: add support for MongoDB queries containing values with escaped single quotes
 - Compile with patched version of Jongo (https://github.com/frmichel/jongo)
 - Fix pre-processing of MongoDB query strings: allow for escaped single-quotes + keep spaces within such escaped strings, e.g.
 ```xrr:query """db.locations.find( {'adminLevel': 'Collectivité d\\'outre-mer'} )""".```
+ - Upgrade to Scala 2.12.3
  
 ## 2019-06-19: add term map property xrr:languageReference
 - The R2RML rr:language property provides a static language tag to assign to literals. The new xrr:languageReference property allows to do that using a language tag that comes from the data source.

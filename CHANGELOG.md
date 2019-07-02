@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.1-RC] 2019-07-02: undo last modification + fix quotes management
+- Return to last official Jongo version 1.4.0 (https://github.com/frmichel/jongo)
+- Escaped single-quotes not supported anymore, instead use double-quotes notation + single quotes inside e.g.
+```xrr:query """db.locations.find( {"adminLevel": "Collectivité d'outre-mer"} )""".```
+ 
 ## 2019-06-21: add support for MongoDB queries containing values with escaped single quotes
 - Compile with patched version of Jongo (https://github.com/frmichel/jongo)
 - Fix pre-processing of MongoDB query strings: allow for escaped single-quotes + keep spaces within such escaped strings, e.g.

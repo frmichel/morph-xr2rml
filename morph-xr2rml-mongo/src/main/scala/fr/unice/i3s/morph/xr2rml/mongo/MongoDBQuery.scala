@@ -62,12 +62,12 @@ object MongoDBQuery {
      * A query string looks like this: <code>db.myCollection.find({ 'a': { \$exists: true} })</code>.
      *
      * This method returns a MongoDBQuery instance where collection = myCollection
-     * and query string = <code>{ 'a': { \$exists: true} }</code>
+     * and query string = <code>{'a':{\$exists:true} }</code>
      */
     def parseQueryString(q: String, stripCurlyBracket: Boolean): MongoDBQuery = {
 
         // Fix 20190618: the cleanString removes all spaces. This is a pb when the string contains 
-        // a quoted string with spaces, e.g. " Foo ' Bar' " should be cleaned as "Foo' Bar '".
+        // a quoted string with spaces, e.g. " Foo ' Bar ' " should be cleaned as "Foo' Bar '".
         // val query = GeneralUtility.cleanString(q)
         val query = GeneralUtility.cleanStringExceptWithinQuotes(q)
         

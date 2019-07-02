@@ -25,22 +25,12 @@ class JongoTest {
     val dbAdr = new ServerAddress("localhost", 27017)
     val mongoClient: MongoClient = new MongoClient(List(dbAdr), List(creds))
 
-    // Define the MongoDB context
-    val mongoCtx = mongoClient.getDatabase(dbName)
-    val processBlock: Block[Document] = new Block[Document]() {
-        @Override
-        def apply(document: Document) {
-            // Materialize each document as a JSON string
-            val json = document.toJson
-        }
-    }
-
     // Define the Jongo context
     val jongoHandler: JongoResultHandler = new JongoResultHandler
     val jongoCtx = new Jongo(mongoClient.getDB(dbName))
 
     /**
-     * Execute a Jongo query given as a simply query string
+     * Execute a Jongo query given as a simple query string
      */
     private def execJongo(queryStr: String, display: Boolean) = {
         val start = System.currentTimeMillis
@@ -51,9 +41,18 @@ class JongoTest {
     @Test def testQ0() {
         println("------------- testQ0 -------------")
 
-        // Equivalent queries as string for Jongo and Java filter for Mongo
-        val qStr = "{'Lastname': 'O\\'Connel'}"
+        var qStr = "{'Lastname': 'O\\'Connel'}"
+
+        qStr = """{"Lastname": "O'Connel"}"""
         println(qStr)
         execJongo(qStr, true)
+    }
+
+    @Test def test1() {
+        println("------------- test1 -------------")
+
+        var src = """{\"adminLevel\": \"Collectivité d'outre-mer\"}"""
+        println(src)
+        println(src.replaceAll("""\\"""", "\""))
     }
 }

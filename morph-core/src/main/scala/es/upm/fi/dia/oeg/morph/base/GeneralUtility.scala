@@ -284,7 +284,7 @@ object GeneralUtility {
     def cleanString(str: String) = str.trim.replaceAll("\\s", "")
 
     /**
-     * Remove any blank character from the string except when blanks characters are within double/single quotes
+     * Remove any blank character from the string except when blanks are within double/single quotes
      */
     def cleanStringExceptWithinQuotes(str: String) = {
 

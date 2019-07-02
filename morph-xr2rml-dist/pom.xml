@@ -4,6 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>morph-xr2rml-dist</artifactId>
 	<name>${project.artifactId}</name>
+	<version>1.1-RC</version>
 
 	<parent>
 		<artifactId>morph-xr2rml</artifactId>
@@ -12,7 +13,6 @@
 	</parent>
 
 	<properties>
-		<!-- <jettyVersion>8.1.19.v20160209</jettyVersion> <jerseyVersion>1.9.1</jerseyVersion> -->
 		<jettyVersion>9.3.9.v20160517</jettyVersion>
 		<jerseyVersion>2.23.1</jerseyVersion>
 	</properties>
@@ -42,9 +42,6 @@
 			<artifactId>jetty-servlet</artifactId>
 			<version>${jettyVersion}</version>
 		</dependency>
-
-		<!-- <dependency> <groupId>com.sun.jersey</groupId> <artifactId>jersey-bundle</artifactId> 
-			<version>${jerseyVersion}</version> </dependency> -->
 
 		<dependency>
 			<groupId>org.glassfish.jersey.core</groupId>

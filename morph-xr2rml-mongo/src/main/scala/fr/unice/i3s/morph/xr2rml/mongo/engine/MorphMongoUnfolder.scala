@@ -39,21 +39,23 @@ class MorphMongoUnfolder(factory: IMorphFactory) extends MorphBaseUnfolder(facto
                 null
             }
             case _: xR2RMLQuery => {
-                val encldChar = Constants.getEnclosedCharacter(dbType);
-                val query = logicalSrc.getValue.replaceAll("\"", encldChar);
-                query
+                // For some reason, Jena escapes double quotes. The workaround is to remove the slash.
+                // replaceAll takes a regular expression, so to match \" we must escape the slash hence the \\"
+                logicalSrc.getValue.replaceAll("""\\"""", "\"");
             }
             case _ => { throw new MorphException("Unknown logical table/source type: " + logicalSrc) }
         }
 
+        if (logger.isDebugEnabled())
+            logger.debug("Raw query for triples map " + triplesMap.name + ": " + logicalSrcQuery)
         val mongoQuery = MongoDBQuery.parseQueryString(logicalSrcQuery, false)
-        logger.info("Query for triples map " + triplesMap.name + ": " + mongoQuery.toString)
+        logger.info("Cleaned query for triples map " + triplesMap.name + ": " + mongoQuery.toString)
         new GenericQuery(Constants.DatabaseType.MongoDB, mongoQuery, logicalSrc.docIterator)
     }
 
     override def unfoldJoinConditions(
-        joinConditions: Set[R2RMLJoinCondition],
-        childTableAlias: String,
-        joinQueryAlias: String,
-        dbType: String): Object = { null }
+            joinConditions: Set[R2RMLJoinCondition],
+            childTableAlias: String,
+            joinQueryAlias: String,
+            dbType: String): Object = { null }
 }

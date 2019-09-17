@@ -79,8 +79,9 @@ object MongoDBQuery {
         val collection = tokens(1)
 
         // The query string starts after the '(' and finished before the trailing ')'
-        tokens = query.split("\\(")
-        var queryStr = tokens(1).substring(0, tokens(1).length - 1).trim
+        // @TODO: this is too simple and does not allow to add someting after "db.collecion.find(...)" e.g. distinct() or sort().
+        val indexFirstPar = query.indexOf('(')
+        var queryStr = query.substring(indexFirstPar + 1, query.length - 1).trim
         
         if (stripCurlyBracket)
             if (queryStr.startsWith("{") && queryStr.endsWith("}"))

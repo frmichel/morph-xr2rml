@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>morph-xr2rml-dist</artifactId>
 	<name>${project.artifactId}</name>
-	<version>1.1-RC</version>
+	<version>1.1-RC2</version>
 
 	<parent>
 		<artifactId>morph-xr2rml</artifactId>

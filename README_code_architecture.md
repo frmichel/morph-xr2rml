@@ -69,7 +69,7 @@ it builds all main objects relying on database-specific implementations in Morph
 ### Execution entry point
 
 fr.unice.i3s.morph.xr2rml.engine.MorphRunner (project morph-xr2rml-dist) provides the main class to run the process:
-- Load the configuration file and crezate the MorphProperties object,
+- Load the configuration file and create the MorphProperties object,
 - Create the concrete instance of MorphBaseRunnerFactory whose distinguished name is provided in the configuration file
   (property runner_factory.class.name),
 - Get a MorphBaseRunner from the factory and run it.
@@ -79,6 +79,8 @@ fr.unice.i3s.morph.xr2rml.engine.MorphRunner (project morph-xr2rml-dist) provide
 Below we describe the architecture of classes regarding the treatment of RDBs. This is easily adapted to the case of MongoDB.
 
 ### Materialization process
+The description below talks about SQL queries but the very same process can be translated to MongoDB.
+
 For each triples map (R2RMLTriplesMap) of the mapping document (R2RMLMappingDocument):
 
 - Unfold the triples map (MorphRDBUnfolder.unfoldTriplesMap): unfolding means to progressively

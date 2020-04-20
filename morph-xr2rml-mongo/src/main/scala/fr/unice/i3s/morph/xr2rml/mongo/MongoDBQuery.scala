@@ -123,7 +123,7 @@ object MongoDBQuery {
 
         val q = mostSpecificQuery(mq1.query, mq2.query)
         if (q.isDefined)
-            Some(new xR2RMLQuery(q.get, q1.refFormulation, q1.docIterator, q1.uniqueRefs union q2.uniqueRefs, q1.listPushDown ++ q2.listPushDown))
+            Some(new xR2RMLQuery(q.get, q1.refFormulation, q1.docIterator, q1.uniqueRefs union q2.uniqueRefs, q1.listPushDown ++ q2.listPushDown, None))
         else None
     }
 

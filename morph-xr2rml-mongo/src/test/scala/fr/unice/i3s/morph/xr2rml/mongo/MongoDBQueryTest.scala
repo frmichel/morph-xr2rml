@@ -16,15 +16,15 @@ class MongoDBQueryTest {
     @Test def testMostSpecificQuery_empty() {
         println("------------------------------------------------- testMostSpecificQuery_empty")
 
-        var ls1 = new xR2RMLQuery("db.collection.find()", "JSONPath", None, Set.empty, Nil)
-        var ls2 = new xR2RMLQuery("db.collection.find()", "JSONPath", None, Set.empty, Nil)
+        var ls1 = new xR2RMLQuery("db.collection.find()", "JSONPath", None, Set.empty, Nil, None)
+        var ls2 = new xR2RMLQuery("db.collection.find()", "JSONPath", None, Set.empty, Nil, None)
 
         var mostSpec = MongoDBQuery.mostSpecificQuery(ls2, ls1)
         assertTrue(mostSpec.isDefined)
         println(mostSpec.get)
         assertEquals("db.collection.find({})", mostSpec.get.query)
 
-        ls2 = new xR2RMLQuery("db.collection.find({ }  )", "JSONPath", None, Set.empty, Nil)
+        ls2 = new xR2RMLQuery("db.collection.find({ }  )", "JSONPath", None, Set.empty, Nil, None)
 
         mostSpec = MongoDBQuery.mostSpecificQuery(ls1, ls2)
         assertTrue(mostSpec.isDefined)
@@ -35,16 +35,16 @@ class MongoDBQueryTest {
     @Test def testMostSpecificQuery() {
         println("------------------------------------------------- testMostSpecificQuery")
 
-        var ls1 = new xR2RMLQuery("db.collection.find({query1, query2})", "JSONPath", None, Set.empty, Nil)
-        var ls2 = new xR2RMLQuery("db.collection.find({query1, query2})", "JSONPath", None, Set.empty, Nil)
+        var ls1 = new xR2RMLQuery("db.collection.find({query1, query2})", "JSONPath", None, Set.empty, Nil, None)
+        var ls2 = new xR2RMLQuery("db.collection.find({query1, query2})", "JSONPath", None, Set.empty, Nil, None)
 
         var mostSpec = MongoDBQuery.mostSpecificQuery(ls2, ls1)
         assertTrue(mostSpec.isDefined)
         println(mostSpec.get)
         assertEquals("db.collection.find({query1,query2})", mostSpec.get.query)
 
-        ls1 = new xR2RMLQuery("db.collection.find({query1, query2})", "JSONPath", None, Set.empty, Nil)
-        ls2 = new xR2RMLQuery("db.collection.find({query1, query2, query3})", "JSONPath", None, Set.empty, Nil)
+        ls1 = new xR2RMLQuery("db.collection.find({query1, query2})", "JSONPath", None, Set.empty, Nil, None)
+        ls2 = new xR2RMLQuery("db.collection.find({query1, query2, query3})", "JSONPath", None, Set.empty, Nil, None)
 
         mostSpec = MongoDBQuery.mostSpecificQuery(ls1, ls2)
         assertTrue(mostSpec.isDefined)
@@ -60,8 +60,8 @@ class MongoDBQueryTest {
     @Test def testMostSpecificQuery2() {
         println("------------------------------------------------- testMostSpecificQuery2")
 
-        var ls1 = new xR2RMLQuery("db.collection.find({query1, query2})", "JSONPath", None, Set.empty, Nil)
-        var ls2 = new xR2RMLQuery("db.collection.find({query1, query2})", "XPath", None, Set.empty, Nil)
+        var ls1 = new xR2RMLQuery("db.collection.find({query1, query2})", "JSONPath", None, Set.empty, Nil, None)
+        var ls2 = new xR2RMLQuery("db.collection.find({query1, query2})", "XPath", None, Set.empty, Nil, None)
 
         var mostSpec = MongoDBQuery.mostSpecificQuery(ls1, ls2)
         assertFalse(mostSpec.isDefined)
@@ -69,7 +69,7 @@ class MongoDBQueryTest {
         mostSpec = MongoDBQuery.mostSpecificQuery(ls2, ls1)
         assertFalse(mostSpec.isDefined)
 
-        ls2 = new xR2RMLQuery("db.collection.find({query1, query2})", "XPath", Some("iter"), Set.empty, Nil)
+        ls2 = new xR2RMLQuery("db.collection.find({query1, query2})", "XPath", Some("iter"), Set.empty, Nil, None)
         mostSpec = MongoDBQuery.mostSpecificQuery(ls2, ls1)
         assertFalse(mostSpec.isDefined)
     }
@@ -77,8 +77,8 @@ class MongoDBQueryTest {
     @Test def testMostSpecificQuery3 {
         println("------------------------------------------------- testMostSpecificQuery2")
 
-        var ls1 = new xR2RMLQuery("db.taxref3.find( { $where:'this.codeTaxon == this.codeReference' } )", "JSONPath", None, Set.empty, Nil)
-        var ls2 = new xR2RMLQuery("db.taxref3.find( {$where: 'this.codeTaxon == this.codeReference', 'spm' : {$ne: ''}, 'spm': {$ne: null} } )", "JSONPath", None, Set.empty, Nil)
+        var ls1 = new xR2RMLQuery("db.taxref3.find( { $where:'this.codeTaxon == this.codeReference' } )", "JSONPath", None, Set.empty, Nil, None)
+        var ls2 = new xR2RMLQuery("db.taxref3.find( {$where: 'this.codeTaxon == this.codeReference', 'spm' : {$ne: ''}, 'spm': {$ne: null} } )", "JSONPath", None, Set.empty, Nil, None)
 
         var mostSpec = MongoDBQuery.mostSpecificQuery(ls1, ls2)
         println(mostSpec.get)
@@ -88,12 +88,12 @@ class MongoDBQueryTest {
     @Test def testIsLeftMoreSpecific_empty() {
         println("------------------------------------------------- testIsLeftMoreSpecific_empty")
 
-        var left = new xR2RMLQuery("db.collection.find()", "JSONPath", None, Set.empty, Nil)
-        var right = new xR2RMLQuery("db.collection.find()", "JSONPath", None, Set.empty, Nil)
+        var left = new xR2RMLQuery("db.collection.find()", "JSONPath", None, Set.empty, Nil, None)
+        var right = new xR2RMLQuery("db.collection.find()", "JSONPath", None, Set.empty, Nil, None)
         var mostSpec = MongoDBQuery.isLeftMoreSpecificOrEqual(right, left)
         assertTrue(mostSpec)
 
-        right = new xR2RMLQuery("db.collection.find({})", "JSONPath", None, Set.empty, Nil)
+        right = new xR2RMLQuery("db.collection.find({})", "JSONPath", None, Set.empty, Nil, None)
         mostSpec = MongoDBQuery.isLeftMoreSpecificOrEqual(left, right)
         assertTrue(mostSpec)
     }
@@ -101,13 +101,13 @@ class MongoDBQueryTest {
     @Test def testIsLeftMoreSpecific() {
         println("------------------------------------------------- testIsLeftMoreSpecific")
 
-        var left = new xR2RMLQuery("db.collection.find({query1, query2})", "JSONPath", None, Set.empty, Nil)
-        var right = new xR2RMLQuery("db.collection.find({query1, query2})", "JSONPath", None, Set.empty, Nil)
+        var left = new xR2RMLQuery("db.collection.find({query1, query2})", "JSONPath", None, Set.empty, Nil, None)
+        var right = new xR2RMLQuery("db.collection.find({query1, query2})", "JSONPath", None, Set.empty, Nil, None)
 
         assertTrue(MongoDBQuery.isLeftMoreSpecificOrEqual(left, right))
 
-        left = new xR2RMLQuery("db.collection.find({query1, query2})", "JSONPath", None, Set.empty, Nil)
-        right = new xR2RMLQuery("db.collection.find({query1, query2, query3})", "JSONPath", None, Set.empty, Nil)
+        left = new xR2RMLQuery("db.collection.find({query1, query2})", "JSONPath", None, Set.empty, Nil, None)
+        right = new xR2RMLQuery("db.collection.find({query1, query2, query3})", "JSONPath", None, Set.empty, Nil, None)
 
         assertFalse(MongoDBQuery.isLeftMoreSpecificOrEqual(left, right))
         assertTrue(MongoDBQuery.isLeftMoreSpecificOrEqual(right, left))
@@ -116,13 +116,13 @@ class MongoDBQueryTest {
     @Test def testIsLeftMoreSpecific2() {
         println("------------------------------------------------- testIsLeftMoreSpecific2")
 
-        var ls1 = new xR2RMLQuery("db.collection.find({query1, query2})", "JSONPath", None, Set.empty, Nil)
-        var ls2 = new xR2RMLQuery("db.collection.find({query1, query2})", "XPath", None, Set.empty, Nil)
+        var ls1 = new xR2RMLQuery("db.collection.find({query1, query2})", "JSONPath", None, Set.empty, Nil, None)
+        var ls2 = new xR2RMLQuery("db.collection.find({query1, query2})", "XPath", None, Set.empty, Nil, None)
 
         assertFalse(MongoDBQuery.isLeftMoreSpecificOrEqual(ls1, ls2))
         assertFalse(MongoDBQuery.isLeftMoreSpecificOrEqual(ls2, ls1))
 
-        ls2 = new xR2RMLQuery("db.collection.find({query1, query2})", "XPath", Some("iter"), Set.empty, Nil)
+        ls2 = new xR2RMLQuery("db.collection.find({query1, query2})", "XPath", Some("iter"), Set.empty, Nil, None)
         assertFalse(MongoDBQuery.isLeftMoreSpecificOrEqual(ls1, ls2))
         assertFalse(MongoDBQuery.isLeftMoreSpecificOrEqual(ls2, ls1))
     }

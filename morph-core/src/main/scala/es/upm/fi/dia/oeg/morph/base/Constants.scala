@@ -300,6 +300,9 @@ object Constants {
     val xR2RML_UNIQUEREF_URI = xR2RML_NS + "uniqueRef";
     val xR2RML_UNIQUEREF_PROPERTY = ResourceFactory.createProperty(xR2RML_UNIQUEREF_URI);
 
+    val xR2RML_SPLIT_URI = xR2RML_NS + "split";
+    val xR2RML_SPLIT_PROPERTY = ResourceFactory.createProperty(xR2RML_SPLIT_URI);
+
     // Reference formulation
     val xR2RML_REFFORMULATION_COLUMN = "Column";
     val xR2RML_REFFORMULATION_JSONPATH = "JSONPath";

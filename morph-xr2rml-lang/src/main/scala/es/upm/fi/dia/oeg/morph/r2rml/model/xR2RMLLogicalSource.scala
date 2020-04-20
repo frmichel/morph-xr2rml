@@ -24,11 +24,12 @@ import es.upm.fi.dia.oeg.morph.base.Constants
  * @author Franck Michel, I3S laboratory
  */
 abstract class xR2RMLLogicalSource(
-        val logicalTableType: Constants.LogicalTableType.Value,
-        val refFormulation: String,
-        val docIterator: Option[String],
-        val uniqueRefs: Set[String],
-        val listPushDown: List[xR2RMLPushDown]) {
+    val logicalTableType: Constants.LogicalTableType.Value,
+    val refFormulation: String,
+    val docIterator: Option[String],
+    val uniqueRefs: Set[String],
+    val listPushDown: List[xR2RMLPushDown],
+    val split: Option[Integer]) {
 
     var alias: String = null;
 
@@ -112,7 +113,7 @@ object xR2RMLLogicalSource {
                         throw new Exception(msg);
                     }
 
-                    new xR2RMLTable(tableName, listPushDown)
+                    new xR2RMLTable(tableName)
 
                 } else if (sqlQueryStmt != null) {
 
@@ -134,12 +135,12 @@ object xR2RMLLogicalSource {
                         throw new Exception(msg);
                     }
 
-                    new xR2RMLQuery(queryStr, refFormulation, readIterator(resource), uniqueRefs, listPushDown)
+                    new xR2RMLQuery(queryStr, refFormulation, readIterator(resource), uniqueRefs, listPushDown, readSplit(resource))
 
                 } else if (queryStmt != null) {
                     // xR2RML query
                     val queryStr = queryStmt.getObject.toString.trim;
-                    new xR2RMLQuery(queryStr, refFormulation, readIterator(resource), uniqueRefs, listPushDown)
+                    new xR2RMLQuery(queryStr, refFormulation, readIterator(resource), uniqueRefs, listPushDown, readSplit(resource))
 
                 } else {
                     val errorMessage = "Missing logical source property: rr:tableName, rr:sqlQuery or xrr:query";
@@ -172,6 +173,23 @@ object xR2RMLLogicalSource {
                 else None
             }
         iter
+    }
+
+    /**
+     *  Read the xrr:split property, return None if undefined
+     */
+    private def readSplit(resource: Resource): Option[Integer] = {
+        val stmt = resource.getProperty(Constants.xR2RML_SPLIT_PROPERTY)
+        val split: Option[Integer] =
+            if (stmt == null)
+                None
+            else {
+                val splitStr = stmt.getObject.toString.trim;
+                if (!splitStr.isEmpty)
+                    Some(splitStr.toInt)
+                else None
+            }
+        split
     }
 
     /** Return true is the reference formulation has the default value i.e. xrr:Column */

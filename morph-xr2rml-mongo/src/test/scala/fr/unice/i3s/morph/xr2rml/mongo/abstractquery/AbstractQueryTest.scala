@@ -53,8 +53,8 @@ class AbstractQueryTest {
     @Test def test_mergeAbstractAtmoicQuery_noUniq1() {
         println("------ test_mergeAbstractAtmoicQuery_noUniq1")
 
-        val ls1 = new xR2RMLQuery("db.collection.find()", "JSONPath", None, Set.empty, Nil, None)
-        var ls1bis = new xR2RMLQuery("db.collection.find()", "JSONPath", None, Set.empty, Nil, None)
+        val ls1 = new xR2RMLQuery("db.collection.find()", "JSONPath", None, Set.empty, Nil)
+        var ls1bis = new xR2RMLQuery("db.collection.find()", "JSONPath", None, Set.empty, Nil)
 
         // Same From, same projection of ?x, same Where, but not unique reference
         q1 = new AbstractQueryAtomicMongo(tpb1, ls1, Set(projx1), Set(cond1), None)
@@ -67,9 +67,9 @@ class AbstractQueryTest {
     @Test def test_mergeAbstractAtmoicQuery_noUniq2() {
         println("------ test_mergeAbstractAtmoicQuery_noUniq2")
 
-        val ls1 = new xR2RMLQuery("db.collection.find()", "JSONPath", None, Set.empty, Nil, None)
-        val ls2 = new xR2RMLQuery("db.collection.find({query2})", "JSONPath", None, Set.empty, Nil, None)
-        val ls1bis = new xR2RMLQuery("db.collection.find()", "JSONPath", None, Set.empty, Nil, None)
+        val ls1 = new xR2RMLQuery("db.collection.find()", "JSONPath", None, Set.empty, Nil)
+        val ls2 = new xR2RMLQuery("db.collection.find({query2})", "JSONPath", None, Set.empty, Nil)
+        val ls1bis = new xR2RMLQuery("db.collection.find()", "JSONPath", None, Set.empty, Nil)
 
         // NOT same From, same projection of ?x, same Where
         q1 = new AbstractQueryAtomicMongo(tpb1, ls1, Set(projx1), Set(cond1), None)
@@ -93,8 +93,8 @@ class AbstractQueryTest {
     @Test def test_mergeAbstractAtmoicQuery_noUniq3() {
         println("------ test_mergeAbstractAtmoicQuery_noUniq3")
 
-        val ls1 = new xR2RMLQuery("db.collection.find({query1})", "JSONPath", None, Set.empty, Nil, None)
-        val ls1bis = new xR2RMLQuery("db.collection.find({query1})", "JSONPath", None, Set.empty, Nil, None)
+        val ls1 = new xR2RMLQuery("db.collection.find({query1})", "JSONPath", None, Set.empty, Nil)
+        val ls1bis = new xR2RMLQuery("db.collection.find({query1})", "JSONPath", None, Set.empty, Nil)
 
         // Same From, same projection of ?x, ?y as other reference, same Where
         q1 = new AbstractQueryAtomicMongo(tpb1, ls1, Set(projx1), Set(cond1), None)
@@ -113,16 +113,16 @@ class AbstractQueryTest {
         println("------ test_mergeAbstractAtmoicQuery_Uniq1")
 
         // Same From with '' and '{}', same projection of ?x, same Where
-        var ls1 = new xR2RMLQuery("db.collection.find()", "JSONPath", None, Set("ref1"), Nil, None)
-        var ls1bis = new xR2RMLQuery("db.collection.find({})", "JSONPath", None, Set("ref1"), Nil, None)
+        var ls1 = new xR2RMLQuery("db.collection.find()", "JSONPath", None, Set("ref1"), Nil)
+        var ls1bis = new xR2RMLQuery("db.collection.find({})", "JSONPath", None, Set("ref1"), Nil)
         q1 = new AbstractQueryAtomicMongo(tpb1, ls1, Set(projx1), Set(cond1), None)
         q2 = new AbstractQueryAtomicMongo(tpb2, ls1bis, Set(projx1bis), Set(cond1bis), None)
         q = q1.mergeForInnerJoin(q2)
         assertTrue(q.isDefined)
 
         // Same From, same projection of ?x, same Where on ?x
-        ls1 = new xR2RMLQuery("db.collection.find({query1})", "JSONPath", None, Set("ref1"), Nil, None)
-        ls1bis = new xR2RMLQuery("db.collection.find({query1})", "JSONPath", None, Set("ref1"), Nil, None)
+        ls1 = new xR2RMLQuery("db.collection.find({query1})", "JSONPath", None, Set("ref1"), Nil)
+        ls1bis = new xR2RMLQuery("db.collection.find({query1})", "JSONPath", None, Set("ref1"), Nil)
         q1 = new AbstractQueryAtomicMongo(tpb1, ls1, Set(projx1), Set(cond1), None)
         q2 = new AbstractQueryAtomicMongo(tpb2, ls1bis, Set(projx1bis), Set(cond1bis), None)
 
@@ -158,8 +158,8 @@ class AbstractQueryTest {
     @Test def test_mergeAbstractAtmoicQuery_Uniq2() {
         println("------ test_mergeAbstractAtmoicQuery_Uniq2")
 
-        val ls1 = new xR2RMLQuery("db.collection.find({query1})", "JSONPath", None, Set("ref1"), Nil, None)
-        val ls2 = new xR2RMLQuery("db.collection.find({query1, query2})", "JSONPath", None, Set("ref1"), Nil, None)
+        val ls1 = new xR2RMLQuery("db.collection.find({query1})", "JSONPath", None, Set("ref1"), Nil)
+        val ls2 = new xR2RMLQuery("db.collection.find({query1, query2})", "JSONPath", None, Set("ref1"), Nil)
 
         // Right From is more specific than Left From, same projection of ?x, ?y as other reference, same Where on ?x
         q1 = new AbstractQueryAtomicMongo(tpb1, ls1, Set(projx1), Set(cond1), None)
@@ -275,8 +275,8 @@ class AbstractQueryTest {
         val res = ResourceFactory.createResource("http://toto#MyTriplesMap")
         val tm = new R2RMLTriplesMap(res, null, null, null, null)
 
-        val ls1 = new xR2RMLQuery("db.collection.find({query1})", "JSONPath", None, Set.empty, Nil, None)
-        var ls2 = new xR2RMLQuery("db.collection.find({query1})", "JSONPath", None, Set.empty, Nil, None)
+        val ls1 = new xR2RMLQuery("db.collection.find({query1})", "JSONPath", None, Set.empty, Nil)
+        var ls2 = new xR2RMLQuery("db.collection.find({query1})", "JSONPath", None, Set.empty, Nil)
 
         var q1 = new AbstractQueryAtomicMongo(new TpBindings, ls1, Set.empty, Set.empty, None)
         var q2 = new AbstractQueryAtomicMongo(new TpBindings, ls2, Set.empty, Set.empty, None)
@@ -287,7 +287,7 @@ class AbstractQueryTest {
 
         // -----------------------------------------
 
-        ls2 = new xR2RMLQuery("db.collection.find({query1, query2})", "JSONPath", None, Set.empty, Nil, None)
+        ls2 = new xR2RMLQuery("db.collection.find({query1, query2})", "JSONPath", None, Set.empty, Nil)
         q2 = new AbstractQueryAtomicMongo(new TpBindings, ls2, Set.empty, Set.empty, None)
         q = q1.propagateConditionFromJoinedQuery(q2)
         println(q)
@@ -300,8 +300,8 @@ class AbstractQueryTest {
         val res = ResourceFactory.createResource("http://toto#MyTriplesMap")
         val tm = new R2RMLTriplesMap(res, null, null, null, null)
 
-        val ls1 = new xR2RMLQuery("db.collection.find({query1})", "JSONPath", None, Set.empty, Nil, None)
-        val ls2 = new xR2RMLQuery("db.collection.find({query1})", "JSONPath", None, Set.empty, Nil, None)
+        val ls1 = new xR2RMLQuery("db.collection.find({query1})", "JSONPath", None, Set.empty, Nil)
+        val ls2 = new xR2RMLQuery("db.collection.find({query1})", "JSONPath", None, Set.empty, Nil)
 
         // No shared variable
         val proj1 = new AbstractQueryProjection(Set("ref1"), Some("?x"))
@@ -324,8 +324,8 @@ class AbstractQueryTest {
         val res = ResourceFactory.createResource("http://toto#MyTriplesMap")
         val tm = new R2RMLTriplesMap(res, null, null, null, null)
 
-        val ls1 = new xR2RMLQuery("db.collection.find({query1})", "JSONPath", None, Set.empty, Nil, None)
-        val ls2 = new xR2RMLQuery("db.collection.find({query1})", "JSONPath", None, Set.empty, Nil, None)
+        val ls1 = new xR2RMLQuery("db.collection.find({query1})", "JSONPath", None, Set.empty, Nil)
+        val ls2 = new xR2RMLQuery("db.collection.find({query1})", "JSONPath", None, Set.empty, Nil)
 
         val proj1 = new AbstractQueryProjection(Set("ref1"), Some("?x"))
         val proj2 = new AbstractQueryProjection(Set("ref2"), Some("?x"))
@@ -359,8 +359,8 @@ class AbstractQueryTest {
     @Test def test_getProjectionsForVariable() {
         println("------ test_getProjectinosForVariable")
 
-        val ls1 = new xR2RMLQuery("db.collection.find({query1})", "JSONPath", None, Set.empty, Nil, None)
-        val ls2 = new xR2RMLQuery("db.collection.find({query1})", "JSONPath", None, Set.empty, Nil, None)
+        val ls1 = new xR2RMLQuery("db.collection.find({query1})", "JSONPath", None, Set.empty, Nil)
+        val ls2 = new xR2RMLQuery("db.collection.find({query1})", "JSONPath", None, Set.empty, Nil)
 
         // No shared variable
         val proj1 = new AbstractQueryProjection(Set("ref1"), Some("?x"))

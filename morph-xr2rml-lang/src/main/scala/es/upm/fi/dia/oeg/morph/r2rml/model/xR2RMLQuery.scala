@@ -11,9 +11,8 @@ class xR2RMLQuery(
     refFormulation: String,
     iterator: Option[String],
     uniqueRefs: Set[String],
-    override val listPushDown: List[xR2RMLPushDown],
-    override val split: Option[Integer])
-        extends xR2RMLLogicalSource(Constants.LogicalTableType.QUERY, refFormulation, iterator, uniqueRefs, listPushDown, split) {
+    listPushDown: List[xR2RMLPushDown])
+        extends xR2RMLLogicalSource(Constants.LogicalTableType.QUERY, refFormulation, iterator, uniqueRefs, listPushDown) {
 
     /**
      * Return true if both xR2RMLQueries have the same query, reference formulation and iterator.

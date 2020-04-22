@@ -19,17 +19,17 @@ import es.upm.fi.dia.oeg.morph.base.Constants
  * In an RDB, this is typically the primary key but it is possible to get this information using table metadata.
  * In MongoDB, the "_id" field is unique thus reference "$._id" is unique, but there is no way to know whether
  * some other fields are unique.
+ * @param split max number of triples in the model (in materialization mode). Allow to generate multiple files for big datasets.
  *
  * @author Freddy Priyatna
  * @author Franck Michel, I3S laboratory
  */
 abstract class xR2RMLLogicalSource(
-    val logicalTableType: Constants.LogicalTableType.Value,
-    val refFormulation: String,
-    val docIterator: Option[String],
-    val uniqueRefs: Set[String],
-    val listPushDown: List[xR2RMLPushDown],
-    val split: Option[Integer]) {
+        val logicalTableType: Constants.LogicalTableType.Value,
+        val refFormulation: String,
+        val docIterator: Option[String],
+        val uniqueRefs: Set[String],
+        val listPushDown: List[xR2RMLPushDown]) {
 
     var alias: String = null;
 
@@ -62,7 +62,7 @@ object xR2RMLLogicalSource {
      * @param reource an xrr:LogicalSource or rr:LogicalTable resource
      * @param logResType class URI of a logical source or logical table
      * @param refFormulation the reference formulation
-     * @return instance of xR2RMLTable and xR2RMLQuery
+     * @return instance of xR2RMLTable or xR2RMLQuery
      */
     def parse(resource: Resource, logResType: String, refFormulation: String): xR2RMLLogicalSource = {
         val logSrc: xR2RMLLogicalSource =
@@ -135,12 +135,12 @@ object xR2RMLLogicalSource {
                         throw new Exception(msg);
                     }
 
-                    new xR2RMLQuery(queryStr, refFormulation, readIterator(resource), uniqueRefs, listPushDown, readSplit(resource))
+                    new xR2RMLQuery(queryStr, refFormulation, readIterator(resource), uniqueRefs, listPushDown)
 
                 } else if (queryStmt != null) {
                     // xR2RML query
                     val queryStr = queryStmt.getObject.toString.trim;
-                    new xR2RMLQuery(queryStr, refFormulation, readIterator(resource), uniqueRefs, listPushDown, readSplit(resource))
+                    new xR2RMLQuery(queryStr, refFormulation, readIterator(resource), uniqueRefs, listPushDown)
 
                 } else {
                     val errorMessage = "Missing logical source property: rr:tableName, rr:sqlQuery or xrr:query";
@@ -173,23 +173,6 @@ object xR2RMLLogicalSource {
                 else None
             }
         iter
-    }
-
-    /**
-     *  Read the xrr:split property, return None if undefined
-     */
-    private def readSplit(resource: Resource): Option[Integer] = {
-        val stmt = resource.getProperty(Constants.xR2RML_SPLIT_PROPERTY)
-        val split: Option[Integer] =
-            if (stmt == null)
-                None
-            else {
-                val splitStr = stmt.getObject.toString.trim;
-                if (!splitStr.isEmpty)
-                    Some(splitStr.toInt)
-                else None
-            }
-        split
     }
 
     /** Return true is the reference formulation has the default value i.e. xrr:Column */

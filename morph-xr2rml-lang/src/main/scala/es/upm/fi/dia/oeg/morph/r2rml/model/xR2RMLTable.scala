@@ -9,7 +9,7 @@ class xR2RMLTable(
     val tableName: String)
 
         extends xR2RMLLogicalSource(
-            Constants.LogicalTableType.TABLE_NAME, Constants.xR2RML_REFFORMULATION_COLUMN, None, Set.empty, List(), None) {
+            Constants.LogicalTableType.TABLE_NAME, Constants.xR2RML_REFFORMULATION_COLUMN, None, Set.empty, List()) {
 
     override def equals(q: Any): Boolean = {
         q.isInstanceOf[xR2RMLTable] && {

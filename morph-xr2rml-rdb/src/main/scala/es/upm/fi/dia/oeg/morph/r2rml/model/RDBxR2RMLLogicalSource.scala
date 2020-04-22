@@ -24,7 +24,7 @@ abstract class RDBxR2RMLLogicalSource(
     uniqueRefs: Set[String],
     listPushDown: List[xR2RMLPushDown])
 
-        extends xR2RMLLogicalSource(logicalTableType, refFormulation, docIterator, uniqueRefs, listPushDown, None) {
+        extends xR2RMLLogicalSource(logicalTableType, refFormulation, docIterator, uniqueRefs, listPushDown) {
 
     var tableMetaData: Option[MorphTableMetaData] = None;
 

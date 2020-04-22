@@ -20,6 +20,7 @@ class MorphProperties extends java.util.Properties {
 
     var mappingDocumentFilePath: String = null;
     var outputFilePath: String = null;
+    var outputFileMaxTriples: Int = 0;
     var queryFilePath: Option[String] = None;
     var outputSyntaxRdf: String = null;
     var outputSyntaxResult: String = null;
@@ -43,7 +44,7 @@ class MorphProperties extends java.util.Properties {
     //batch upgrade
     var literalRemoveStrangeChars: Boolean = true;
     var literalTrim: Boolean = true;
-    
+
     var encodeUnsafeCharsInUri: Boolean = true;
     var encodeUnsafeCharsInDbValues: Boolean = true;
     var transformString: Option[String] = None;
@@ -124,6 +125,9 @@ class MorphProperties extends java.util.Properties {
 
         this.outputFilePath = this.getProperty(Constants.OUTPUTFILE_PROP_NAME, "result.txt")
         logger.info("Output file = " + this.outputFilePath)
+
+        this.outputFileMaxTriples = this.readInteger(Constants.OUTPUTFILE_MAX_TRIPLES, 0)
+        logger.info("Output file max number of triples = " + this.outputFileMaxTriples)
 
         if (configurationDirectory != null) {
             this.outputFilePath = configurationDirectory + outputFilePath

@@ -43,7 +43,10 @@ class MorphBaseRunner(val factory: IMorphFactory) {
         factory.getDataTranslator.translateData_Materialization(factory.getMappingDocument)
 
         // Write the result to the output file
-        factory.getMaterializer.serialize(factory.getProperties.outputSyntaxRdf)
+        // v1.2 - this is moved to the DataTranslator so that we can save several files during the translation process,
+        // using the 'split' property of the logical source can be used as a max number of triples in a file 
+        //factory.getMaterializer.serialize(factory.getProperties.outputSyntaxRdf)
+        
         conclude(startTime)
     }
 

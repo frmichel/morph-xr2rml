@@ -128,10 +128,10 @@ object Constants {
     val QUERYFILE_PROP_NAME = "query.file.path";
     val ONTOURL_PROP_NAME = "onto.url.path";
     val OUTPUTFILE_PROP_NAME = "output.file.path";
+    val OUTPUTFILE_MAX_TRIPLES = "output.file.max_triples";
     val OUTPUT_SYNTAX_RDF = "output.syntax.rdf";
     val OUTPUT_SYNTAX_RESULT = "output.syntax.result";
     val OUTPUTFILE_DISPLAY = "output.display";
-    val SPLIT_OUTPUT_PER_CONCEPT = "split_output_per_concept";
 
     val OPTIMIZE_TB = "querytranslator.abstract.selfjoinelimination";
     val OPTIMIZE_SU = "querytranslator.abstract.selfunionelimination";
@@ -299,9 +299,6 @@ object Constants {
 
     val xR2RML_UNIQUEREF_URI = xR2RML_NS + "uniqueRef";
     val xR2RML_UNIQUEREF_PROPERTY = ResourceFactory.createProperty(xR2RML_UNIQUEREF_URI);
-
-    val xR2RML_SPLIT_URI = xR2RML_NS + "split";
-    val xR2RML_SPLIT_PROPERTY = ResourceFactory.createProperty(xR2RML_SPLIT_URI);
 
     // Reference formulation
     val xR2RML_REFFORMULATION_COLUMN = "Column";

@@ -28,6 +28,9 @@ class MorphBaseMaterializer(
 
     val logger = Logger.getLogger(this.getClass.getName)
 
+    /** Count of files serialized in case a max number of triples is defined by property split of logical source */
+    var counter: Integer = 0
+
     /**
      * Serialize the default Jena model into the output file defined in the configuration
      *
@@ -37,6 +40,22 @@ class MorphBaseMaterializer(
     def serialize(syntax: String): Option[File] = {
         val output = new File(factory.getProperties.outputFilePath)
         serialize(this.model, output, syntax)
+    }
+
+    /**
+     * Serialize the default Jena model into the file defined in the configuration
+     * with an additional index at the end of the file name,
+     * and removes all triples from the model.
+     *
+     * @param syntax the RDF syntax to use
+     * @return the output file or None if the operation failed
+     */
+    def serializeIncremental(syntax: String): Option[File] = {
+        val output = new File(factory.getProperties.outputFilePath + '.' + counter.toString)
+        val result = serialize(this.model, output, syntax)
+        counter += 1
+        this.model.removeAll()
+        result
     }
 
     /**
@@ -96,7 +115,7 @@ class MorphBaseMaterializer(
                  * in the model. If yes,
                  * - first we do not add a triple.
                  * - but that not enough. The collection/container passed to the method (parameter obj),
-                 *   exists in the model since it consists of several triples. 
+                 *   exists in the model since it consists of several triples.
                  *   Therefore, we have to remove this collection/container from the model.
                  */
 

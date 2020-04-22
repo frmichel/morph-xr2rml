@@ -54,6 +54,7 @@ object MorphRunner {
             options.addOption("f", "configFile", true, "Configuration file name. Must be located within the configuration directory")
             options.addOption("m", "mappingFile", true, "xR2RML mapping file name. Overrides the properties file.")
             options.addOption("o", "output", true, "Output file name. Overrides the properties file.")
+            options.addOption("x", "outputMaxTriples", true, "Maximum number of triples per file generated.")
 
             val parser: CommandLineParser = new BasicParser()
             val cmd: CommandLine = parser.parse(options, args)
@@ -69,11 +70,16 @@ object MorphRunner {
                 properties.mappingDocumentFilePath = cmd.getOptionValue("m")
             }
             logger.info("Mapping file = " + properties.mappingDocumentFilePath)
-            
+
             if (cmd.hasOption("o")) {
                 properties.outputFilePath = cmd.getOptionValue("o")
             }
             logger.info("Output file = " + properties.outputFilePath)
+
+            if (cmd.hasOption("x")) {
+                properties.outputFileMaxTriples = cmd.getOptionValue("x").toInt
+            }
+            logger.info("Output file max number of triples = " + properties.outputFileMaxTriples)
 
             // Initialize the runner factory
             MorphBaseRunnerFactory.initFactory(properties)

@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.2] 2020-04-22
+- Add config property output.file.max_triples (and parameter --outputMaxTriples) to generate files with a maximum number of triples
+
+
 ## [1.1-RC2] 2019-09-16: fix bug in Mongo query parsing
 - Mongo query containing parentheses were not supported, e.g ```find({field: "1(2)3"})```
 

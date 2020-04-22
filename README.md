@@ -53,7 +53,7 @@ Only one join condition is supported in a referencing object map.
 
 # Code description
 
-See a detailed [description of the project code and architecture](README_code_architecture.md).
+See a detailed [description of the project code and architecture](doc/README_code_architecture.md).
 
 ----------
 
@@ -61,9 +61,9 @@ See a detailed [description of the project code and architecture](README_code_ar
 
 ### Download, Build
 
-Pre-requisite: have **Java SDK8** installed
+Pre-requisite: have **Java SDK 10** installed
 
-You can download the last snapshot published in [this repository](https://www.dropbox.com/sh/1xcnvpc7pv6um2i/AABewNiypMWJRIYcLjpeYIvxa/snapshot/fr/unice/i3s/morph-xr2rml-dist/1.0-SNAPSHOT?dl=0).
+You can download the last snapshot published in [this repository](https://www.dropbox.com/home/artifacts/snapshot/fr/unice/i3s/morph-xr2rml-dist).
 
 Alternatively, you can build the application using [Maven](http://maven.apache.org/) 2 or 3: in a shell, CD to the root directory morph-xr2rml, then run the command: ```mvn clean package```. A jar with all dependencies is generated in morph-xr2rml-dist/target.
 
@@ -72,15 +72,22 @@ Alternatively, you can build the application using [Maven](http://maven.apache.o
 
 The application takes two options: `--configDir` gives the configuration directory and `--configFile` give the configuration file within this directory. Option `--configFile` defaults to `morph.properties`.
 
-Additionally, the mapping file and output file are given in the configuration file, but can be overridden using options `--mappingFile` and `--output` respectively.
+Additionally, several parameter given in the configuration file can be overridden using the following options: 
+- mapping file: `--mappingFile` 
+- output file : `--output`
+- maximum number of triples generated in a single output file: `--outputMaxTriples`
+
 
 **From a command line interface**, CD to directory morph-xr2rml-dist and run the application as follows:
+
 ```
-java -jar target/morph-xr2rml-dist-1.0-SNAPSHOT-jar-with-dependencies.jar \
+java -jar target/morph-xr2rml-dist-<version>-jar-with-dependencies.jar \
    --configDir <configuration directory> \
    --configFile <configuration file within this directory>
 ```
+
 Besides, the logger configuration can be overriden by passing the `log4j.configuration` parameter to the JVM:
+
 ```
 java -Dlog4j.configuration=file:/path/to/my/log4j.configuration -jar ...
 ```
@@ -144,6 +151,10 @@ server.port=8080
 # -- Processing result output file, relative to --configDir. Default: result.txt
 output.file.path=result.txt
 
+# -- Max number of triples to generate in output file. Default: 0 (no limit)
+# If the max number is reached, file name is suffixed with an index e.g. result.txt.0, result.txt.1, result.txt.2 etc.
+output.file.max_triples=0
+
 # -- Output RDF syntax: RDF/XML|N-TRIPLE|TURTLE|N3|JSON-LD. Default: TURTLE
 # Applies to the graph materialization and the rewriting of SPARQL CONSTRUCT and DESCRIBE queries
 output.syntax.rdf=TURTLE
@@ -182,7 +193,7 @@ runner_factory.class.name=fr.unice.i3s.morph.xr2rml.mongo.engine.MorphMongoRunne
 # uricolumn.encode_unsafe_chars_dbvalues=true
 
 # -- URL-encode reserved chars IRI template string. Default: true 
-Z# uricolumn.encode_uri=true
+# uricolumn.encode_uri=true
 
 
 # -- Cache the result of previously executed queries for MongoDB. Default: false

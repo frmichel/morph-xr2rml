@@ -1,0 +1,2448 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>xR2RML: Relational and Non-Relational Databases to RDF Mapping Language</title>
+    <link rel="stylesheet" type="text/css" href="http://www.w3.org/StyleSheets/TR/w3c-unofficial.css" />
+    <style>
+        code           { font-family: monospace; }
+
+        div.constraint,
+        div.issue,
+        div.note,
+        div.notice     { margin-left: 2em; }
+
+        ol.enumar      { list-style-type: decimal; }
+        ol.enumla      { list-style-type: lower-alpha; }
+        ol.enumlr      { list-style-type: lower-roman; }
+        ol.enumua      { list-style-type: upper-alpha; }
+        ol.enumur      { list-style-type: upper-roman; }
+
+        div.exampleInner pre { margin-left: 1em; margin-top: 0em; margin-bottom: 0em}
+        div.exampleOuter {border: 4px double gray; margin: 0em; padding: 0em}
+        div.exampleInner { background-color: #d5dee3;
+            border-top-width: 4px;
+            border-top-style: double;
+            border-top-color: #d3d3d3;
+            border-bottom-width: 4px;
+            border-bottom-style: double;
+            border-bottom-color: #d3d3d3;
+            padding: 4px; margin: 0em }
+        div.exampleWrapper { margin: 4px }
+        div.exampleHeader { font-weight: bold; margin: 4px}
+
+        em.rfc2119 { text-transform: lowercase;
+            font-variant: small-caps;
+            font-style: normal; }
+            
+        /* Changes and additions to W3C styles */
+        pre { margin-left: 0em; margin-top: 3px; margin-bottom: 3px; }
+        table { border-collapse: collapse; }
+        table tr td { padding: 5px; border: 1px solid #000000; }
+        table tr th { padding: 5px; border: 1px solid #000000; }
+        
+        div.definition  { margin-left: 2em; background-color: #eeeeee; border: 1px solid #999999; padding: 5px; }
+        .red { color: red; }
+        .highlight { background-color: #fff0aa; }
+        .indent { margin-left: 2em; }
+        
+    </style>
+</head>
+
+<body>
+      <div class="head">
+        <h1>xR2RML: Relational and Non-Relational Databases to RDF Mapping Language</h1>
+
+        <dl>
+        <dt>Authors:</dt>
+        <dd>Franck Michel, <i>University Côte d'Azur, CNRS, Inria, I3S laboratory</i></dd>
+        <dd>Loïc Djimenou, <i>University Côte d'Azur, Inria, CNRS, I3S laboratory</i></dd>
+        <dd>Catherine Faron-Zucker, <i>University Côte d'Azur, Inria, CNRS, I3S laboratory</i></dd>
+        <dd>Johan Montagnat, <i>University Côte d'Azur, CNRS, I3S laboratory</i></dd>
+        </dl>        
+        
+        <dl>
+            <dt>This version:</dt>
+            <dd><a href="http://i3s.unice.fr/~fmichel/xr2rml_specification_v5.html">http://i3s.unice.fr/~fmichel/xr2rml_specification_v5.html</a></dd>
+            <dt>Latest version:</dt>
+            <dd><a href="http://i3s.unice.fr/~fmichel/xr2rml_specification.html">http://i3s.unice.fr/~fmichel/xr2rml_specification.html</a></dd>
+        </dl>
+
+        <p class="copyright"><a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/80x15.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.</p>
+      </div>
+      <hr/>
+        <h2><a id="abstract"></a>Abstract</h2>
+        <p>This document describes xR2RML, a language for expressing customized mappings from various types of databases (XML, object-oriented, NoSQL) to RDF datasets. </p>
+        <p>xR2RML is an extension of the R2RML <a href="#bib1">[1]</a> mapping language, and relies on some properties of the RML mapping language <a href="#bib4">[4]</a><a href="#bib3">[3]</a>. R2RML addresses the mapping of relational databases to RDF. RML extends R2RML to address the mapping of heterogeneous data formats (CSV, XML, JSON) to RDF, but does not investigate the constraints that arise when dealing with different types of heterogeneous databases. xR2RML extends this scope to a wide range of non-relational databases. This document leverages the R2RML specification and mainly describes extensions. It also leverage the RML specification <a href="#bib2">[2]</a> (Draft, 17 Sept. 2014), either explicitly reusing RML properties when applicable, or by extending existing properties. Consequently, the reader should have a good understanding of both R2RML and RML before reading this document.</p>
+        <p>xR2RML is backward compatible with R2RML.</p>
+
+
+        <h2>Document history</h2>
+
+        <table>
+            <tbody>
+                <tr>
+                    <th>Version</th>
+                    <th>Date</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>2014-09-22</td>
+                    <td>Initial version</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>2014-10-08</td>
+                    <td>Fix spelling mistakes.</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>2014-10-20</td>
+                    <td>Convergence with RML language definitions, moving of reference formulation <br/>from language to processor environment, fix misc. minor mistakes.</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>2016-11-07</td>
+                    <td>Add property xrr:uniqueRef in logical source. Many rewordings and clarifications.</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>2017-10-25</td>
+                    <td>Add property xrr:pushDown in logical source and nested term map</td>
+                </tr>
+            </tbody>
+        </table>
+
+    <h2>Table of Contents</h2>
+    <div class="toc">
+    
+    1 <b><a href="#_Toc466307445">Introduction</a></b><br/>
+
+        &nbsp;&nbsp;&nbsp;&nbsp;1.1 <a href="#_Toc466307446">Document Conventions</a><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;1.2 <a href="#_Toc466307447">Query Languages and Data Models</a><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;1.3 <a href="#_Toc466307448">xR2RML mapping graphs and mapping documents</a><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;1.4 <a href="#_Toc466307449">xR2RML processors</a><br/>
+
+    2 <b><a href="#_Toc466307450">xR2RML Overview and Examples</a></b><br/>
+
+        &nbsp;&nbsp;&nbsp;&nbsp;2.1 <a href="#_Toc466307451">Mapping CSV data</a><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;2.2 <a href="#_Toc466307452">Mapping JSON data</a><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;2.3 <a href="#_Toc466307453">Mapping XML data</a><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;2.4 <a href="#_Toc466307454">Mapping data with mixed formats</a><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;2.5 <a href="#_Toc466307455">Generating an RDF collection from a list of values</a><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;2.6 <a href="#_Toc466307456">Generating an RDF container with a referencing object map</a><br/>
+
+    3 <b><a href="#_Toc466307457">Language description</a></b><br/>
+
+        &nbsp;&nbsp;&nbsp;&nbsp;3.1 <a href="#_Toc466307458">Mapping Logical Sources to RDF with Triples Maps</a><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.1.1 <a href="#_Toc466307459">xR2RML Triples Map.</a><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.1.2 <a href="#_Toc466307460">Defining a Logical Source</a><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.1.3 <a href="#_Toc466307461">xR2RML Triples Map Iteration Model</a><br/>
+
+        &nbsp;&nbsp;&nbsp;&nbsp;3.2 <a href="#_Toc466307462">Creating RDF terms with Term Maps</a><br/>
+
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.2.1 <a href="#_Toc466307463">xR2RML Term Maps</a><br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.2.1.1 <a href="#_Toc466307464">Constant-, Column-, Reference- and Template-valued Term Maps</a><br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.2.1.2 <a href="#_Toc466307465">Term Types of Term Maps</a><br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.2.1.3 <a href="#_Toc466307466">Nested Term Maps</a><br/>
+
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.2.2 <a href="#_Toc466307467">Referencing data elements</a><br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.2.2.1 <a href="#_Toc466307468">Referencing simple data elements</a><br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.2.2.2 <a href="#_Toc466307469">Referencing data elements with mixed data formats</a><br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.2.2.3 <a href="#_Toc466307470">Production of multiple RDF terms</a><br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.2.2.4 <a href="#_Toc496719460">Pushing down data elements during a term map iteration</a><br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.2.2.5 <a href="#_Toc466307471">Production of RDF collections or containers</a><br/>
+
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.2.3 <a href="#_Toc466307472">Parsing nested structured values</a><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.2.4 <a href="#_Toc466307473">Multiple Mapping Strategies</a><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.2.5 <a href="#_Toc466307474">Default Term Types</a><br/>
+
+        &nbsp;&nbsp;&nbsp;&nbsp;3.3 <a href="#_Toc466307475">Reference relationships between logical sources</a><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.3.1 <a href="#_Toc466307476">Reference elationship with structured values</a><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.3.2 <a href="#_Toc466307477">Generating RDF ollection/container with a referencing object map</a><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.3.3 <a href="#_Toc466307478">Generating RDF ollection/container with a referencing object map in the relational case</a><br/>
+
+    <h3>Appendix</h3>
+
+   A <b><a href="#_Toc466307479">References</a></b><br/>
+
+   <hr/>
+   </div>
+   
+            
+       
+        <h1 id="_Toc466307445">1 Introduction</h1>
+        <h2 id="_Toc466307446">1.1 Document Conventions</h2>
+        <p>In this document, examples assume the following namespace prefix bindings unless otherwise tated:</p>
+
+       <table>
+            <tbody>
+               <tr>
+                    <th>Prefix</th>
+                   <th>IRI</th>
+                </tr>
+               <tr>
+                    <td><code>rr:</code></td>
+                   <td><code>http://www.w3.org/ns/r2rml#</code></td>
+                </tr>
+                <tr>
+                    <td><code>rml:</code></td>
+                    <td><code>http://semweb.mmlab.be/ns/rml#</code></td>
+                </tr>
+                <tr>
+                    <td><code>ql:</code></td>
+                    <td><code>http://semweb.mmlab.be/ns/ql#</code></td>
+                </tr>
+                <tr>
+                    <td><code>xrr:</code></td>
+                    <td><code>http://www.i3s.unice.fr /ns/xr2rml#</code></td>
+                </tr>
+                <tr>
+                    <td><code>rdf:</code></td>
+                    <td><code>http://www.w3.org/1999/02/22-rdf-syntax-ns#</code></td>
+                </tr>
+                <tr>
+                    <td><code>rdfs:</code></td>
+                    <td><code>http://www.w3.org/2000/01/rdf-schema#</code></td>
+                </tr>
+                <tr>
+                    <td><code>xsd:</code></td>
+                    <td><code>http://www.w3.org/2001/XMLSchema#</code></td>
+                </tr>
+                <tr>
+                    <td><code>ex:</code></td>
+                    <td><code>http://example.com/ns#</code></td>
+                </tr>
+
+            </tbody>
+        </table>
+
+        <p>Vocabulary definitions are formatted in such grey boxes:</p>
+
+        <br/>
+        <div class="definition">
+            Definition
+        </div>
+        
+        <h2 id="_Toc466307447">1.2 Query Languages and Data Models</h2>
+
+        <p>R2RML is specifically focused on the translation of relational databases into RDF datasets. xR2RML extends this scope to non-relational databases. Although it is illusory to seek universal support of any database, our endeavor is to equally support most common relational and non-relational databases. In our approach, we more specifically analyze the requirements to support NoSQL and XML databases. Yet, xR2RML may not support all NoSQL databases, given the large variety of systems behind this word. Nevertheless, we argue that our work can be generalized to some other types of database, for instance object-oriented and directory (LDAP) databases. </p>
+
+        <h3>Query languages</h3>
+
+        <p>Relational databases all support ANSI SQL (or at least a subset of it), and most XML databases support XQuery and XPath (which is subset of XQuery). By contrast, NoSQL is a catch-all term referring to very diverse systems <a href="#bib6">[6]</a><a href="#bib5">[5]</a>. They have heterogeneous access methods ranging from low-level APIs to expressive query languages. Despite several propositions of common query language (<a href="http://www.couchbase.com/communities/n1ql">N1QL</a>, <a href="">UnQL</a>, SQL++ [8], <a href="http://docs.arangodb.org/Aql/README.html">ArangoDB Query Language</a>, CloudMdsQL<a href="#bib7">[7]</a>), no consensus has emerged yet, that would fit most NoSQL databases. Therefore, until a standard eventually arises, xR2RML must be agile enough to cope with various query languages and protocols.</p>
+
+        <p><b>Remark: </b>R2RML relies on the ability of relational databases to support a declarative query language. xR2RML does the same assumption with regards to other types of databases, although this may be limitative. For instance, most NoSQL key-value stores provide simple key-based operations (such as put, get, delete) by means of APIs used in imperative programming languages, but they hardly provide a declarative query language. If such a system is to be mapped to RDF using xR2RML, an xR2RML processor should implement a mechanism to bridge this gap. In other words the xR2RML processor should define its own query language to be interpreted and compiled using an imperative programming language.</p>
+
+        
+        <h3>Data models</h3>
+
+        <p>Relational databases comply with a row-based model in which all rows have the same columns. </p>
+        <p>NoSQL systems have heterogeneous data models (key-value store, document store, extensible column-store, graph store). Some of them also comply with the row-based model, such as extensible column-stores (also known as column family stores) with the difference that all rows do not necessarily share the same columns (BigTables, Cassandra…). Other databases in which data is formatted in JSON (document stores such as MongoDB, CouchDB…) or XML (native XM databases such as BaseX, eXistDB) can hardly be reduced to a row-based model. JSON or XML documents consist of structured (hierarchical) values representing collections or key-value associations:</p>
+
+        <ul>
+        <li>A JSON dictionary is an ordered association of keys and values, both keys and values may be of any type. A JSON array is an ordered collection of elements, it is a specific case of dictionary in which keys are implicit integer indexes: 0, 1, 2, etc.</li>
+        <li>Similarly, a set of XML elements having the same parent element can be seen as an ordered association of keys (element names) and values (element values). A set of XML elements of the same type, having the same parent element, can be seen as an ordered collection. Besides, attributes of an XML element can be seen as a specific type of key-value association.</li>
+        </ul>
+        
+        <p>The model of structured values described above for JSON and XML can easily be applied to other databases. In an object-oriented model, an object can be approximated by as a key-value association: keys are attribute names while values are either a scalar, another object (composition or aggregation relationship), or a collection (depending on capabilities of the modeling language: list, map, etc). Similarly, an LDAP directory is organized as a tree. Each node has an identifier and a set of attributes represented as ''name=value'' that are nothing else than a key-value association. A set of attributes with the same name can be interpreted as either as a collection or a key-value association in which keys are not unique. Thus, xR2RML must be able to map data elements from rows as well as structured values (nested collections and key-value associations) to RDF terms.</p>
+
+        <p><b>Note:</b> Below, we shall use the term "structured values" to refer to collections and key-value associations, whatever the representation syntax used.</p>
+
+        
+        <h2 id="_Toc466307448">1.3 xR2RML mapping graphs and mapping documents</h2>
+
+        <div class="definition">
+        An <b>xR2RML mapping</b> defines a mapping from a database to RDF; it is represented as an RDF graph called an <b>xR2RML mapping graph</b>.
+        <p>An <b>xR2RML mapping document</b> is any document written in the Turtle RDF syntax that encodes an xR2RML mapping graph.</p>
+        Any R2RML mapping graph is a valid xR2RML mapping graph (backward compatibility).
+        </div>
+        
+        
+        <h2 id="_Toc466307449">1.4 xR2RML processors</h2>
+
+        <div class="definition">
+        An <b>xR2RML processor</b>, or <b>processing engine</b>, is a system that, given an xR2RML mapping and an input database, provides access to the output RDF dataset.
+        <p>An <b>xR2RML processor</b> has access to an execution environment consisting of:</p>
+        
+        <ul>
+        <li>An <b>xR2RML mapping document</b>, as defined above.</li>
+        <li>A <b>connection</b> to the input database, used by the xR2RML processor to evaluate queries against the input database. It must be established with sufficient privileges for read access to all database elements (tables, views, documents, objects…) that are referenced in the xR2RML mapping.</li>
+        <li>A <b>reference formulation</b> (optional): this concept, introduced by RML, names a syntax used to reference data elements within results of a query run against the database connection. The reference formulation is not mentioned in the mapping language, but is typically provided as configuration parameter. If it is not provided, it defaults to “column name” in order to ensure backward compatibility with R2RML.</li>
+        <li>A <b>query language</b> <b>identifier</b> (optional) identifies which query language shall be used to query the database, in case several languages are supported.</li>
+        <li>A <b>base IRI</b> used in resolving relative IRIs produced by the xR2RML mapping (optional).</li>
+        </ul>
+        </div>
+        
+        <p>It is the responsibility of an xR2RML processor developer to document how to provide the processor with this context information.</p>
+
+        
+        <h1 id="_Toc466307450">2 xR2RML Overview and Examples</h1>
+
+        <p>This section gives a brief overview of the xR2RML mapping language, followed by simple examples of mapping various types of database to RDF. </p>
+
+        <p>An xR2RML mapping refers to logical sources to retrieve data from the input database. A logical source can be either an <i>xR2RML base table (</i>for input databases where tables or views exist, such as SQL views), or an <i>xR2RML view </i>representingthe result of executing a query against the input database. An xR2RML processor is provided an xR2RML mapping description, a connection to the database and a reference formulation that specifies the syntax used to refer to data elements retrieved from the input database: this can be a column name in the case of row-based systems (RDB, extensible column-store), a JSONPath expression in case of a NoSQL document store, an XPath expression in case of an XML native database, an LDAP path in case of an LDAP directory, etc.</p>
+
+        <p>Each logical source is mapped to RDF using a triples map. As in R2RML, a triples map consists of a subject map that generates the subject of all RDF triples that will be generated from data elements, and multiple predicate-object maps that produce the predicate and object terms of triples.</p>
+
+        <h2 id="_Toc466307451">2.1 Mapping CSV data</h2>
+
+        <p>The input database in the example below consists of one CSV document. It is assumed that the xR2RML processor is provided a connection to that file, e.g. by means of a descriptor to a file on the local file system or a URL to locate the file on a web server. Data elements will be referenced using column names, i.e. the reference formulation passed to the xR2RML processor.</p>
+
+        <p>As a CSV file simply consists of a single unnamed table, the logical source can simply be left empty.</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td>Input data</td>
+                    <td><pre>
+title, year, director
+Manhattan, 1979, Woody Allen
+Annie Hall, 1979, Woody Allen
+2046, 2004, Wong Kar-wai
+In the Mood for Love, 2000, Wong Kar-wai</pre></td>
+                </tr>
+                <tr>
+                    <td>Mapping graph</td>
+                    <td><pre>
+&lt;#CSVTriplesMap&gt;
+  rr:subjectMap [rr:template "http://example.org/movie/{<span class="red">title</span>}"; ];
+  rr:predicateObjectMap [
+    rr:predicate ex:directedBy;
+    rr:objectMap [ <span class="red">xrr:reference "director";</span> ];
+  ].</pre></td>
+                </tr>
+                <tr>
+                    <td>RDF triples produced</td>
+                    <td><pre>
+&lt;http://example.org/movie/Manhattan&gt; ex:directedBy "Woody Allen".
+&lt;http://example.org/movie/Annie%20Hall&gt; ex:directedBy "Woody Allen".
+&lt;http://example.org/movie/2046&gt; ex:directedBy "Wong Kar-wai".
+&lt;http://example.org/movie/In%20the%20Mood%20for%20Love&gt; ex:directedBy "Wong Kar-wai".</pre></td>
+                </tr>
+
+            </tbody>
+        </table>
+
+        <h2 id="_Toc466307452">2.2 Mapping JSON data</h2>
+
+        <p>The input database in the example below is a MongoDB database (document store). The query in the logical source uses the proprietary JavaScript-based query language of MongoDB. It retrieves one JSON document from collection "movies", that lists movie directors and movies they directed.</p>
+
+        <p>Without further instruction on how to parse the document, JSONPath expressions referring to data elements in the subject and object map will be evaluated against the whole document. For instance, a subject using expression "$.directors.name" will return two terms, while an object map using expression "$.directors.movies.*" will return four terms, one for each movie whatever its director. This will result in mixing up directors and movies. To avoid this, an rml:iterator property is added to the logical source, specifying that the triples map iteration should occur on each element of the array of directors.</p>
+
+        <p>References to data elements (rr:template, xrr:reference), as well as the iterator pattern, are expressed in JSONPath (i.e. the reference formulation, passed to the xR2RML processor along with the database connection).</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td>Input data</td>
+                    <td><pre>
+{ "directors": [ 
+  { "name": "Wong Kar-wai", "movies": ["2046", "In the Mood for Love"] },
+  { "name": "Woody Allen", "movies": ["Manhattan", "Annie Hall"] }
+]}</pre></td>
+                </tr>
+                <tr>
+                    <td>Mapping graph</td>
+                    <td><pre>
+&lt;#Directors&gt;
+  <span class="red">xrr:logicalSource [
+    xrr:query "db.movies.find( { directors: { $exists: true} } )";
+    rml:iterator "$.directors.*";
+  ];</span>
+  rr:subjectMap [ rr:template "http://example.org/director/{<span class="red">$.name</span>}"; ];
+  rr:predicateObjectMap [
+    rr:predicate ex:directed;
+    rr:objectMap [ <span class="red">xrr:reference "$.movies.*";</span> ];
+  ].</pre></td>
+                </tr>
+                <tr>
+                    <td>RDF triples produced</td>
+                    <td><pre>
+&lt;http://example.org/director/Woody%20Allen&gt; ex:directed "Manhattan".
+&lt;http://example.org/director/Woody%20Allen&gt; ex:directed "Annie Hall".
+&lt;http://example.org/director/Wong%20Kar-wai&gt; ex:directed "2046".
+&lt;http://example.org/director/Wong%20Kar-wai&gt; ex:directed "In the Mood for Love".</pre></td>
+                </tr>
+
+            </tbody>
+        </table>
+
+        <h2 id="_Toc466307453">2.3 Mapping XML data</h2>
+
+        <p>The example below is very similar to the previous one, using an XML database supporting XQuery. The query in the logical source retrieves "director" XML elements. As in the previous example, to avoid mixing up directors and movies, an rml:iterator property is added to the logical source, specifying that the triples map iteration should occur on each "director" XML element.</p>
+
+        <p>References to data elements (rr:template, xrr:reference), as well as the iterator pattern, use the XPath syntax (i.e. the reference formulation, passed to the xR2RML processor along with the database connection).</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td>Input data</td>
+                    <td><pre>
+&lt;directors&gt;
+  &lt;director name="Wong Kar-wai"&gt;
+    &lt;movies&gt;
+      &lt;movie&gt;2046&lt;/movie&gt;
+      &lt;movie&gt;In the Mood for Love&lt;/movie&gt;
+    &lt;/movies&gt;
+  &lt;/director&gt;
+  &lt;director name="Woody Allen"&gt;
+    &lt;movies&gt;
+      &lt;movie&gt;Manhattan&lt;/movie&gt;
+      &lt;movie&gt;Annie Hall&lt;/movie&gt;
+    &lt;/movies&gt;
+  &lt;/director&gt;
+&lt;/directors&gt;</pre></td>
+                </tr>
+                <tr>
+                    <td>Mapping graph</td>
+                    <td><pre>
+&lt;#Directors&gt;
+  <span class="red">xrr:logicalSource [
+    """for $i in //directors/director                            
+       where $i/country eq "China"
+       return $i; """;
+  ];</span>
+  rr:subjectMap [
+    rr:template "http://example.org/director/{/director/<span class="red">@name</span>}";
+  ];
+  rr:predicateObjectMap [
+    rr:predicate ex:directed;
+    rr:objectMap [ <span class="red">xrr:reference "//movie";</span> ];
+  ].</pre></td>
+                </tr>
+                <tr>
+                    <td>RDF triples produced</td>
+                    <td><pre>
+&lt;http://example.org/director/Woody%20Allen&gt; ex:directed "Manhattan".
+&lt;http://example.org/director/Woody%20Allen&gt; ex:directed "Annie Hall".
+&lt;http://example.org/director/Wong%20Kar-wai&gt; ex:directed "2046".
+&lt;http://example.org/director/Wong%20Kar-wai&gt; ex:directed "In the Mood for Love".</pre></td>
+                </tr>
+
+            </tbody>
+        </table>
+
+        <h2 id="_Toc466307454">2.4 Mapping data with mixed formats</h2>
+
+        <p>In some use cases, it is common to store values in a format which is not the native database format. For instance, an application designer may choose to embed JSON, CSV, or XML values in the cells of a relational database, for performance concerns or application design constraints.</p>
+
+        <p>xR2RML allows to reference data elements within such mixed contents with <i>mixed-syntax paths</i>. A path with mixed-syntax consists of the concatenation of several path expressions separated by the slash '/' character. Each individual path is enclosed in a syntax path constructor: Column(column-name), CSV(column-name), TSV(column-name), JSONPath(JSONPath-expression), XPath(XPath-expression).</p>
+
+        <p>In the example below, the logical source is a relational table with two columns. The second column, Movies, holds values formatted as JSON arrays. The xrr:reference property of the object map uses a mixed-syntax path: <i>Column(Movies)/JSONPath($.*)</i>. This expression selects values from column "Movies" and evaluates JSONPath expression "$.*" against the values.</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td>Input data</td>
+                    <td><p>Table DIRECTORS:</p>
+
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Movies</td>
+                                </tr>
+                                <tr>
+                                    <td><code>Wong Kar-wai</code></td>
+                                    <td><code>["2046", "In the Mood for Love"]</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>Woody Allen</code></td>
+                                    <td><code>["Manhattan", "Annie Hall"]</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td>Mapping graph</td>
+                    <td><pre>
+&lt;#Directors&gt;
+  rr:logicalTable [
+    rr:tableName "DIRECTORS";
+  ];
+  rr:subjectMap [ rr:template "http://example.org/director/{Name}"; ];
+  rr:predicateObjectMap [
+    rr:predicate ex:directed;
+    rr:objectMap [ xrr:reference "<span class="red">Column(Movies)/JSONPath($.*)</span>"; ];
+  ].</pre></td>
+                </tr>
+                <tr>
+                    <td>RDF triples produced</td>
+                    <td><pre>
+&lt;http://example.org/director/Woody%20Allen&gt; ex:directed "Manhattan".
+&lt;http://example.org/director/Woody%20Allen&gt; ex:directed "Annie Hall".
+&lt;http://example.org/director/Wong%20Kar-wai&gt; ex:directed "2046".
+&lt;http://example.org/director/Wong%20Kar-wai&gt; ex:directed "In the Mood for Love".</pre></td>
+                </tr>
+
+            </tbody>
+        </table>
+
+        <h2 id="_Toc466307455">2.5 Generating an RDF collection from a list of values</h2>
+
+        <p>As illustrated by the previous example, several RDF terms can be generated by a term map during one triples map iteration step. While this can lead to the generation of several triples, this can also be used to generate hierarchical values in the form of RDF collections or containers.</p>
+
+        <p>The example below was already presented in section <a href="#_Toc466307452">2.2</a>. In the object map we simply add an rr:termType property with value xrr:RdfList. All RDF terms produced by the object map during one triples map iteration step are then grouped as members of one term of type rdf:List (denoted as "(a b c…)" in Turtle syntax).</p>
+
+        <p>Additionally, assume we want to add a language tag to the movie titles. The object map describes the generation of RDF lists, hence it would not make sense to add an rr:language property. To state properties about the members of the generated RDF list, we need a nested term map, introduced by the xrr:nestedTermMap property. A nested term map accepts the same properties as a term map, but it applies to members of RDF collection/container terms generated by its parent term map.</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td>Input data</td>
+                    <td><pre>
+{ "directors": [
+  { "name": "Wong Kar-wai", "movies": ["2046", "In the Mood for Love"] },
+  { "name": "Woody Allen",  "movies": ["Manhattan", "Annie Hall"] }
+]}</pre></td>
+                </tr>
+                <tr>
+                    <td>Mapping graph</td>
+                    <td><pre>
+&lt;#Directors&gt;
+  xrr:logicalSource [
+    xrr:query "db.movies.find( { directors: { $exists: true} } )";
+    rml:iterator "$.directors.*";
+  ];
+  rr:subjectMap [ rr:template "http://example.org/director/{$.name}"; ];
+  rr:predicateObjectMap [
+    rr:predicate ex:directed;
+    rr:objectMap [ 
+      xrr:reference "$.movies.*"; 
+      <span class="red">rr:termType xrr:RdfList;
+      xrr:nestedTermMap [ rr:language "en"; ]</span>
+    ];
+  ].</pre></td>
+                </tr>
+                <tr>
+                    <td>RDF triples produced</td>
+                    <td><pre>
+&lt;http://example.org/director/Woody%20Allen&gt; ex:directed [
+  a rdf:List;                            
+  rdf:_1 "Manhattan"@en;                            
+  rdf:_2 "Annie Hall"@en;
+].
+
+&lt;http://example.org/director/&lt;Wong%20Kar-wai&gt; ex:directed
+  ( "2046"@en "In the Mood for Love"@en ).</pre></td>
+                </tr>
+
+            </tbody>
+        </table>
+
+        <h2 id="_Toc466307456">2.6 Generating an RDF container with a referencing object map</h2>
+
+        <p>The example below uses a referencing object map to describe a cross-reference relationship between logical resources. In addition, it generates an RDF bag from the result of the join condition in the referencing object map.</p>
+
+        <p>Triples map &lt;#Movies&gt; generates IRIs for the movies. The referencing object map in triples map &lt;#Directors&gt; uses IRI generated in triples map &lt;#Movies&gt; as the members of an RDF bag (property rr:term:Type xrr:RdfBag).</p>
+
+        <p>The join condition in triples map &lt;#Directors&gt; produces a result if a movie title (rr:parent "$.title") matches at least one movie in the list of movies associated with each director (rr:child "$.movies.*").</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td>Input data</td>
+                    <td><pre>
+{ "directors": [ 
+  { "name": "Wong Kar-wai", "movies": ["2046", "In the Mood for Love"] },
+  { "name": "Woody Allen",  "movies": ["Manhattan", "Annie Hall"] }
+]}
+{ "movies": [
+  { "title": "Manhattan",            "year": "1979" },
+  { "title": "Annie Hall",           "year": "1977" },
+  { "title": "2046",                 "year": "2004" },
+  { "title": "In the Mood for Love", "year": "2000"}
+]}</pre></td>
+                </tr>
+                <tr>
+                    <td>Mapping graph</td>
+                    <td><pre>
+&lt;#Movies&gt;
+  xrr:logicalSource [
+    xrr:query "db.movies.find( { movies: { $exists: true} } )";
+    rml:iterator "$.movies.*"; 
+  ];
+  rr:subjectMap [ rr:template "http://example.org/movies/{$.title}"; ].
+
+&lt;#Directors&gt;
+  xrr:logicalSource [
+    xrr:query "db.movies.find( { directors: { $exists: true} } )";
+    rml:iterator "$.directors.*";
+  ];
+  rr:subjectMap [ rr:template "http://example.org/director/{$.name}"; ];
+  rr:predicateObjectMap [
+    rr:predicate ex:directed;
+    rr:objectMap [
+      rr:parentTriplesMap &lt;#Movies&gt;;
+      <span class="red">rr:joinCondition [
+        rr:child "$.movies.*";
+        rr:parent "$.title";
+      ];
+      rr:termType xrr:RdfBag;</span>
+    ];
+  ].</pre></td>
+                </tr>
+                <tr>
+                    <td>Generated RDF triples</td>
+                    <td><pre>
+&lt;http://example.org/director/Woody%20Allen&gt; ex:directed [
+  a rdf:Bag;
+  rdf:_1 &lt;http://example.org/movie/Manhattan&gt;";
+  rdf:_1 &lt;http://example.org/movie/Annie%20Hall&gt;.
+].
+
+&lt;http://example.org/director/&lt;Wong%20Kar-wai&gt; ex:directed [
+  a rdf:Bag;
+  rdf:_1 &lt;http://example.org/movie/2046&gt;";
+  rdf:_2 &lt;http://example.org/movie/In%20the%20Mood%20for%20Love&gt;.
+].</pre></td>
+                </tr>
+
+            </tbody>
+        </table>
+
+        
+        
+        
+        
+        <h1 id="_Toc466307457">3 Language description</h1>
+
+        <h2 id="_Toc466307458">3.1 Mapping Logical Sources to RDF with Triples Maps</h2>
+
+        <h3 id="_Toc466307459">3.1.1 xR2RML Triples Map</h3>
+
+        <p>An xR2RML triples map specifies a rule for translating data elements of a logical source to zero or more RDF triples. The RDF triples generated from one data element (row, document, set of XML elements, etc.) in the logical source all share the same subject.</p>
+
+        <p>An xR2RML triples map extends R2RML triples map by referencing a logical source (next section) instead of a logical table. An xR2RML triples map is represented by a resource that references the following resources:</p>
+
+        <ul>
+        <li>It must have exactly one <b>xrr:logicalSource</b> property. Its object is a logical source that specifies a table or a query result to be mapped to triples.</li>
+
+        <li>It must have exactly one subject map that specifies how to generate a subject for each data element of the logical source (row, document, set of XML elements, etc.). A subject map may be specified in two ways:
+
+        <ul>
+        <li>using the rr:subjectMap property, whose value must be the subject map, or</li>
+        <li>using the constant shortcut property rr:subject.</li>
+        </ul></li>
+        
+        <li>It may have zero or more rr:predicateObjectMap properties, whose values must be predicate-object maps. They specify pairs of predicate maps and object maps that, together with the subjects generated by the subject map, may form one or more RDF triples for each data element.</li>
+        </ul>
+        
+        
+        
+        
+        <h3 id="_Toc466307460">3.1.2 Defining a Logical Source</h3>
+
+        <p><b>R2RML logical table: </b>An R2RML logical table is a data set on which a triples map applies: this may be a relational table, an SQL view, or the result of a valid SQL query (property rr:sqlQuery).</p>
+
+        <p><b>RML logical source:</b></p>
+
+        <ul>
+        <li>An RML logical source extends the R2RML logical table. It points to a source containing the data to be mapped, denoted by property rml:source. In some cases, it brings database connection details (such as the protocol, URL or login provided by a connection string) into the mapping. Whereas this enables several triples maps to refer to difference data sources, it opposes the implicit R2RML idea that such specificities should be kept out of the scope of the mapping. Besides, it is unclear how this property relates to property rml:query. The latter in defined in the RML ontology, although it is not described or exemplified in the language specification nor in RML Web pages. It is only briefly mentioned in an article [Dimou et al., 2013] where authors propose that property rml:query subsume properties rr:sqlQuery and rml:xmlQuery. But this conflicts with requirement 2 since a specific property has to be defined for each supported query language.</li>
+
+        <li>The RML reference formulation concept (property rml:referenceFormulation) of an RML logical source names the syntax of data element reference syntaxes (ql:CSV, ql:JSONPath, ql:XPath, ql:CSS3 and rr:SQL2008). This binds the mapping language with a predefined set of syntaxes, which conflicts with requirement 1 and hampers the extensibility to a wider scope of database.</li>
+        </ul>
+
+        <p>The discussion above underlines that it would not be suitable for xR2RML to extend RML's logical source concept. Instead, the xR2RML logical source extends the R2RML logical table, while relevant RML properties are used or extended separately.</p>
+
+        <p>Below we define the xR2RML logical source that extends the R2RML logical source to cope with a wider scope of input databases as well as richer iteration models detailed in section <a href="#_Toc466307461">3.1.3</a>.</p>
+
+        <div class="definition">
+            <p>A <b>logical source</b> (property <b>xrr:logicalSource</b>) extends the R2RML concept of logical table (property rr:logicalTable) in the case of non-relational databases. A logical source is the result of a query applied to the input database, to be mapped to RDF triples. A logical source is either an <b>xR2RML base table</b> or an <b>xR2RML view</b>.</p>
+
+            <p>An <b>xR2RML base table </b>is a logical source containing data from a table in the input database. It simply extends the concept of <i>R2RML table or view</i> to the context of tabular databases beyond relational databases (e.g. CSV, extensible column store). An xR2RML base table is represented by a resource that has exactly one <b>rr:tableName</b> property. Its object is a string literal representing the table name.</p>
+
+            <p>An <b>xR2RML view</b> is a logical source whose content is the result of executing a query against the input database. It is represented by a resource that has exactly one <b>xrr:query</b> property. Property xrr:query extends RML property rml:query. The object of property xrr:query is a string literal representing a valid expression with regards to the query language supported by the input database.</p>
+
+            <p>A logical source may have one data property <b>rml:iterator</b> that specifies the <i>iteration pattern</i> to apply on data retrieved from the input database (section <a href="#_Toc466307461">3.1.3</a>). Its object is an expression written using the reference formulation (section <a href="#_Toc466307449">1.4</a>). The rml:iterator property is ignored in the context of tabular result sets in which data is accessed by column names.</p>
+
+            <p>An rml:iterator property may be complemented with any number of <b>xrr:pushDown</b> properties (section <a href="#_Toc466307461">3.1.3</a>) that specify how some values must be added within the documents that result of the rml:iterator. The object of a xrr:pushDown property is an instance of the <b>xrr:PushDown</b> class, that must have exactly one xrr:reference property and one <b>xrr:as</b> property.</p>
+
+            <p>A logical source may have any number of <b>xrr:uniqueRef</b> properties that specify a <i>unique data element reference</i> within the documents retrieved by the xrr:query property. This property may be used for query optimization when rewriting a SPARQL query into the target database query language. The unique data element reference is an expression written according to the syntax specified by the reference formulation (section <a href="#_Toc466307449">1.4</a>).
+        </div>
+
+        <p>Note that xR2RML logical source and R2RML logical table definitions may equally be used in the case of a relational database. Examples:</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <th>R2RML logical table</th>
+                    <th>Equivalent xR2RML logical source</th>
+                </tr>
+                <tr>
+                    <td><pre>
+[] rr:logicalTable [
+  rr:tableName "SOME_TABLE".
+]</pre></td>
+                    <td><pre>
+[] xrr:logicalSource [
+  rr:tableName "SOME_TABLE";
+]</pre></td>
+                </tr>
+                <tr>
+                    <td><pre>
+[] rr:logicalTable [
+  rr:sqlQuery
+    "SELECT NAME, DATE FROM MOVIES".
+]</pre></td>
+                    <td><pre>
+[] xrr:logicalSource [
+  xrr:query
+    "SELECT NAME, DATE FROM MOVIES".
+]</pre></td>
+                </tr>
+
+            </tbody>
+        </table>
+
+        <p>The table below shows examples of xR2RML logical source definition with different flavors of input databases.</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <th>Type of database</th>
+                    <th>Logical source definition</th>
+                </tr>
+                <tr>
+                    <td>Relational database</td>
+                    <td><pre>
+[] rr:logicalTable [
+  rr:sqlQuery """
+    SELECT TITLE FROM MOVIES 
+    WHERE YEAR &gt; 1980
+    ORDER BY YEAR
+    LIMIT 10""";
+];</pre></td>
+                </tr>
+                <tr>
+                    <td><p>XML file. The xR2RML processor is provided with a file URL, e.g. http://example.org/movies.xml, and the XPath reference formulation. Therefore no further query is required (no xrr:query property).</p>
+
+                        <p>An iterator defines the pattern of XML elements to iterate on. XPath is used to refer to data elements within the XML data returned by the database.</td>
+                    <td><pre>
+[] xrr:logicalSource [
+  rml:iterator "//movie";
+];</pre></td>
+                </tr>
+                <tr>
+                    <td>REST-based web service returning an XML stream based on parameters passed in the HTTP GET query string. The service URL (e.g. http://example.org/service) and XPath reference formulation are passed to the xR2RML processor by configuration, while the HTTP query string is provided by the xrr:query property.</td>
+                    <td><pre>
+[] xrr:logicalSource [
+  xrr:query "?minYear=1980&amp;limit=10";
+  rml:iterator "//movie";
+];</pre></td>
+                </tr>
+                <tr>
+                    <td><p>XML database supporting XQuery.</p>
+
+                        <p>XPath is used to describe the iterator and later on to refer to data elements within the XML data returned by the database.</p>
+
+                    </td>
+                    <td><pre>
+[] xrr:logicalSource [
+  xrr:query """for $i in //movies/movie
+               where $i/year gt 1980
+               order by $i/@title
+               return $i/@title""";
+  rml:iterator "//movie";
+];</pre></td>
+                </tr>
+                <tr>
+                    <td><p>JSON file. The xR2RML processor is provided with file URL and the JSONPath reference formulation. No further query is required (no xrr:query property).</p>
+
+                        <p>An iterator defines the pattern to iterate on.</p></td>
+                    <td><pre>
+[] xrr:logicalSource [
+  rml:iterator "$.movies.*";
+];</pre></td>
+                </tr>
+                <tr>
+                    <td>MongoDB database (document store). MongoDB Shell Query Language is used to search for documents in collection "movies". Then, JSONPath is used to refer to data elements within the JSON documents returned by the database.</td>
+                    <td><pre>
+[] xrr:logicalSource [
+  xrr:query '''db.movies.find({"year":{$gt: 1980}})''';
+  xrr:uniqueRef "$.movieId"
+];</pre></td>
+                </tr>
+                <tr>
+                    <td>Cassandra (extensible column store) using Cassandra Query Language (CQL). Data element are referenced by column name (reference formulation passed to the xR2RML processor).</td>
+                    <td><pre>
+[] xrr:logicalSource [
+  xrr:query 
+    """SELECT TITLE, YEAR FROM Movies LIMIT 10""";
+];</pre></td>
+                </tr>
+                <tr>
+                    <td><p>AllegroGraph (RDF graph store) using SPARQL.</p>
+
+                        <p>The column name reference formulation is applied to a SPARQL result set: the result set is considered as a table in which columns are named after variable names.</p></td>
+                    <td><pre>
+[] xrr:logicalSource [
+  xrr:query """select ?title ?year
+    where { ?movie a ex:Movie; 
+            ex:name ? title;
+            ex:year ?year. }
+    filter (?year &gt; "1980"^^xsd:integer)
+    order by ?year
+    limit 10""";
+];</pre></td>
+                </tr>
+
+            </tbody>
+        </table>
+        
+        
+        
+
+        <h3 id="_Toc466307461">3.1.3 xR2RML Triples Map Iteration Model</h3>
+
+        <p>In R2RML, the row-based iteration implicitly occurs on a set of rows read from a logical table. xR2RML applies this principle to other row-based systems such as CSV/TSV files and extensible column stores, but also SPARQL result sets as already mentioned. In the context of non row-based databases, the model is implicitly extended to a <b>document-based iteration model</b>: a document is one result of a result set, whatever the form of such a result. Typically, the document-based iteration applies to a set of JSON documents retrieved from a NoSQL document store, or a set of XML documents retrieved from an XML database. In the case of data sources that do not natively provide iterators over results, for instance a simple XML file or a web service returning an XML stream at once, then a single iteration occurs on the whole document retrieved.</p>
+
+        <p>The document-based iteration model alone may not be sufficient to fulfill any iteration needs. This is particularly true for <b>hierarchical data models </b>such as JSON and XML. Let us consider the JSON document below that describes movie directors and respective movies:</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td><pre>
+{ "type": 3,
+  "directors": [
+    { "name": "Wong Kar-wai", "movies": ["2046", "In the Mood for Love"] },
+    { "name": "Woody Allen",  "movies": ["Manhattan", "Annie Hall"] }
+]}</pre></td>
+                </tr>
+
+            </tbody>
+        </table>
+
+        <p>We consider the following xR2RML following mapping graph:</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td><pre>
+&lt;#Directors&gt;
+  xrr:logicalSource [ xrr:query "db.movies.find( { directors: { $exists: true} } )" ];
+  rr:subjectMap [ rr:template "http://example.org/director/{$.name}"; ];
+  rr:predicateObjectMap [
+    rr:predicate ex:directed;
+    rr:objectMap [ xrr:reference "$.directors.*.movies.*"; ];
+  ].</pre></td>
+                </tr>
+
+            </tbody>
+        </table>
+
+        <p>In this mapping, the subject map returns two terms (one per director) while the object map returns four terms (one per movie in the document). Consequently, triples are generated that mix up all directors and movies:</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td><pre>
+&lt;http://example.org/director/Woody%20Allen&gt;  ex:directed "Manhattan".
+&lt;http://example.org/director/Woody%20Allen&gt;  ex:directed "Annie Hall".
+&lt;http://example.org/director/Woody%20Allen&gt;  ex:directed "2046".
+&lt;http://example.org/director/Woody%20Allen&gt;  ex:directed "In the Mood for Love".
+&lt;http://example.org/director/Wong%20Kar-wai&gt; ex:directed "Manhattan".
+&lt;http://example.org/director/Wong%20Kar-wai&gt; ex:directed "Annie Hall".
+&lt;http://example.org/director/Wong%20Kar-wai&gt; ex:directed "2046".
+&lt;http://example.org/director/Wong%20Kar-wai&gt; ex:directed "In the Mood for Love".</pre></td>
+                </tr>
+
+            </tbody>
+        </table>
+
+        <p>To deal with such cases, xR2RML relies on the concept of iterator defined in RML:</p>
+
+        <div class="definition">
+        <p>An <b>iterator</b> is defined within an xR2RML logical source by means of the <b>rml:iterator</b> property. It specifies the iteration pattern to apply to data retrieved from the input database. The object of an rml:iterator property is a valid path expression written using the reference formulation (section <a href="#_Toc466307449">1.4</a>).</p>
+        </div>
+
+        <p>With the rml:iterator property, the previous example is modified as shown below:</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td><pre>
+&lt;#Directors&gt;
+  xrr:logicalSource [
+    xrr:query "db.movies.find( { directors: { $exists: true} } )";
+    <span class="red">rml:iterator "$.directors.*";</span>
+  ];
+  rr:subjectMap [ rr:template "http://example.org/director/{$.name}"; ];
+  rr:predicateObjectMap [
+    rr:predicate ex:directed;
+    rr:objectMap [ xrr:reference "$.movies.*"; ];
+  ].</pre></td>
+                </tr>
+
+            </tbody>
+        </table>
+
+        <p>The rml:iterator property indicates that, within the document retrieved, the triples map iteration should be performed on each director element rather than on the whole document. The iterator now yields <u>two separate documents</u>:</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td><pre>
+{ "name": "Wong Kar-wai", "movies": ["2046", "In the Mood for Love"] }
+{ "name": "Woody Allen",  "movies": ["Manhattan", "Annie Hall"] }</pre></td>
+                </tr>
+
+            </tbody>
+        </table>
+
+        <p>Finally, the first document yields the first two triples below, while the second document yields the 3<sup>rd</sup> and 4<sup>th</sup> triples:</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td><pre>
+&lt;http://example.org/director/Woody%20Allen&gt;  ex:directed "Manhattan".
+&lt;http://example.org/director/Woody%20Allen&gt;  ex:directed "Annie Hall".
+&lt;http://example.org/director/Wong%20Kar-wai&gt; ex:directed "2046".
+&lt;http://example.org/director/Wong%20Kar-wai&gt; ex:directed "In the Mood for Love".</pre></td>
+                </tr>
+
+            </tbody>
+        </table>
+
+        <p>Let us now assume that we would like field “type” (whose value is 3, whatever this means) to be part of the subject terms, e.g. &lt;http://example.org/director/<b><span class="red">3-</span></b>Woody%20Allen&gt;. The documents yielded by the iterator do not contain field “type” since it is defined higher in the document hierarchy. To address this issue, we define an element of class xrr:PushDown with the xrr:pushDown property:</p>
+
+        <div class="definition">
+        <p>An <b>xrr:PushDown instance</b> is defined within an xR2RML logical source by means of the <b>xrr:pushDown</b> property. It is valid only as a companion of an rml:iterator property. It specifies a reference (property xrr:reference), written using the reference formulation (section <a href="#_Toc466307449">1.4</a>), whose value must be added in the documents yielded by the iterator as a new data element whose name is given by the <b>xrr:as</b> property of the xrr:PushDown instance.</p>
+        </div>
+
+        <p>In our example, this should look like:</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td><pre>
+&lt;#Directors&gt;
+  xrr:logicalSource [
+    xrr:query "db.movies.find( { directors: { $exists: true} } )";
+    <span class="red">rml:iterator "$.directors.*";
+    xrr:pushdown [ xrr:reference "$.type" xrr:as "newType" ];</span>
+  ];
+  rr:subjectMap [ 
+    rr:template "http://example.org/director/<span class="red">{$.newType}</span>-{$.name}"; 
+  ];
+  rr:predicateObjectMap [
+    rr:predicate ex:directed;
+    rr:objectMap [ xrr:reference "$.movies.*"; ];
+  ].</pre></td>
+                </tr>
+
+            </tbody>
+        </table>
+
+        <p>As a result, a field “newType” (property xrr:as) is created within the documents yielded by the iterator. The value of this field is the result of evaluating the “$.type” reference (xrr:reference property) against the documents fetched from the database. Example:</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td><pre>
+{ "name": "Wong Kar-wai", "movies": ["2046", "In the Mood for Love"], <span class="red">"newType": 3</span> }
+{ "name": "Woody Allen",  "movies": ["Manhattan", "Annie Hall"],      <span class="red">"newType": 3</span> }</pre></td>
+                </tr>
+
+            </tbody>
+        </table>
+
+        <p>Finally, the following triples are produced:</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td><pre>
+&lt;http://example.org/director/<span class="red">3</span>-Woody%20Allen&gt;  ex:directed "Manhattan".
+&lt;http://example.org/director/<span class="red">3</span>-Woody%20Allen&gt;  ex:directed "Annie Hall".
+&lt;http://example.org/director/<span class="red">3</span>-Wong%20Kar-wai&gt; ex:directed "2046".
+&lt;http://example.org/director/<span class="red">3</span>-Wong%20Kar-wai&gt; ex:directed "In the Mood for Love".</pre></td>
+                </tr>
+
+            </tbody>
+        </table>
+
+        
+        
+        
+        
+        <h2 id="_Toc466307462">3.2 Creating RDF terms with Term Maps</h2>
+
+        <h3 id="_Toc466307463">3.2.1 xR2RML Term Maps</h3>
+
+        <p>R2RML defines a <u>term map</u> as a function that generates <u>RDF terms</u> from a logical table row.</p>
+        <p>A term map is either a subject map, predicate map, object map or graph map.</p>
+        <p>A term map must be exactly one of the following types:</p>
+
+        <ul>
+        <li>a constant-valued term map (property rr:constant)</li>
+        <li>a column-valued term map (property rr:column)</li>
+        <li>a template-valued term map (property rr:template).</li>
+        </ul>
+
+        <p>R2RML treats all values from the input database as literals expressed in built-in data types. To deal with structured values such as collections or key-value associations, xR2RML term maps extend R2RML term maps so that structured values can be parsed, and data elements within structured values can be selected to build RDF terms. xR2RML extensions are described in this section.</p>
+
+        <h4 id="_Toc466307464">3.2.1.1 Constant-, Column-, Reference- and Template-valued Term Maps</h4>
+
+        <p>R2RML properties rr:column and rr:template reference columns of a logical table. xR2RML not only references columns but also any data element within structured values. xR2RML relies on the <b>rml:reference</b>, that extends property rr:column. Its object is a column name (in the case of an RDB, CSV/TSV file, extensible column store, SPARQL result set, etc.), an XPath expression (in the case of XML data) and a JSONPath expression (in the case of JSON data). Furthermore, xR2RML introduces the possibility to reference data elements in data with mixed formats (<a href="#_Toc466307469">§3.2.2.2</a>). Thus, xR2RML extends property rml:reference with property <b>xrr:reference</b>. This leads to the following definition of an xR2RML term map. xR2RML changes to R2RML are <span class="highlight">highlighted</span>.</p>
+
+        <div class="definition">
+            <p>A constant-valued term map is represented by a resource that has exactly one rr:constant property. A constant-valued term map always generates the same RDF term.</p>
+
+            <p>A column-valued term map has exactly one rr:column property. The value of the rr:column property is a valid column name.</p>
+
+            <p><span class="highlight">A reference-valued term map has exactly one xrr:reference property. The value of the xrr:reference property is a valid reference to a data element, expressed using the syntax defined by the reference formulation (section <a href="#_Toc466307449">1.4</a>). A reference-valued term map term map may have any number of <b>xrr:pushDown</b> properties (section <a href="#_Toc496719460">3.2.2.4</a>) if and only if it has an xrr:nestedTermMap property.</span></p>
+
+            <p>A template-valued term map has exactly one rr:template property. The value of the rr:template property is a valid string template. A string template is a format string used to build strings from multiple components. It <span class="highlight">uses valid references to data elements</span> by enclosing them in curly braces ("{" and "}"). <span class="highlight">Each reference is expressed using the syntax defined by the reference formulation (section <a href="#_Toc466307449">1.4</a>)</span>.</p>
+        </div>
+
+        
+        
+        <h4 id="_Toc466307465">3.2.1.2 Term Types of Term Maps</h4>
+
+        <p>RDF terms generated by a term map have a term type (rr:termType) that may be one of the three R2RML term types: rr:Literal, rr:BlankNode or rr:IRI.</p>
+
+        <div class="definition">
+            <p>xR2RML extends the rr:termType property with four new values, hereafter referred to as <b>RDF collection or container term types</b>:</p>
+            <ul>
+                <li>A term map with<b> xrr:RdfList </b>as value of property rr:termTypegenerates an RDF collection of type rdf:List;</li>
+                <li>A term map with<b> xrr:RdfSeq</b>: as value of property rr:termTypegenerates an RDF container of type rdf:Seq;</li>
+                <li>A term map with<b> xrr:RdfBag</b>: as value of property rr:termTypegenerates an RDF container of type rdf:Bag;</li>
+                <li>A term map with<b> xrr:RdfAlt</b>: as value of property rr:termTypegenerates an RDF container of type rdf:Alt.</li>
+            </ul>
+        </div>
+
+        
+        
+        <h4 id="_Toc466307466">3.2.1.3 Nested Term Maps</h4>
+
+        <p>Hierarchical data such as JSON or XML documents commonly have more than one level of nesting, resulting in tree-like values that may need to be parsed in depth, e.g. to nest RDF collections and containers (build an RDF collection of RDF collections).</p>
+
+        <div class="definition">
+            <p>An xR2RML term map may have an <b>xrr:nestedTermMap</b> property, whose range is the <b>xrr:NestedTermMap</b> class.</p>
+
+            <p>In a column-valued or reference-valued term map, the xrr:nestedTermMap property describes how to translate values produced by the rr:column or xrr:reference properties into RDF terms.</p>
+
+            <p>In a template-valued term map, the xrr:nestedTermMap property describes how to translate values produced by applying the template string to input values into RDF terms.</p>
+
+            <p>In a constant-valued term map, it is invalid to define a nested term map.</p>
+        </div>
+        
+        <p> </p>
+        
+        <div class="definition">
+            <p>A <b>nested term map</b> may have the properties below:</p>
+            <ul>
+                <li><b>xrr:reference</b> bears the same semantics as in the context of a term map. Its object is a valid path expression (possibly a mixed-syntax path, see <a href="#_Toc466307469">§3.2.2.2</a>). Evaluation of the path expression is performed against values retrieved by the parent of the nested term map. This parent may be a term map or a nested term map.</li>
+                <li><b>rr:template</b> bears the same semantics as in the context of a term map. References enclosed in capturing curly braces are valid path expressions (possibly mixed-syntax paths), they apply to values retrieved in the parent of the nested term map. This parent may be a term map or a nested term map.</li>
+                <li><b>xrr:nestedTermMap</b> is used to recursively parse any depth of nested structured values;</li>
+                <li><b>xrr:pushDown</b> properties if and only if there exists an xrr:nestedTermMap property (see section <a href="#_Toc496719460">3.2.2.4</a>).</li>
+                <li><b>rr:termType</b> bears the same semantics as in the context of a term map;</li>
+                <li><b>rr:language</b> bears the same semantics as defined in R2RML;</li>
+                <li><b>rr:datatype</b> bears the same semantics as defined in R2RML.</li>
+            </ul>
+            <p>A <b>simple nested term map</b> is a nested term map that has no xrr:reference nor rr:template property. A simple nested term map is used to qualify terms of an RDF collection or container generated by its parent term map or nested term map, i.e. assign them an optional term type, data type or language tag.</p>
+
+            <p>A <b>reference-valued nested term map</b> is a nested term map that has exactly one xrr:reference property.</p>
+
+            <p>A <b>template-valued nested term map</b> is a nested term map that has exactly one rr:template property.</p>
+        </div>
+
+        <p><u><b>xrr:nestedTermMap vs. rr:termType:</b></u></p>
+
+        <p>A nested term map <i>N</i> describes how to translate into RDF terms values produced by its parent <i>P</i>, <i>P</i> may be a term map or a nested term map. </p>
+
+        <p>If <i>P</i> has no rr:termType property, it simply returns values produced by <i>N</i>, therefore the term type of P is that of <i>N</i>.</p>
+
+        <p>If <i>P</i> has an rr:termType property with an RDF collection or container term type as object, then values produced by <i>N</i> will be assembled in an RDF collection or container.</p>
+
+        <p>Lastly, <i>P</i> should not have an rr:termType property with an R2RML term type (literal, blank node, IRI) or in other words, a nested term map cannot be used in the context of a term map or nested term map that has an R2RML term type (literal, IRI, blank node). Thus:</p>
+
+        <div class="definition">
+            <p>If a term map or nested term map has an xrr:nestedTermMap property, then it should have either no rr:termType property or an rr:termType property with an RDF collection or container term type. Formally:</p>
+
+            <div class="indent">
+            ?P is an rr:TermMap or xrr:NestedTermMap.<br/>
+            ?P xrr:nestedTermMap ?N.<br/>
+            ?P rr:termType ?tt.<br/>
+            ⇒ ?tt is one of xrr:RdfList, xrr:RdfSeq, xrr:RdfBag or xrr:RdfAlt
+            </div>
+
+            <p>A term map or nested term map with an RDF collection or container term type and no xrr:nestedTermMap property is assumed to have a <b>default xrr:nestedTermMap property</b> defined as follows:</p>
+
+            <ul>
+            <li>If the parent term map or nested term map is reference-valued:<br/>
+            <code>xrr:nestedTermMap [ rr:termType rr:Literal ];</code></li>
+            <li>If the parent term map or nested term map is template-valued:<br/>
+            <code>xrr:nestedTermMap [ rr:termType rr:IRI ];</code></li>
+            </ul>
+        </div>
+
+        <p>Finally, as defined in R2RML, properties rr:language and rr:datatype apply when generating literals only:</p>
+
+        <div class="definition">
+            <p>A term map or nested term map may have an rr:language or rr:datatype property only if its term type is rr:Literal (either stated by property rr:termType or inferred as a default value).</p>
+        </div>
+
+        
+        
+        
+        <p>Nested term maps are exemplified in section <a href="#_Toc466307472">3.2.3</a>.</p>
+
+        <h3 id="_Toc466307467">3.2.2 Referencing data elements</h3>
+
+        <h4 id="_Toc466307468">3.2.2.1 Referencing simple data elements</h4>
+
+        <p>The table below exemplifies the use of properties rr:column, xrr:reference and rr:template to reference simple data elements (i.e. with non-mixed data formats) from the logical source.</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <th>Logical source</th>
+                    <th>Term map</th>
+                </tr>
+                <tr>
+                    <td>Relational database: either rr:column or xrr:reference can be used to name a column.
+                    </td>
+                    <td><pre>
+[] rr:column "NAME".
+[] xrr:reference "NAME".
+[] rr:template "{NAME}".</pre></td>
+                </tr>
+                <tr>
+                    <td>Extensible column store: properties xrr:reference and rr:template reference data elements by column names.</td>
+                    <td><pre>
+[] xrr:reference "NAME".
+[] rr:template "{NAME}".</pre></td>
+                </tr>
+                <tr>
+                    <td>XML database supporting: properties xrr:reference and rr:template reference data elements by XPath expressions.</td>
+                    <td><pre>
+[] xrr:reference "//name".
+[] rr:template "{//name }".</pre></td>
+                </tr>
+                <tr>
+                    <td>NoSQL document store: xrr:reference and rr:template reference data elements using a valid JSONPath expression.</td>
+                    <td><pre>
+[] xrr:reference "$.name".
+[] rr:template "{$.name }".</pre></td>
+                </tr>
+                <tr>
+                    <td>RDF graph store accessed using a SPARQL SELECT query: xrr:reference and rr:template reference data elements by name of variable returned in the SPARQL result set.</td>
+                    <td><pre>
+[] xrr:reference "?name".
+[] rr:template "{?name }".</pre></td>
+                </tr>
+
+            </tbody>
+        </table>
+
+        <p>Remark: If a term map references a structured value but does not parse it using a nested term map, then generated RDF terms are string literals containing a simple serialization of structured values. Example:</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td>Input data</td>
+                    <td><pre>{ "person": { "FirstName":"John", "LastName":"Smith" } }</pre></td>
+                </tr>
+                <tr>
+                    <td>Term map</td>
+                    <td><pre>
+[] rr:objectMap [
+  xrr:reference "$.person";
+];</pre></td>
+                </tr>
+                <tr>
+                    <td>Generated RDF term</td>
+                    <td>The structured value matching the JSONPath expression "$.person" is returned as a string literal in quotes:
+                    <pre>'<span class="red">{ "FirstName":"John", "LastName":"Smith" }</span>'</pre></td>
+                </tr>
+
+            </tbody>
+        </table>
+
+        
+
+        <h4 id="_Toc466307469">3.2.2.2 Referencing data elements with mixed data formats</h4>
+
+        <p>In some use cases, databases are commonly used to store values written in a data format that they cannot interpret. For instance, an application designer may choose to embed JSON, CSV, or XML values in the cells of a relational table, for performance concerns or application design constraints.</p>
+
+        <p>To reference data elements within such mixed contents, xR2RML allows a term map to reference data elements with <b>mixed-syntax paths</b>:</p>
+
+        <div class="definition">
+            <p>Properties xrr:reference and rr:template may use <b>mixed-syntax paths</b> to reference data elements across data in different formats. A mixed-syntax path consists of the concatenation of several path expressions separated by the slash '/' character. Each individual path is enclosed in a <b>syntax path constructor</b> naming the path syntax explicitly. Existing constructors are:</p>
+            <ul>
+                <li><b>Column</b>(column-name): applies to row/column databases such as relational database and extensible column-store.</li>
+                <li><b>CSV</b>(column-name), <b>TSV</b>(column-name): applies to data formatted as comma-separated or tab-separated values. Column-name may be a 0-based column index, or an actual column name if a head line provides column names.</li>
+                <li><b>JSONPath</b>(JSONPath-expression): applies to any data formatted in JSON.</li>
+                <li><b>XPath</b>(XPath-expression): applies to any data formatted in XML.</li>
+            </ul>
+            <p>In expressions enclosed in a syntax path constructor, special characters '/', '(', ')', '{' and '}' must be escaped with a '\'. Since, in Turtle syntax, the '\' character itself must be escaped with an additional '\', special characters are escaped with '\\'.</p>
+        </div>
+
+        <p>Example:</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td>Input data</td>
+                    <td><p>Relational table with one column:</p>
+
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td>Name</td>
+                                </tr>
+                                <tr>
+                                    <td><pre>{ "FirstName":"John", "LastName":"Smith" }</pre></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Logical source definition and Term map</td>
+                    <td><pre>
+[] xrr:logicalSource [ … ];
+  ...
+  rr:objectMap [
+    xrr:reference "<span class="red">Column</span>(Name)/<span class="red">JSONPath</span>($.FirstName)";                            
+    rr:language "en";
+  ];</pre></td>
+                </tr>
+                <tr>
+                    <td>Generated RDF term</td>
+                    <td><pre>"John"@en</pre></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>From the example above, it can be noticed that (i) the leftmost syntax path constructor (Column) is consistent with the reference formulation (section <a href="#_Toc466307449">1.4</a>), and (ii) data elements referenced by mixed-syntax path "Column(Name)/JSONPath($.FirstName)" are formatted in JSON, corresponding to the rightmost syntax path constructor. More generally:</p>
+
+        <div class="definition">
+            <p>The leftmost syntax path constructor of a mixed-syntax path must be consistent with the reference formulation (section <a href="#_Toc466307449">1.4</a>). </p>
+            <ul>
+                <li>Constructors Column(), CSV() and TSV() apply with the column name reference formulation ,</li>
+                <li>Constructor XPath() applies with the XPath reference formulation,</li>
+                <li>Constructor JSONPath() applies with the JSONPath reference formulation.</li>
+            </ul>
+            <p>The format of data retrieved by a mixed-syntax path is the format of the rightmost syntax path constructor.</p>
+        </div>
+
+        
+        
+        <h4 id="_Toc466307470">3.2.2.3 Production of multiple RDF terms</h4>
+
+        <p>In a row-based logical source, a column reference returns exactly one scalar value per triples map iteration step: the value of the cell identified by "column name" in the current row. Thus, an R2RML term map generates zero or one RDF term during each iteration step, ultimately a triples map generates zero or one triple during each iteration step.</p>
+
+        <p>Due to the tree-like nature or JSON and XML data formats, JSONPath and XPath expressions allow addressing not only literals but also structured values. Thus, using the xrr:reference or rr:template properties with a JSONPath or XPath expression may return multiple values during each triples map iteration step. Hence the introduction of the term map iteration.</p>
+
+        <div class="definition">
+            <p>A <b>term map iteration</b> is a process that occurs in a term map during each triples-map iteration step. Thus, a reference-valued or template-valued term map generates zero to any number of RDF terms during each triples-map iteration step.</p>
+        </div>
+
+        <p>Examples:</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td>Input data retrieved in one triples-map iteration step</td>
+                    <td><pre>
+{ 
+"FirstNames":
+  ["John", "Albert"],
+  "LastName": "Smith"
+}</pre></td>
+                    <td><pre>
+&lt;person&gt;
+  &lt;FirstNames&gt;
+    &lt;item&gt;John&lt;/item&gt;
+    &lt;item&gt;Albert&lt;/item&gt;
+  &lt;/FirstNames&gt;
+  &lt;LastName&gt;Smith&lt;/LastName&gt;
+&lt;/person&gt;</pre></td>
+                </tr>
+                <tr>
+                    <td>Term map</td>
+                    <td><pre>
+[] rr:objectMap [
+  xrr:reference 
+    "$.FirstNames.*";
+];</pre></td>
+                    <td><pre>
+[] rr:objectMap [
+  xrr:reference
+    "/person/FirstNames/item";
+];</pre></td>
+                </tr>
+                <tr>
+                    <td>Generated RDF terms</td>
+                    <td><pre>"John"<br/>"Albert"</pre></td>
+                    <td><pre>"John"<br/>"Albert"</pre></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>The term map iteration applies identically in the context of mixed-syntax paths. Example:</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td>Input data</td>
+                    <td><pre>
+&lt;person&gt;
+  &lt;name&gt;John Smith&lt;/name&gt;
+  &lt;items&gt;[1,2,3]&lt;/items&gt;
+&lt;/person&gt;</pre>
+                        <p>XML element "items" contains a value expressed as a JSON array.</p></td>
+                </tr>
+                <tr>
+                    <td>Term map</td>
+                    <td><pre>
+[] xrr:logicalSource [ ... ]
+  ...
+  rr:objectMap [
+     xrr:reference "<span class="red">XPath</span>(\\/person\\/items)/<span class="red">JSONPath</span>($.*)";
+     rr:datatype xsd:integer;
+  ]</pre>
+                        <p>The last expression of the mixed-syntax path, "JSONPath($.*)", indicates that (i) value "[1,2,3]" is formatted in JSON syntax, and (ii) it must be parsed as such using the "$.*" JSONPath expression.</p></td>
+                </tr>
+                <tr>
+                    <td>Generated RDF terms</td>
+                    <td><pre>
+1^^xsd:integer
+2^^xsd:integer
+3^^xsd:integer</pre></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>A template-valued term map may reference several data elements from the logical source, captured by curly braces ('{' and '}'). If at least one of the data elements referenced in a template string produces several terms, then the following applies:</p>
+
+        <div class="definition">
+            <p>A template-valued term map produces RDF terms by performing a Cartesian product between all values produced by all data elements referenced in the template.</p>
+        </div>
+
+        <p>Example:</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td>Input data</td>
+                    <td><pre>
+{
+  "FirstNames": '["John", "Albert"]',
+  "LastName": "Smith"
+}</pre></td>
+                </tr>
+                <tr>
+                    <td>Term map</td>
+                    <td><pre>
+[] xrr:logicalSource [ … ];
+  rr:subjectMap [
+  rr:template "http://example.org/{$.FirstNames.*}/{$.LastName}";
+];</pre></td>
+                </tr>
+                <tr>
+                    <td>Generated RDF terms</td>
+                    <td>The template performs a Cartesian product between "Smith" and ["John", "Albert"], resulting in two terms:
+<pre>&lt;http://example.org/John/Smith&gt;
+&lt;http://example.org/Albert/Smith&gt;</pre></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>Finally, below we define the behavior of a <u>triples map in which one or several term maps generate multiple RDF terms</u> during a single triples map iteration step:</p>
+
+        <div class="definition">
+            <p>During each iteration of an xR2RML triples map, triples are generated as the Cartesian product between RDF terms produced by the subject map and each predicate-object map. Predicate-object couples result of the Cartesian product between RDF terms produced by each predicate and object map.</p>
+
+            <p>Note that a graph map may also produce multiple terms, in which case triples are produced simultaneously in several target graphs.</p>
+        </div>
+
+        <p><u>xR2RML vs. RML</u>: RML makes the restriction that a subject map should return zero or one value during each triples map iteration. In the case of xR2RML, we make no such restriction so that the Cartesian product be possibly applied between multiple subjects, multiple predicate-object couples, and multiple graph IRIs. Besides, RML does not describe how a template with several multi-valued references is processed. xR2RML states that the Cartesian product applies equally in this case, whether the template be used as a subject, predicate, object or graph map.</p>
+
+        <p>In the example below, during one triples map iteration step, the subject map produces two RDF terms &lt;http://example.org/company/Dell&gt; and &lt;http://example.org/company/Asus&gt;, while the object map produces two literals "Laptop" and "Desktop". A Cartesian product between the two subjects and the two objects results in the production of four triples:</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td>Input data: one row retrieved from a relational table, <br/>values are formatted in JSON in column “cos”,<br/> and XML in column “products”</td>
+                    <td> <table>
+                            <tbody>
+                                <tr>
+                                    <td>cos</td>
+                                    <td>products</td>
+                                </tr>
+                                <tr>
+                                    <td><pre>[ "Dell", "Asus" ]</pre></td>
+                                    <td><pre>
+&lt;list&gt;
+  &lt;product&gt;Laptop&lt;/product&gt;
+  &lt;product&gt;Desktop&lt;/product&gt;
+&lt;/list&gt;</pre></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Mapping graph</td>
+                    <td><pre>
+[] xrr:logicalSource [ ... ];
+  rr:subjectMap [
+    rr:template "http://example.org/{Column(cos)/JSONPath($.*)}";
+  ];
+  rr:predicateObjectMap [ 
+    rr:predicate ex:produces;
+    rr:objectMap [
+      xrr:reference "Column(products)/XPath(\\/list\\/*)";
+    ];
+  ];</pre></td>
+                </tr>
+                <tr>
+                    <td>Generated triples</td>
+                    <td><pre>
+&lt;http://example.org/Dell&gt; ex:produces "Laptop".
+&lt;http://example.org/Dell&gt; ex:produces "Desktop".
+&lt;http://example.org/Asus&gt; ex:produces "Laptop".
+&lt;http://example.org/Asus&gt; ex:produces "Desktop".</pre></td>
+                </tr>
+
+            </tbody>
+        </table>
+
+        
+        
+        <h4 id="_Toc496719460">3.2.2.4 Pushing down data elements during a term map iteration</h4>
+
+        <p>As seen in the previous section, a <b>term map iteration</b> may occur in the context of hierarchical data formats. Within a term map iteration, it may be needed to access data elements higher in the hierarchical documents, such as JSON fields that are outside of the iteration and thus no longer available. To deal with such cases, a <b>reference-valued term map</b> or <b>a reference-valued nested term map</b> may have any number of xrr:pushDown properties, whose semantics is that defined in the context of a logical source (section <a href="#_Toc466307461">3.1.3</a>).</p>
+
+        <p>Example:</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td>Input data</td>
+                    <td><pre>
+{ "id": 5,
+  "FirstNames": '["John", "Albert"]',
+  "LastName": "Smith"
+}</pre></td>
+                </tr>
+                <tr>
+                    <td>Term map</td>
+                    <td><pre>
+rr:objectMap [
+  rr:reference " $.FirstNames";
+  <span class="red">xrr:pushDown [ xrr:reference "$.id"; xrr:as "personId" ];</span>
+  xrr:nestedTermMap [
+    rr:template "Person {<span class="red">$.personId</span>}: {$.*}";
+    rr:termType xrr:Literal;
+  ]
+];</pre></td>
+                </tr>
+                <tr>
+                    <td>Generated RDF terms</td>
+                    <td><pre>
+"Person 5: John"
+"Person 5: Albert"</pre></td>
+                </tr>
+            </tbody>
+        </table>
+
+        
+        
+        
+        <h4 id="_Toc466307471">3.2.2.5 Production of RDF collections or containers</h4>
+
+        <p>A term map with an RDF collection or container term type generates one RDF term during each triples map iteration step. The elements of the collection or container are the RDF terms produced by the term map, whether using property rr:column, xrr:reference or rr:template.</p>
+
+        <p>In the example below, the triples map generates one triple per iteration step, the object of this triple is an RDF bag (itself consisting of several triples):</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td>Input data: JSON document retrieved in a single iteration step</td>
+                    <td><pre>
+&lt;company "name"="Dell"&gt;
+  &lt;products&gt;
+    &lt;product&gt;Laptop&lt;/product&gt;
+    &lt;product&gt;Desktop&lt;/product&gt;
+  &lt;/products&gt;
+&lt;/company&gt;</pre></td>
+                </tr>
+                <tr>
+                    <td>Mapping graph</td>
+                    <td><pre>
+[] xrr:logicalSource [ ... ];
+  rr:subjectMap [
+  rr:template "http://example.org/{/company/@name}";
+  ];
+  rr:predicateObjectMap [ 
+    rr:predicate ex:builds;
+    rr:objectMap [
+      xrr:reference "//company/products/*";
+      <span class="red">rr:termType xrr:RdfBag;</span>
+    ];
+  ];</pre></td>
+                </tr>
+                <tr>
+                    <td>Generated triples</td>
+                    <td><pre>
+&lt;http://example.org/Dell&gt; ex:builds <span class="red">[
+  a rdf:Bag;
+  rdf:_1 "Laptop";
+  rdf:_2 "Desktop" .
+]</span>.</pre></td>
+                </tr>
+
+            </tbody>
+        </table>
+
+        <p>Unlike RDF terms of type IRI or blank node, RDF terms of type RDF collection or container cannot be used as subject or predicate of an RDF triple, nor as a graph IRI. Consequently:</p>
+
+        <div class="definition">
+            <p>A term map with term type xrr:RdfList, xrr:RdfSeq, xrr:RdfBag or xrr:RdfAlt is an object map (hence it cannot be a subject map, predicate map nor graph map). Formally:</p>
+            <div class="indent">
+                ?X an rr:TermMap.<br/>
+                ?X rr:termType ?tt.<br/>
+                ?tt is one of xrr:RdfList, xrr:RdfSeq, xrr:RdfBag or xrr:RdfAlt<br/>
+                ⇒ ?X an rr:ObjectMap.
+            </div>
+        </div>
+
+        <p>A nested term map (property xrr:nestedTermMap) can be used to specify a term type, language tag or data type of members of an RDF collection or container. The example below illustrates the usage of a nested term map to generate an RDF collection of IRIs (first example), and an RDF sequence of data-typed literals (second example):</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td>Input data</td>
+                    <td><pre>{ "key1": ["url1", "url2"] }</pre></td>
+                    <td><pre>{ "key1": [10, 20] }</pre></td>
+                </tr>
+                <tr>
+                    <td>Term map</td>
+                    <td><pre>
+[] rr:objectMap [
+  xrr:reference "$.key1.*";
+  rr:termType xrr:RdfList;
+  <span class="red">xrr:nestedTermMap [
+    rr:termType rr:IRI;
+  ];</span>
+];</pre></td>
+                    <td><pre>
+[] rr:objectMap [
+  xrr:reference "$.key1.*";
+  rr:termType xrr:RdfSeq;
+  <span class="red">xrr:nestedTermMap [
+    rr:termType rr:Literal;
+    rr:datatype xsd:integer;
+  ];</span>
+];</pre></td>
+                </tr>
+                <tr>
+                    <td>Generated RDF terms</td>
+                    <td>In Turtle abbreviated notation: <pre>(&lt;url1&gt; &lt;url2&gt;)</pre></td>
+                    <td><pre>
+[ a rdf:Seq;
+  rdf:_1 10^^xsd:integer;
+  rdf:_2 20^^xsd:integer.
+];</pre></td>
+                </tr>
+
+            </tbody>
+        </table>
+
+        <p>In a template-valued term map, the xrr:nestedTermMap property applies to values resulting from the application of the template string to the input values. In the first example below, term type rr:IRI applies to the result of the template string. The same principle applies in the second example with term type rr:Literal and datatype xsd:string.</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td>Input data</td>
+                    <td><pre>
+{
+  "FirstNames": '["John", "Albert"]',
+  "LastName": "Smith"
+}</pre></td>
+                    <td><pre>
+{
+  "FirstNames": '["John", "Albert"]',
+  "LastName": "Smith"
+}</pre></td>
+                </tr>
+                <tr>
+                    <td>Term map</td>
+                    <td><pre>
+[] rr:objectMap [
+  <span class="red">rr:template</span> "http://example.org/
+    {$.FirstNames.*}/{$.LastName}";
+  <span class="red">rr:termType xrr:RdfList;
+  xrr:nestedTermMap [
+    rr:termType rr:IRI;
+  ];</span>
+];</pre></td>
+                    <td><pre>
+[] rr:objectMap [
+  <span class="red">rr:template</span>
+    "{$.FirstNames.*} {$.LastName}";
+  <span class="red">rr:termType xrr:RdfList;
+  xrr:nestedTermMap [
+    rr:termType rr:Literal;
+    rr:datatype xsd:string;
+  ];</span>
+];</pre></td>
+                </tr>
+                <tr>
+                    <td>Generated RDF terms</td>
+                    <td><pre>
+( &lt;http://example.org/John/Smith&gt;
+  &lt;http://example.org/Albert/Smith&gt; )</pre></td>
+                    <td><pre>
+( "John Smith"^^xsd:string
+  "Albert Smith"^^xsd:string )</pre></td>
+                </tr>
+
+            </tbody>
+        </table>
+
+        
+        
+        
+        <h3 id="_Toc466307472">3.2.3 Parsing nested structured values</h3>
+
+        <p>The example below illustrates the use of a nested term map to (i) parse nested structured values ("teams" are collections of "team" elements, which are collections of "member" elements) and (ii) translate those nested structured values into RDF terms of class rdf:List.</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td>Input data</td>
+                    <td><pre>
+&lt;teams&gt;
+  &lt;team&gt;
+    &lt;member&gt;John&lt;/member&gt;
+    &lt;member&gt;Paul&lt;/member&gt;
+  &lt;/team&gt;
+  &lt;team&gt;
+    &lt;member&gt;Cathy&lt;/member&gt;
+    &lt;member&gt;Ed&lt;/member&gt;
+  &lt;/team&gt;
+&lt;/teams&gt;</pre></td>
+                </tr>
+                <tr>
+                    <td>Term map</td>
+                    <td><pre>
+[] rr:objectMap [
+  xrr:reference "/teams/team";
+  <span class="red">xrr:nestedTermMap [
+    xrr:reference "/member";
+    rr:termType xrr:RdfList;
+  ];</span>
+];</pre>
+                        <p>The first xrr:reference property ("/teams/team") selects "team" elements from the XML input, each "team" element being the root of an XML tree whose descendants are "member" elements. </p>
+
+                        <p>The second xrr:reference property ("/member"), within the xrr:nestedTermMap property, is evaluated sequentially against the results of the parent reference expression. Thus, the xrr:RdfList term type successively applies to "member" elements of the first team, then to "member" elements of the second team. Finally the term map generates two RDF collections, one per team element.</td>
+                </tr>
+                <tr>
+                    <td>Generated RDF terms</td>
+                    <td><pre>
+("John" "Paul")
+("Cathy" "Ed")</pre>
+                        <p>Note: the object map has no rr:termType property, therefore its term type is that of its nested term type, that is xrr:RdfList.</td>
+                </tr>
+
+            </tbody>
+        </table>
+
+        <p>The subsequent example generates one RDF sequence of nested RDF collections. Elements of the inner RDF collections are typed as rr:Literal and assigned a language tag using a second nested xrr:nestedTermMap property.</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td>Input data</td>
+                    <td><pre>{ "teams": [ ["John", "Paul"] , ["Cathy", "Ed"] ] }</pre></td>
+                </tr>
+                <tr>
+                    <td>Term map</td>
+                    <td><pre>
+[] rr:objectMap [
+  xrr:reference "$.teams.*";
+  <span class="red">rr:termType xrr:RdfSeq;</span> # represent "teams" as an rdf:Seq
+
+  # Describe the elements of the RDF sequence
+  <span class="red"> xrr:nestedTermMap [
+    rr:template "Player {$.*}";
+    rr:termType xrr:RdfList;</span> # represent each team as an rdf:List
+
+    # Type members of each team as literals with language "en"
+    # using a simple nested term map
+    <span class="red">xrr:nestedTermMap [
+      rr:termType rr:Literal;
+      rr:language "en";
+    ];
+  ];</span>
+];</pre></td>
+                </tr>
+                <tr>
+                    <td>Generated RDF terms</td>
+                    <td><pre>
+[ a rdf:Seq;
+  rdf:_1 ("Player John"@en "Player Paul"@en);
+  rdf:_2 ("Player Cathy"@en "Player Ed"@en);
+]</pre></td>
+                </tr>
+
+            </tbody>
+        </table>
+
+        <p>As already mentioned, in a template-valued term map, property xrr:nestedTermMap applies to values resulting from the application of the template string to input values. Thus, defining a nested term map in a template-valued term map suggests that the template produces a valid expression with regards to the current data format, that, in turn, is interpreted against a path expression provided by an xrr:reference or rr:template property.</p>
+
+        <p>For instance, applying the template string:<br/>
+
+        <span class="indent"><code>'\{ "first": "{FirstNames}", "last": "{LastName}" \}'</code></span><br/>
+
+        would produce a string formatted as a JSON dictionary, like:<br/>
+
+        <span class="indent"><code>{ "first": "John", "last": "Smith" }</code></span></p>
+
+        <p>This use case is illustrated in the example below:</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td>Input data</td>
+                    <td><pre>
+{
+  "FirstNames": '["John", "Albert"]',
+  "LastName": "Smith"
+}</pre></td>
+                </tr>
+                <tr>
+                    <td>Term map</td>
+                    <td><pre>
+[] rr:objectMap [
+  rr:template '\{ "first": "{$.FirstNames.*}", "last": "{$.LastName}" \}';
+  <span class="red">xrr:nestedTermMap [
+    xrr:reference "$.*";
+    rr:termType xrr:RdfList;
+  ];</span>
+];</pre></td>
+                </tr>
+                <tr>
+                    <td>Generated RDF terms</td>
+                    <td><pre>
+( "John" "Smith" )
+( "Albert" "Smith" )</pre>
+                        <p>Two values are generated by applying the template string, those values are formatted as JSON arrays:</p>
+
+<pre>{ "first": "John", "last": "Smith" }
+{ "first": "Albert", "last": "Smith" }</pre>
+
+                        <p>The xrr:nestedTermMap property instructs to parse those values using the JSONPath expression "$.*" (property xrr:reference), and generates an RDF collection (rdf:List) for each of them.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p><u>Note</u>: this use case may seem rather awkward and probably of little use, but insofar as it is consistent with the xR2RML language definition, we think it should be considered as valid.</p>
+
+        
+        
+        
+        
+        <h3 id="_Toc466307473">3.2.4 Multiple Mapping Strategies</h3>
+
+        <p>The flexibility offered by nested term maps allows the same mapping to be written using various strategies: path expressions of properties xrr:reference and rr:template can be split in several levels of term map and nested term map.</p>
+
+        <p>For instance, both term maps below produce equivalent results. In the first case (left), the JSONPath expression ($.teams.*.*) retrieves all team members at once. In the second case (right), teams are retrieved first ($.teams.*), then the xrr:nestedTermMap property runs a second JSONPath evaluation to retrieve and datatype team members.</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td>Input data</td>
+                    <td colspan="2"><pre>
+{ "teams": [ ["John", "Paul"], ["Cathy", "Ed"] ] }</pre></td>
+                </tr>
+                <tr>
+                    <td>Term maps</td>
+                    <td><pre>
+[] xrr:logicalSource [ … ];
+  rr:objectMap [
+    xrr:reference "<span class="red">$.teams.*.*</span>";
+    rr:datatype xsd:string;
+  ];</pre></td>
+                    <td><pre>
+[] xrr:logicalSource [ … ];
+  rr:objectMap [
+    xrr:reference "<span class="red">$.teams.*</span>";
+    <span class="red">xrr:nestedTermMap [</span>
+      xrr:reference "<span class="red">$.*</span>";
+      rr:datatype xsd:string;
+    <span class="red">];</span>
+];</pre></td>
+                </tr>
+                <tr>
+                    <td>Generated RDF terms</td>
+                    <td colspan="2"><pre>
+"John"^^xsd:string
+"Paul"^^xsd:string
+"Cathy"^^xsd:string
+"Ed"^^xsd:string</pre></td>
+                </tr>
+
+            </tbody>
+        </table>
+
+        <p>It is likely that the first case will be more efficient as only one JSONPath evaluation is performed, whereas in the second case two JSONPath evaluations are performed in sequence.</p>
+
+        <p>Similarly, the example below shows how a mixed-syntax path can be split into a term map and a nested term map:</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td><pre>
+[] xrr:logicalSource [ … ];
+  rr:objectMap [
+    xrr:reference
+      "Column(<span class="red">col</span>)/XPath(<span class="red">\\/person\\/name</span>)";
+    rr:datatype xsd:string;
+  ];</pre></td>
+                    <td><pre>
+[] xrr:logicalSource [ … ];
+  rr:objectMap [
+  rr:column "col";
+  <span class="red">xrr:nestedTermMap [</span>
+    xrr:reference "XPath(<span class="red">\\/person\\/name</span>)";
+    rr:datatype xsd:string;
+  <span class="red">];</span>
+];</pre></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>Both mappings are likely to be equally efficient, as both evaluations (column selection and XPath expression evaluation) need to be done anyway.</p>
+
+        
+        
+        
+        
+        <h3 id="_Toc466307474">3.2.5 Default Term Types</h3>
+
+        <p>This section is an adaptation of <a href="https://www.w3.org/TR/r2rml/#termtype">section 7.4 of the R2RML specification</a>). xR2RML additions to R2RML are <span class="highlight">highlighted</span>.</p>
+
+        <p>If the term map has an optional rr:termType property then its term type is the value of that property. The value MUST be one of the following options:</p>
+        
+        <ul>
+        <li>If the term map is a subject map: rr:IRI or rr:BlankNode</li>
+        <li>If the term map is a predicate map: rr:IRI</li>
+        <li>If the term map is an object map: rr:IRI, rr:BlankNode, rr:Literal, <span class="highlight">rdf:List, rdf:Seq, rdf:Bag, rdf:Alt</span>.</li>
+        <li>If the term map is a graph map: rr:IRI.</li>
+        </ul>
+        
+        <p>If the term map does not have an rr:termType property, then its term type is:</p>
+        
+        <ul>
+        <li>rr:Literal, if it is an object map and at least one of the following conditions is true:
+            <ul>
+            <li>It is a column-based term map.</li>
+            <li>It has an rr:language property (and thus a specified language tag).</li>
+            <li>It has an rr:datatype property (and thus a specified datatype).</li>
+            <li><span class="highlight">It does not have an rr:language property and it has a nested term map that has an rr:language property.</span></li>
+            <li><span class="highlight">It does not have an rr:datatype property and it has a nested term map that has an rr:datatype property.</span></li>
+            </ul>
+        </li>
+        <li><span class="highlight">the term type of the value of its nested term map.</span></li>
+        <li>rr:IRI, otherwise.</li>
+        </ul>
+
+        <p>A corollary of this definition is that the xrr:nestedTermMap property may be used in a subject map, predicate map or graph map only if it produces IRIs. Consequently:</p>
+
+        <div class="definition">
+            <p>A term map with an xrr:nestedTermMap property may be a subject map or graph map only if (i) it does not have an rr:termType property and (ii) its nested term map has an rr:termType property with object rr:IRI or rr:BlankNode.</p>
+
+            <p>A term map with an xrr:nestedTermMap property may be a predicate map only if (i) it does not have an rr:termType property and (ii) its nested term map property has an rr:termType property with object rr:IRI.</p>
+        </div>
+
+        
+        
+        
+        
+        <h2 id="_Toc466307475">3.3 Reference relationships between logical sources</h2>
+
+        <p>The following definitions are an adaptation of <a href="http://www.w3.org/TR/r2rml/#foreign-key">R2RML specification section 8</a>. xR2RML additions to R2RML are <span class="highlight">highlighted</span>.</p>
+
+        <div class="definition">
+            <p>A referencing object map allows using the subjects of another triples map as the objects generated by a predicate-object map. Since both triples maps may be based on different logical <span class="highlight">sources</span>, this may require a join between the logical <span class="highlight">sources</span>.</p>
+
+            <p>A referencing object map resource has exactly one rr:parentTriplesMap property (its value is a triples map), and optional rr:joinCondition properties. A join condition has exactly one rr:child property and one rr:parent property. The rr:child property references the join condition's child <span class="highlight">data element</span>, the rr:parent property references the join condition's parent <span class="highlight">data element. Data element references are valid path expressions with regards to the reference formulation (section <a href="#_Toc466307449">1.4</a>), possibly using mixed-syntax paths.</span></p>
+
+            <p><span class="highlight">A referencing object map may have an rr:termType property with an RDF collection or container term type (see further details in <a href="#_Toc466307477">§3.3.2</a>).</span></p>
+
+            <p>The child query of a referencing object map is the <span class="highlight">query or source name of the logical source</span> of the triples map containing the referencing object map.</p>
+
+            <p>The parent query of a referencing object map is the <span class="highlight">query or source name of the logical source</span> of the referencing object map's parent triples map.</p>
+        </div>
+
+        <p>Properties rr:child and rr:parent use valid path expressions to reference data elements. As described in <a href="#_Toc466307470">§3.2.2.3</a>, such path expressions may produce multiple terms. Consequently, the equivalent joint query of a referencing object map must take into account the fact that child and parent references be multi-valued. More precisely, a join between two multi-valued references should be satisfied if at least one data element of the first reference matches one data element of the second reference.</p>
+
+        <p>The joint query of a referencing object map is defined below using SQL syntax (SELECT... FROM... AS... WHERE) and first order logic for the description of WHERE conditions:</p>
+
+        <div class="definition">
+            <p>If a referencing object map has no join condition, its joint query is:</p>
+
+            <div class="indent">SELECT * FROM (<i>{child-query}</i>) AS tmp</div>
+
+            <p>If a referencing object map has at least one join condition, its joint query is:</p>
+            <div class="indent">SELECT * FROM ({child-query}) AS child, ({parent-query}) AS parent<br/>
+            WHERE ∃c<sub>1</sub> ∈ eval(child, {child-ref<sub>1</sub>}), ∃p<sub>1</sub> ∈ eval(parent, {parent-ref1}), c<sub>1</sub> = p<sub>1</sub><br/>
+            AND ∃c<sub>2 </sub>∈ eval(child, {child-ref<sub>2</sub>}), ∃p<sub>2</sub> ∈ eval(parent, {parent-ref2}), c<sub>2</sub> = p<sub>2</sub><br/>
+            AND ...</div>
+
+            <p>where {child-ref<sub>n</sub>} and {parent-ref<sub>n</sub>} are the child reference and parent reference of the n<sup>th</sup> join condition, and eval(source, {ref}) is the result of the evaluation of expression "{ref}" on data "source".</p>
+        </div>
+
+        <p><u>Note</u>: when applied to a relational database, in which child and parent references are single-valued, this definition can be simplified into the R2RML joint query definition:</p>
+
+        <div class="indent">SELECT * FROM ({child-query}) AS child, ({parent-query}) AS parent<br/>
+        WHERE child.{child-ref1} = parent.{parent-ref1}<br/>
+        AND   child.{child-ref2} = parent.{parent-ref2}<br/>
+        AND …</div>
+
+        
+        
+        
+        
+        <h3 id="_Toc466307476">3.3.1 Reference relationship with structured values</h3>
+
+        <p>The relational database example below models the relation between medical doctors and the studies for which they are investigators. Column "Doctor.studies" contains JSON arrays of which elements are references (similar to foreign keys) to column "Study.study_id".</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td>Input data</td>
+                    <td><p>Table Study</p>
+
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td>study_id</td>
+                                    <td>study_name</td>
+                                </tr>
+                                <tr>
+                                    <td><code>1</code></td>
+                                    <td><code>study1</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>2</code></td>
+                                    <td><code>study2</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>3</code></td>
+                                    <td><code>study3</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <p>Table Doctor</p>
+
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td>doc_id</td>
+                                    <td>doc_name</td>
+                                    <td>studies</td>
+                                </tr>
+                                <tr>
+                                    <td><code>1</code></td>
+                                    <td><code>D1</code></td>
+                                    <td><code>[1,2]</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>2</code></td>
+                                    <td><code>D2</code></td>
+                                    <td><code>[3]</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td>Mapping graph</td>
+                    <td><pre>
+&lt;#Study&gt;
+  rr:logicalTable [ rr:tableName "Study" ];
+  rr:subjectMap [ 
+    rr:template "http://example.org/study/{study_name}";
+  ].
+  
+&lt;#Doctor&gt;
+  rr:logicalTable [ rr:tableName "Doctor" ];
+  rr:subjectMap [ 
+    rr:template "http://example.org/doc/{doc_name}";
+  ];
+  rr:predicateObjectMap [
+    rr:predicate ex:investigatorOf;
+    rr:objectMap [
+      rr:parentTriplesMap &lt;#Study&gt;;
+      rr:joinCondition [
+      rr:parent "study_id";
+      rr:child "<span class="red">Column(studies)/JSONPath($.*)</span>";
+    ];
+  ];
+].</pre>
+
+                        <p>The rr:child property uses a mixed-syntax path specifying that the data retrieved is formatted in JSON, and that each element of this structured value is considered in the join operation.</p></td>
+                </tr>
+                <tr>
+                    <td>Generated triples</td>
+                    <td><pre>
+&lt;http://example.org/doc/D1&gt; ex:investigatorOf &lt;http://example.org/study/study1&gt; .
+&lt;http://example.org/doc/D1&gt; ex:investigatorOf &lt;http://example.org/study/study2&gt; .
+&lt;http://example.org/doc/D2&gt; ex:investigatorOf &lt;http://example.org/study/study3&gt; .</pre>
+
+                        <p>According to the equivalent joint query definition, the joint query is as follows ("child" and "parent" notations have been removed for readability):</p>
+
+                        <div class="indent">SELECT * FROM Doctor, Study <br/>
+                        WHERE ∃c ∈ eval(<span class="red">Doctor, Column(studies)/JSONPath($.*)</span>),<br/>
+                        ∃p ∈ Study.study_id,<br/>
+                        c = p </div>
+
+                        <p>where <i>eval(Doctor, Column(studies)/JSONPath($.*))</i> represents the evaluation of mixed-syntax path "Column(studies)/JSONPath($.*)" on table Doctor.</p>
+
+                        <p>Since Study.study_id is single-valued, we can rewrite the query as:</p>
+
+                        <div class="indent">SELECT * FROM Doctor, Study <br/>
+                        WHERE ∃ c ∈ Doctor.Column(studies)/JSONPath($.*), <br/>
+                        &nbsp;&nbsp;&nbsp;&nbsp;c = Studies.study_id<br/>
+                        </div>
+                        
+                        <p>The join query results in this table:</p>
+
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td>doc_id</td>
+                                    <td>doc_name</td>
+                                    <td>studies</td>
+                                    <td>study_id</td>
+                                    <td>study_name</td>
+                                </tr>
+                                <tr>
+                                    <td><code>1</code></td>
+                                    <td><code>D1</code></td>
+                                    <td><code>[<span class="red">1</span>,2]</code></td>
+                                    <td><code><span class="red">1</span></code></td>
+                                    <td><code>study1</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>1</code></td>
+                                    <td><code>D1</code></td>
+                                    <td><code>[1,<span class="red">2</span>]</code></td>
+                                    <td><code><span class="red">2</span></code></td>
+                                    <td><code>study2</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>2</code></td>
+                                    <td><code>D2</code></td>
+                                    <td><code>[3]</code></td>
+                                    <td><code>3</code></td>
+                                    <td><code>study3</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3 id="_Toc466307477">3.3.2 Generating RDF collection/container with a referencing object map</h3>
+
+        <p>In R2RML, referencing object maps do not have an rr:termType property as they should only produce RDF terms of type rr:IRI. In xR2RML however, the result of a joint query may be translated into an RDF collection or container using property rr:termType. The rr:termType has a specific semantics here: it groups joint query results by subjects of the generated triples, i.e. by child reference, and renders all objects in the same grouping as an RDF collection or container.</p>
+
+        <div class="definition">
+            <p>If a referencing object map has no rr:termType property, then its term type is rr:IRI (compliant with the R2RML definition).</p>
+
+            <p>A referencing object map may have an rr:termType property with an RDF collection or container term type (xrr:RdfList, xrr:RdfSeq, xrr:RdfBag or xrr:RdfAlt). In that case, members of the collection or container are necessarily of type rr:IRI.</p>
+
+            <p>In a referencing object map with an RDF collection or container term type, results of the joint query pertaining to the same subject term are grouped together. The objects of the triples map are grouped in a single object of type RDF collection or container, as instructed by the rr:termType property.</p>
+        </div>
+
+        <p>In the example below the referencing object map has an rr:termType property with value xrr:RdfList:</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td>Input data</td>
+                    <td><p>JSON documents retrieved by the query in the &lt;#Study&gt; triples map:</p>
+<pre>
+{ "study_id":1, "study_name":"study1" }
+{ "study_id":2, "study_name":"study2"}
+{ "study_id":3, "study_name":"study3"}
+</pre>
+                        <p>JSON documents retrieved by the query in the &lt;#Doctor&gt; triples map:</p>
+<pre>
+{ "doc_name":"D1", "studies": [1,2] }
+{ "doc_name":"D2", "studies": [2,3] }
+</pre>
+                        </td>
+                </tr>
+                <tr>
+                    <td>Mapping graph</td>
+                    <td>Below, queries to retrieve Studies and Doctors are referred to as <i>&lt;Study query&gt; </i>and <i>&lt;Doctor query&gt;.</i>
+<pre>&lt;#Doctor&gt;
+  xrr:logicalSource [ xrr:query "<i>&lt;Doctor query&gt;</i>"; ];
+  rr:subjectMap [ 
+    rr:template "http://example.org/doc/{$.doc_name}";
+  ].
+  
+&lt;#Study&gt;
+  xrr:logicalSource [ xrr:query "<i>&lt;Study query&gt;</i>"; ];
+  rr:subjectMap [ 
+    rr:template "http://example.org/study/{$.study_name}";
+  ];
+  rr:predicateObjectMap [
+    rr:predicate ex:hasInvestigators;
+    rr:objectMap [
+      rr:parentTriplesMap &lt;#Doctor&gt;;
+      rr:joinCondition [
+        rr:child "$.study_id";
+        rr:parent "<span class="red">$.studies.*</span>";
+      ];
+    <span class="red">rr:termType xrr:RdfList;</span>
+    ];
+  ].</pre></td>
+                </tr>
+                <tr>
+                    <td>Generated RDF triples</td>
+                    <td>
+<pre>
+&lt;http://example.org/study/study1&gt; ex:hasInvestigators
+    ( &lt;http://example.org/doc/D1&gt; ).
+&lt;http://example.org/study/study2&gt; ex:hasInvestigators
+    ( &lt;http://example.org/doc/D1&gt; &lt;http://example.org/doc/D2&gt; ).
+&lt;http://example.org/study/study3&gt; ex:hasInvestigators
+    ( &lt;http://example.org/doc/D2&gt; ).
+</pre>                   
+                        <p>Explanation: according to the equivalent joint query definition, the joint query is as follows:</p>
+
+                        <div class="indent">
+                        SELECT * FROM (<i>&lt;Study query&gt;</i>) as child, (<i>&lt;Doctor query&gt;</i>) as parent<br/>
+                        WHERE ∃ p ∈ eval(parent, $.studies.*), p = eval(child, $.study_id)
+                        </div>
+                        
+                        <p>where <i>eval(parent, $.studies.*)</i> represents the evaluation of path "$.studies.*" on the result of the parent query, and <i>eval(child, $.study_id)</i> represents the evaluation of path "$.study_id" on the result of the child query.</p>
+
+                        <p>The equivalent joint query results in the following documents:</p>
+<pre>
+{ "study_id":<span class="red">1</span>, "study_name":"study1", "doc_name":"D1", "studies": [<span class="red">1</span>,2] }
+{ "study_id":<span class="red">2</span>, "study_name":"study2", "doc_name":"D1", "studies": [1,<span class="red">2</span>] }
+{ "study_id":<span class="red">2</span>, "study_name":"study2", "doc_name":"D2", "studies": [<span class="red">2</span>,3] }
+{ "study_id":<span class="red">3</span>, "study_name":"study3", "doc_name":"D2", "studies": [2,<span class="red">3</span>] }
+</pre>
+                        <p>Then, term type xrr:RdfList instructs to group results pertaining to the same subject, i.e. by "study_id".</p></td>
+                </tr>
+            </tbody>
+        </table>
+        
+        
+        
+        
+
+        <h3 id="_Toc466307478">3.3.3 Generating RDF collection/container with a referencing object map in the relational case</h3>
+
+        <p>An interesting consequence of using the rr:termType in a referencing object map is the ability, in the case of a relational database with standard SQL values, to build an RDF collection or container reflecting a one-to-many relation. In the example below, foreign key Study.doctor relates each study to its investigator in a many-to-one relation (several studies may have the same investigator). Considered the other way round, it can be seen as a one-to-many relation (one doctor investigates several studies). The mapping graph describes the generation of each doctor along with the list of studies he/she investigates.</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td>Input data</td>
+                    <td><p>Table Study</p>
+
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td>study_id</td>
+                                    <td>study_name</td>
+                                    <td>doctor</td>
+                                </tr>
+                                <tr>
+                                    <td><code>1</code></td>
+                                    <td><code>study1</code></td>
+                                    <td><code>1</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>2</code></td>
+                                    <td><code>study2</code></td>
+                                    <td><code>1</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>3</code></td>
+                                    <td><code>study3</code></td>
+                                    <td><code>2</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <p>Table Doctor</p>
+
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td>doc_id</td>
+                                    <td>doc_name</td>
+                                </tr>
+                                <tr>
+                                    <td><code>1</code></td>
+                                    <td><code>D1</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>2</code></td>
+                                    <td><code>D2</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td>Mapping graph</td>
+                    <td>
+<pre>
+&lt;#Study&gt;
+  rr:logicalTable [ rr:tableName "Study" ];
+  rr:subjectMap [ 
+    rr:template "http://example.org/study/{study_name}";
+  ].
+
+&lt;#Doctor&gt;
+  rr:logicalTable [ rr:tableName "Doctor" ];
+  rr:subjectMap [ 
+    rr:template "http://example.org/doc/{doc_name}";
+  ].
+  rr:predicateObjectMap [
+    rr:predicate ex:investigatesStudies;
+    rr:objectMap [
+      rr:parentTriplesMap &lt;#Study&gt;;
+      rr:joinCondition [
+        rr:child "doc_id";
+        rr:parent "doctor;
+      ];
+      <span class="red">rr:termType xrr:RdfList;</span>
+    ];
+  ].</pre></td>
+                </tr>
+                <tr>
+                    <td>Generated RDF triples</td>
+                    <td>
+<pre>
+&lt;http://example.org/doc/D1&gt; ex: investigatesStudies
+    (&lt;http://example.org/study/study1&gt; &lt;http://example.org/study/study2&gt;) .
+&lt;http://example.org/doc/D2&gt; ex: investigatesStudies
+    ( &lt;http://example.org/study/study3&gt; ) .
+</pre>
+                        <p>The equivalent joint query results in this table:</p>
+
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td>doc_id</td>
+                                    <td>doc_name</td>
+                                    <td>study_id</td>
+                                    <td>study_name</td>
+                                    <td>doctor</td>
+                                </tr>
+                                <tr>
+                                    <td><code><span class="red">1</span></code></td>
+                                    <td><code>D1</code></td>
+                                    <td><code>1</code></td>
+                                    <td><code>study1</code></td>
+                                    <td><code><span class="red">1</span></code></td>
+                                </tr>
+                                <tr>
+                                    <td><code><span class="red">1</span></code></td>
+                                    <td><code>D1</code></td>
+                                    <td><code>2</code></td>
+                                    <td><code>study2</code></td>
+                                    <td><code><span class="red">1</span></code></td>
+                                </tr>
+                                <tr>
+                                    <td><code><span class="red">2</span></code></td>
+                                    <td><code>D2</code></td>
+                                    <td><code>3</code></td>
+                                    <td><code>study3</code></td>
+                                    <td><code><span class="red">2</span></code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <p>Results are grouped by subjet, i.e. by column "doc_name" to generate RDF lists.</p></td>
+                </tr>
+            </tbody>
+        </table>
+
+        
+        
+        
+        <h1 id="_Toc466307479">A References</h1>
+        
+        <dl class="bib">
+            <dt id="bib1">[1]</dt>
+            <dd>S. Das, S. Sundara, R. Cyganiak, R2RML: RDB to RDF Mapping Language, (2012).</dd>
+
+            <dt id="bib2">[2]</dt>
+            <dd>A. Dimou, M.V. Sande, <a href="http://rml.io/spec.html">RDF Mapping Language (RML) Unofficial Draft<a> 17 September 2014, (2014).</dd>
+
+            <dt id="bib3">[3]</dt>
+            <dd>A. Dimou, M. Vander Sande, P. Colpaert, E. Mannens, R. Van de Walle, Extending R2RML to a source-independent mapping language for RDF, in: Workshop Proceedings, 12th International Semantic Web Conference Posters &amp; Demos, Sydney, Australia, 2013: pp. 237–240.</dd>
+
+            <dt id="bib4">[4]</dt>
+            <dd>A. Dimou, M. Vander Sande, P. Colpaert, R. Verborgh, E. Mannens, R. Van de Walle, RML: A Generic Language for Integrated RDF Mappings of Heterogeneous Data, in: Proceedings of the 7th Workshop on Linked Data on the Web (LDOW2014), Seoul, Korea, 2014.</dd>
+
+            <dt id="bib5">[5]</dt>
+            <dd>S.K. Gajendran, A Survey on NoSQL Databases (technical report), 2013.</dd>
+
+            <dt id="bib6">[6]</dt>
+            <dd>R. Hecht, S. Jablonski, NoSQL Evaluation: A Use Case Oriented Survey, in: Proceedings of the 2011 International Conference on Cloud and Service Computing, IEEE Computer Society, Washington, DC, USA, 2011: pp. 336–341.</dd>
+
+            <dt id="bib7">[7]</dt>
+            <dd>B. Kolev, P. Valduriez, R. Jimenez-Peris, N. Martínez-Bazan, J. Pereira, CloudMdsQL: Querying Heterogeneous Cloud Data Stores with a Common Language.pdf, in: Proceeding of the BDA 2014 Conference, Autrans, France, 2014.</dd>
+
+            <dt id="bib8">[8]</dt>
+            <dd>K.W. Ong, Y. Papakonstantinou, R. Vernoux, The SQL++ Unifying Semi-structured Query Language, and an Expressiveness Benchmark of SQL-on-Hadoop, NoSQL and NewSQL Databases (submitted), CoRR. abs/1405.3631 (2014).</dd>
+
+        </dl>
+
+        
+        
+<!-- Dataset markup -->
+<script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@graph": [
+            {
+                "@type": "Report",
+                "reportNumber": "ISRN I3S/RR 2014-04-FR",
+                "name": "xR2RML: Relational and Non-Relational Databases to RDF Mapping Language",
+                "dateCreated": "2017-10-25",
+                "datePublished": "2019-04-08",
+                "sameAs": "https://hal.archives-ouvertes.fr/hal-01066663v5",
+                "description": "This document is the specification of the xR2RML language meant to describe customized mappings from various types of databases (XML, object-oriented, NoSQL) to RDF datasets. xR2RML extends R2RML and RML to a wide range of non-relational databases.",
+                "license": "https://creativecommons.org/licenses/by/4.0/",
+
+                "author": [
+                    {
+                        "@type": "Person",
+                        "@id": "https://orcid.org/0000-0001-9064-0463"
+                    },
+                    {
+                        "@type": "Person",
+                        "@id": "https://orcid.org/0000-0001-5959-5561"
+                    },
+                    {
+                        "@type": "Person",
+                        "name": "Johan MONTAGNAT",
+                        "url": "http://www.i3s.unice.fr/~johan/",
+                        "sameAs": "https://cv.archives-ouvertes.fr/johan-montagnat"    
+                    },
+                    {
+                        "@type": "Person",
+                        "name": "Loïc DJIMENOU",
+                        "url": "https://www.linkedin.com/in/loic-djimenou-13386511a"
+                    }
+                ],
+                
+                "publisher": {
+                    "@type": "Organization",
+                    "name": "Université Côte d'Azur, CNRS, Inria, I3S",
+                    "logo": [
+                        "http://univ-cotedazur.fr/fr/university/communication-presse/charte-et-logos/logo/png/uca-logo-large",
+                        "https://www.inria.fr/dircom/logoinria-eng.png",
+                        "http://www.cnrs.fr/themes/custom/cnrs/logo.svg"
+                    ]
+                },
+                
+                "keywords": [
+                    "mapping", "language", "rdf", "r2rml", "xr2rml"
+                ],
+                
+                "subjectOf": {
+                    "@type": "SoftwareApplication",
+                    "url": "https://github.com/frmichel/morph-xr2rml/",
+                    "name": "Morph-xR2RML",
+                    "description": "Implementation of the xR2RML mapping language for MongoDB",
+                    "applicationCategory": "Data translation",
+                    "operatingSystem": "any (Java-based)",
+                    "author": "https://orcid.org/0000-0001-9064-0463"
+                },
+                
+                "citation": {
+                    "@type": "ScholarlyArticle",
+                    "name": "Translation of Relational and Non-Relational Databases into RDF with xR2RML",
+                    "datePublished": "2015",
+                    "author": [
+                        {
+                            "@type": "Person",
+                            "@id": "https://orcid.org/0000-0001-9064-0463"
+                        },
+                        {
+                            "@type": "Person",
+                            "@id": "https://orcid.org/0000-0001-5959-5561"
+                        },
+                        {
+                            "@type": "Person",
+                            "name": "Johan MONTAGNAT",
+                            "url": "http://www.i3s.unice.fr/~johan/",
+                            "sameAs": "https://cv.archives-ouvertes.fr/johan-montagnat"    
+                        },
+                        {
+                            "@type": "Person",
+                            "name": "Loïc DJIMENOU",
+                            "url": "https://www.linkedin.com/in/loic-djimenou-13386511a"
+                        }
+                    ],
+                    "sameAs": [
+                        "https://doi.org/10.5220/0005448304430454",
+                        "https://hal.archives-ouvertes.fr/hal-01207828"
+                    ],
+                    "isPartOf": {
+                        "name": "Proceedings of the WebIST'15 Conference, 2015, Lisbon, Portugal"
+                    },
+                    "pageStart": "443",
+                    "pageEnd": "454"
+                }
+            },
+            
+            {
+                "@type": "Person",
+                "@id": "https://orcid.org/0000-0001-9064-0463",
+                "name": "Franck MICHEL",
+                "sameAs": [
+                    "http://modalis.i3s.unice.fr/fmichel",
+                    "https://cv.archives-ouvertes.fr/fmichel/", 
+                    "https://w3id.org/people/franckmichel",
+                    "https://www.researchgate.net/profile/Franck_Michel3"
+                ]
+            },
+            
+            {
+                "@type": "Person",
+                "@id": "https://orcid.org/0000-0001-5959-5561",
+                "name": "Catherine FARON-ZUCKER",
+                "sameAs": [
+                    "http://www.i3s.unice.fr/~faron/",
+                    "https://cv.archives-ouvertes.fr/catherine-faron-zucker", 
+                    "https://w3id.org/people/franckmichel",
+                    "https://www.researchgate.net/profile/Catherine_Faron-Zucker"
+                ]
+            }
+        ]
+    }
+</script>
+
+</body>
+</html>

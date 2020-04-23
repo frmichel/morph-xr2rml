@@ -38,7 +38,7 @@ class JongoTest {
         print(results.toList)
     }
 
-    @Test def testQ0() {
+    /* @Test def testQ0() {
         println("------------- testQ0 -------------")
 
         var qStr = "{'Lastname': 'O\\'Connel'}"
@@ -54,5 +54,5 @@ class JongoTest {
         var src = """{\"adminLevel\": \"Collectivité d'outre-mer\"}"""
         println(src)
         println(src.replaceAll("""\\"""", "\""))
-    }
+    } */
 }

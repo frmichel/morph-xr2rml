@@ -63,9 +63,9 @@ See a detailed [description of the project code and architecture](doc/README_cod
 
 Pre-requisite: have **Java SDK 10** installed
 
-You can download the last snapshot published in [this repository](https://www.dropbox.com/home/artifacts/snapshot/fr/unice/i3s/morph-xr2rml-dist).
+You can download the last release published in [this repository](https://www.dropbox.com/home/artifacts/release/fr/unice/i3s/morph-xr2rml-dist).
 
-Alternatively, you can build the application using [Maven](http://maven.apache.org/) 2 or 3: in a shell, CD to the root directory morph-xr2rml, then run the command: ```mvn clean package```. A jar with all dependencies is generated in morph-xr2rml-dist/target.
+Alternatively, you can build the application using [Maven](http://maven.apache.org/): in a shell, CD to the root directory morph-xr2rml, then run the command: `mvn clean package`. A jar with all dependencies is generated in `morph-xr2rml-dist/target`.
 
 
 ### Run it

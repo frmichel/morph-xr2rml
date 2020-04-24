@@ -1,9 +1,10 @@
 package es.upm.fi.dia.oeg.morph.rdb.engine
 
-import com.hp.hpl.jena.graph.Node
-import com.hp.hpl.jena.sparql.core.Var
+import org.apache.jena.graph.Node
+import org.apache.jena.graph.Node_Variable
+import org.apache.jena.sparql.core.Var
+
 import es.upm.fi.dia.oeg.morph.base.Constants
-import com.hp.hpl.jena.graph.Node_Variable
 
 class NameGenerator {
 

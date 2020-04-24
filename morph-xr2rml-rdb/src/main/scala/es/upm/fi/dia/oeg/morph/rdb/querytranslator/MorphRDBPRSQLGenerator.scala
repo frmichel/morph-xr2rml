@@ -3,10 +3,12 @@ package es.upm.fi.dia.oeg.morph.rdb.querytranslator
 import scala.collection.JavaConversions.asJavaCollection
 import scala.collection.JavaConversions.seqAsJavaList
 import scala.collection.mutable.LinkedHashSet
+
+import org.apache.jena.graph.Node
+import org.apache.jena.graph.Triple
+import org.apache.jena.vocabulary.RDF
 import org.apache.log4j.Logger
-import com.hp.hpl.jena.graph.Node
-import com.hp.hpl.jena.graph.Triple
-import com.hp.hpl.jena.vocabulary.RDF
+
 import Zql.ZConstant
 import Zql.ZSelectItem
 import es.upm.fi.dia.oeg.morph.base.Constants
@@ -15,10 +17,10 @@ import es.upm.fi.dia.oeg.morph.base.querytranslator.MorphAlphaResult
 import es.upm.fi.dia.oeg.morph.base.querytranslator.MorphPRSQLResult
 import es.upm.fi.dia.oeg.morph.base.querytranslator.SparqlUtility
 import es.upm.fi.dia.oeg.morph.base.sql.MorphSQLSelectItem
-import es.upm.fi.dia.oeg.morph.r2rml.model.RDBR2RMLMappingDocument
 import es.upm.fi.dia.oeg.morph.r2rml.model.R2RMLPredicateObjectMap
 import es.upm.fi.dia.oeg.morph.r2rml.model.R2RMLTermMap
 import es.upm.fi.dia.oeg.morph.r2rml.model.R2RMLTriplesMap
+import es.upm.fi.dia.oeg.morph.r2rml.model.RDBR2RMLMappingDocument
 import es.upm.fi.dia.oeg.morph.rdb.engine.NameGenerator
 
 class MorphRDBPRSQLGenerator(md: RDBR2RMLMappingDocument, unfolder: MorphBaseUnfolder) {

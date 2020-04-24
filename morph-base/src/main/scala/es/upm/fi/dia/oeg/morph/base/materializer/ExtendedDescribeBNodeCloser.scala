@@ -6,21 +6,19 @@
  */
 package es.upm.fi.dia.oeg.morph.base.materializer
 
-import scala.collection.JavaConverters._
-
-import com.hp.hpl.jena.query.Dataset
-import com.hp.hpl.jena.query.Query
-import com.hp.hpl.jena.query.QueryExecution
-import com.hp.hpl.jena.query.QueryExecutionFactory
-import com.hp.hpl.jena.query.QueryFactory
-import com.hp.hpl.jena.query.QuerySolutionMap
-import com.hp.hpl.jena.query.ResultSet
-import com.hp.hpl.jena.rdf.model.Model
-import com.hp.hpl.jena.rdf.model.Resource
-import com.hp.hpl.jena.sparql.ARQConstants
-import com.hp.hpl.jena.sparql.core.describe.DescribeHandler
-import com.hp.hpl.jena.sparql.util.Closure
-import com.hp.hpl.jena.sparql.util.Context
+import org.apache.jena.query.Dataset
+import org.apache.jena.query.Query
+import org.apache.jena.query.QueryExecution
+import org.apache.jena.query.QueryExecutionFactory
+import org.apache.jena.query.QueryFactory
+import org.apache.jena.query.QuerySolutionMap
+import org.apache.jena.query.ResultSet
+import org.apache.jena.rdf.model.Model
+import org.apache.jena.rdf.model.Resource
+import org.apache.jena.sparql.ARQConstants
+import org.apache.jena.sparql.core.describe.DescribeHandler
+import org.apache.jena.sparql.util.Closure
+import org.apache.jena.sparql.util.Context
 
 /**
  * Describe handler that considers all statements for which the resource is either a subject or an object,

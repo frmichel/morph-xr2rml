@@ -4,18 +4,18 @@ import scala.collection.JavaConversions.asScalaBuffer
 
 import org.apache.log4j.Logger
 
-import com.hp.hpl.jena.graph.Node
-import com.hp.hpl.jena.graph.NodeFactory
-import com.hp.hpl.jena.graph.Triple
-import com.hp.hpl.jena.query.Query
-import com.hp.hpl.jena.sparql.algebra.Op
-import com.hp.hpl.jena.sparql.algebra.OpAsQuery
-import com.hp.hpl.jena.sparql.algebra.TableFactory
-import com.hp.hpl.jena.sparql.algebra.op.OpDistinct
-import com.hp.hpl.jena.sparql.algebra.op.OpProject
-import com.hp.hpl.jena.sparql.algebra.op.OpSlice
-import com.hp.hpl.jena.sparql.algebra.op.OpTable
-import com.hp.hpl.jena.sparql.engine.binding.BindingFactory
+import org.apache.jena.graph.Node
+import org.apache.jena.graph.NodeFactory
+import org.apache.jena.graph.Triple
+import org.apache.jena.query.Query
+import org.apache.jena.sparql.algebra.Op
+import org.apache.jena.sparql.algebra.OpAsQuery
+import org.apache.jena.sparql.algebra.TableFactory
+import org.apache.jena.sparql.algebra.op.OpDistinct
+import org.apache.jena.sparql.algebra.op.OpProject
+import org.apache.jena.sparql.algebra.op.OpSlice
+import org.apache.jena.sparql.algebra.op.OpTable
+import org.apache.jena.sparql.engine.binding.BindingFactory
 
 import es.upm.fi.dia.oeg.morph.base.Constants
 import es.upm.fi.dia.oeg.morph.base.GeneralUtility

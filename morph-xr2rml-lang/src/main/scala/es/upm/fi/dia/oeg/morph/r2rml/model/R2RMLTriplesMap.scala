@@ -5,9 +5,8 @@ import scala.collection.JavaConversions.collectionAsScalaIterable
 import scala.collection.JavaConversions.mapAsJavaMap
 import scala.collection.JavaConversions.setAsJavaSet
 
+import org.apache.jena.rdf.model.Resource
 import org.apache.log4j.Logger
-
-import com.hp.hpl.jena.rdf.model.Resource
 
 import es.upm.fi.dia.oeg.morph.base.Constants
 import es.upm.fi.dia.oeg.morph.base.exception.MorphException

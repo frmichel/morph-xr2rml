@@ -1,6 +1,6 @@
 package es.upm.fi.dia.oeg.morph.r2rml.model
 
-import com.hp.hpl.jena.rdf.model.{ RDFNode, Resource }
+import org.apache.jena.rdf.model.{ RDFNode, Resource }
 import es.upm.fi.dia.oeg.morph.base.exception.MorphException
 import es.upm.fi.dia.oeg.morph.base.{ Constants, TemplateUtility }
 import es.upm.fi.dia.oeg.morph.base.path.MixedSyntaxPath

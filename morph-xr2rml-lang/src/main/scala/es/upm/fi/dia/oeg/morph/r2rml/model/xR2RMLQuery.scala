@@ -11,7 +11,7 @@ class xR2RMLQuery(
     refFormulation: String,
     iterator: Option[String],
     uniqueRefs: Set[String],
-    override val listPushDown: List[xR2RMLPushDown])
+    listPushDown: List[xR2RMLPushDown])
         extends xR2RMLLogicalSource(Constants.LogicalTableType.QUERY, refFormulation, iterator, uniqueRefs, listPushDown) {
 
     /**
@@ -25,7 +25,8 @@ class xR2RMLQuery(
         q.isInstanceOf[xR2RMLQuery] && {
             val ls = q.asInstanceOf[xR2RMLQuery]
             this.logicalTableType == ls.logicalTableType && this.refFormulation == ls.refFormulation &&
-                this.docIterator == ls.docIterator && GeneralUtility.cleanString(this.query) == GeneralUtility.cleanString(ls.query)
+                this.docIterator == ls.docIterator && 
+                GeneralUtility.cleanString(this.query) == GeneralUtility.cleanString(ls.query)
         }
     }
 

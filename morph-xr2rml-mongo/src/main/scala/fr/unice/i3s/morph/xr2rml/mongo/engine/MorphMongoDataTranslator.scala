@@ -1,11 +1,11 @@
 package fr.unice.i3s.morph.xr2rml.mongo.engine
 
+import org.apache.jena.datatypes.xsd.XSDDatatype
+import org.apache.jena.rdf.model.Literal
+import org.apache.jena.vocabulary.RDF
 import org.apache.log4j.Logger
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype
-import com.hp.hpl.jena.rdf.model.Literal
-import com.hp.hpl.jena.vocabulary.RDF
 
 import es.upm.fi.dia.oeg.morph.base.Constants
 import es.upm.fi.dia.oeg.morph.base.GeneralUtility
@@ -63,7 +63,7 @@ class MorphMongoDataTranslator(val fact: IMorphFactory)
         // Execute the query against the database and apply the optional iterator and pushDown properties
         val childResultSet = factory.getDataSourceReader
             .executeQueryAndIterator(query, ls.docIterator, None, ls.listPushDown)
-            .asInstanceOf[MorphMongoResultSet].resultSet.toList
+            .asInstanceOf[MorphMongoResultSet].resultSet
 
         // Execute the queries of all the parent triples maps (in the join conditions) against the database
         // and apply their iterators. These queries will serve in computing the joins.
@@ -79,7 +79,7 @@ class MorphMongoDataTranslator(val fact: IMorphFactory)
                 val queryMapId = MorphMongoDataSourceReader.makeQueryMapId(parentQuery, parentTM.logicalSource.docIterator, None)
                 if (!parentResultSets.contains(queryMapId)) {
                     val resultSet = factory.getDataSourceReader.executeQueryAndIterator(parentQuery, parentTM.logicalSource.docIterator, None).asInstanceOf[MorphMongoResultSet].resultSet
-                    parentResultSets += (queryMapId -> resultSet.toList)
+                    parentResultSets += (queryMapId -> resultSet)
                 }
             })
         })
@@ -197,6 +197,12 @@ class MorphMongoDataTranslator(val fact: IMorphFactory)
                     val refObjNodes = refObjects.map(this.createRDFNode)
                     val graphNodes = (subjectGraphs ++ predicateObjectGraphs).map(this.createRDFNode)
                     nbTriples += factory.getMaterializer.materializeQuads(subNodes, predNodes, objNodes, refObjNodes, graphNodes).intValue
+
+                    if (factory.getProperties.outputFileMaxTriples > 0) {
+                        // Write the current model to the output file and start a new one
+                        if (factory.getMaterializer.model.size() >= factory.getProperties.outputFileMaxTriples)
+                            factory.getMaterializer.serializeIncremental(factory.getProperties.outputSyntaxRdf)
+                    }
                 })
             } catch {
                 case e: MorphException => {

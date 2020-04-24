@@ -2,12 +2,12 @@ package es.upm.fi.dia.oeg.morph.base
 
 import java.io.File
 
+import scala.collection.JavaConverters.asJavaIteratorConverter
+
+import org.apache.jena.rdf.model.ModelFactory
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
-
-import com.hp.hpl.jena.rdf.model.ModelFactory
-import com.hp.hpl.jena.rdf.model.RDFNode
 
 class GeneralUtilityTest {
 
@@ -16,10 +16,10 @@ class GeneralUtilityTest {
         val model = ModelFactory.createDefaultModel()
 
         val valuesAsRdfNodes = List("a", "b", "c").map(value => model.createLiteral(value))
-        val lst1 = model.createList(valuesAsRdfNodes.toArray[RDFNode])
+        val lst1 = model.createList(valuesAsRdfNodes.iterator.asJava)
 
         val valuesAsRdfNodes2 = List("a", "b", "c").map(value => model.createLiteral(value))
-        val lst2 = model.createList(valuesAsRdfNodes2.toArray[RDFNode])
+        val lst2 = model.createList(valuesAsRdfNodes2.iterator.asJava)
 
         assertTrue(GeneralUtility.compareRdfList(lst1, lst2))
     }
@@ -29,10 +29,10 @@ class GeneralUtilityTest {
         val model = ModelFactory.createDefaultModel()
 
         val valuesAsRdfNodes = List("a", "b", "d").map(value => model.createLiteral(value))
-        val lst1 = model.createList(valuesAsRdfNodes.toArray[RDFNode])
+        val lst1 = model.createList(valuesAsRdfNodes.iterator.asJava)
 
         val valuesAsRdfNodes2 = List("a", "b", "c").map(value => model.createLiteral(value))
-        val lst2 = model.createList(valuesAsRdfNodes2.toArray[RDFNode])
+        val lst2 = model.createList(valuesAsRdfNodes2.iterator.asJava)
 
         assertFalse(GeneralUtility.compareRdfList(lst1, lst2))
     }
@@ -42,10 +42,10 @@ class GeneralUtilityTest {
         val model = ModelFactory.createDefaultModel()
 
         val valuesAsRdfNodes = List("a", "b").map(value => model.createLiteral(value))
-        val lst1 = model.createList(valuesAsRdfNodes.toArray[RDFNode])
+        val lst1 = model.createList(valuesAsRdfNodes.iterator.asJava)
 
         val valuesAsRdfNodes2 = List("a", "b", "c").map(value => model.createLiteral(value))
-        val lst2 = model.createList(valuesAsRdfNodes2.toArray[RDFNode])
+        val lst2 = model.createList(valuesAsRdfNodes2.iterator.asJava)
 
         assertFalse(GeneralUtility.compareRdfList(lst1, lst2))
         assertFalse(GeneralUtility.compareRdfList(lst2, lst1))

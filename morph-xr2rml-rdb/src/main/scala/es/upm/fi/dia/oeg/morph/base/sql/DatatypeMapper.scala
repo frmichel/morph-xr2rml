@@ -1,9 +1,9 @@
 package es.upm.fi.dia.oeg.morph.base.sql
-import scala.collection.JavaConversions._
-import org.apache.log4j.Logger
-import java.sql.Types
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype
 import java.sql.ResultSetMetaData
+import java.sql.Types
+
+import org.apache.jena.datatypes.xsd.XSDDatatype
+import org.apache.log4j.Logger
 
 class DatatypeMapper {
     val logger = Logger.getLogger("DatatypeMapper");

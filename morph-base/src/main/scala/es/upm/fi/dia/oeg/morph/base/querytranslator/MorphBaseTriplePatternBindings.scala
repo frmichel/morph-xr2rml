@@ -1,8 +1,6 @@
 package es.upm.fi.dia.oeg.morph.base.querytranslator
 
-import scala.collection.JavaConversions.seqAsJavaList
-
-import com.hp.hpl.jena.graph.Triple
+import org.apache.jena.graph.Triple
 
 import es.upm.fi.dia.oeg.morph.r2rml.model.R2RMLTriplesMap
 

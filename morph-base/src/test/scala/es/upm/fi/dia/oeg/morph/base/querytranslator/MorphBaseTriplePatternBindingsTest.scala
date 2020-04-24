@@ -4,7 +4,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-import com.hp.hpl.jena.graph.NodeFactory
+import org.apache.jena.graph.NodeFactory
 
 import es.upm.fi.dia.oeg.morph.base.Constants
 import es.upm.fi.dia.oeg.morph.r2rml.model.R2RMLObjectMap
@@ -33,7 +33,7 @@ class MorphBaseTriplePatternBindingsTest {
             None, // xR2RMLNestedTermMap]
             "JSONPath" // Reference formulation
             , Nil //PushDown
-            ) 
+        )
         termMap.setConstantValue("val")
         assertTrue(triplePatternBinder.compatible(termMap, variable))
 
@@ -44,7 +44,7 @@ class MorphBaseTriplePatternBindingsTest {
             Set.empty, // graph URIs
             "JSONPath" // Reference formulation
             , Nil //PushDown
-            ) 
+        )
         assertTrue(triplePatternBinder.compatible(termMap, variable))
 
         termMap = new R2RMLPredicateMap(
@@ -52,7 +52,7 @@ class MorphBaseTriplePatternBindingsTest {
             Some(Constants.R2RML_BLANKNODE_URI), // term type
             "JSONPath" // Reference formulation
             , Nil //PushDown
-            ) 
+        )
         assertTrue(triplePatternBinder.compatible(termMap, variable))
     }
 
@@ -62,8 +62,8 @@ class MorphBaseTriplePatternBindingsTest {
         var literal = NodeFactory.createLiteral("3")
         var literal_lang = NodeFactory.createLiteral("3", "fr", false)
         var literal_langde = NodeFactory.createLiteral("3", "de", false)
-        var literal_dt = NodeFactory.createLiteral("3", com.hp.hpl.jena.datatypes.xsd.XSDDatatype.XSDint)
-        var literal_dtl = NodeFactory.createLiteral("3", com.hp.hpl.jena.datatypes.xsd.XSDDatatype.XSDlong)
+        var literal_dt = NodeFactory.createLiteral("3", org.apache.jena.datatypes.xsd.XSDDatatype.XSDint)
+        var literal_dtl = NodeFactory.createLiteral("3", org.apache.jena.datatypes.xsd.XSDDatatype.XSDlong)
 
         var termMap = new R2RMLObjectMap(
             Constants.MorphTermMapType.ConstantTermMap, // term map type
@@ -75,7 +75,7 @@ class MorphBaseTriplePatternBindingsTest {
         termMap.setConstantValue("3")
         assertTrue(triplePatternBinder.compatible(termMap, literal))
         assertFalse(triplePatternBinder.compatible(termMap, literal_lang))
-        assertFalse(triplePatternBinder.compatible(termMap, literal_dt))
+        assertTrue(triplePatternBinder.compatible(termMap, literal_dt))
 
         termMap = new R2RMLObjectMap(
             Constants.MorphTermMapType.ConstantTermMap, // term map type
@@ -129,7 +129,7 @@ class MorphBaseTriplePatternBindingsTest {
         var literal = NodeFactory.createLiteral("3")
         var literal_lang = NodeFactory.createLiteral("3", "fr", false)
         var literal_langde = NodeFactory.createLiteral("3", "de", false)
-        var literal_dt = NodeFactory.createLiteral("3", com.hp.hpl.jena.datatypes.xsd.XSDDatatype.XSDstring)
+        var literal_dt = NodeFactory.createLiteral("3", org.apache.jena.datatypes.xsd.XSDDatatype.XSDstring)
         var iri = NodeFactory.createURI("http://example.org/starring")
         var bn = NodeFactory.createAnon()
 
@@ -139,9 +139,10 @@ class MorphBaseTriplePatternBindingsTest {
             None, None, // data type, language tag
             None, // language map
             None, "JSONPath", Nil) // xR2RMLNestedTermMap, Reference formulation, PushDown
+        
         assertTrue(triplePatternBinder.compatible(termMap, literal))
         assertFalse(triplePatternBinder.compatible(termMap, literal_lang))
-        assertFalse(triplePatternBinder.compatible(termMap, literal_dt))
+        assertTrue(triplePatternBinder.compatible(termMap, literal_dt))
         assertFalse(triplePatternBinder.compatible(termMap, iri))
         assertFalse(triplePatternBinder.compatible(termMap, bn))
 
@@ -153,7 +154,7 @@ class MorphBaseTriplePatternBindingsTest {
             None, // language map
             None, "JSONPath", Nil) // xR2RMLNestedTermMap, Reference formulation, PushDown
         assertTrue(triplePatternBinder.compatible(termMap, literal_dt))
-        assertFalse(triplePatternBinder.compatible(termMap, literal))
+        assertTrue(triplePatternBinder.compatible(termMap, literal))
         assertFalse(triplePatternBinder.compatible(termMap, literal_lang))
 
         termMap = new R2RMLObjectMap(
@@ -294,7 +295,7 @@ class MorphBaseTriplePatternBindingsTest {
 
     @Test
     def test_compatible_TermMaps3 {
-        // Literal, IRI, BlankNode 
+        // Literal, IRI, BlankNode
 
         var termMap1 = new R2RMLObjectMap(
             Constants.MorphTermMapType.ReferenceTermMap, // term map type

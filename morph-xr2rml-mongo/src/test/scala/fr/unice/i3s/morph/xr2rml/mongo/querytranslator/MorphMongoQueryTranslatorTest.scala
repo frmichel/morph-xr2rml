@@ -8,11 +8,11 @@ import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Test
 
-import com.hp.hpl.jena.graph.NodeFactory
-import com.hp.hpl.jena.graph.Triple
-import com.hp.hpl.jena.query.QueryFactory
-import com.hp.hpl.jena.sparql.algebra.Algebra
-import com.hp.hpl.jena.sparql.algebra.op.OpBGP
+import org.apache.jena.graph.NodeFactory
+import org.apache.jena.graph.Triple
+import org.apache.jena.query.QueryFactory
+import org.apache.jena.sparql.algebra.Algebra
+import org.apache.jena.sparql.algebra.op.OpBGP
 
 import es.upm.fi.dia.oeg.morph.base.GenericConnection
 import es.upm.fi.dia.oeg.morph.base.MorphProperties

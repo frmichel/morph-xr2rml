@@ -1,22 +1,21 @@
 package fr.unice.i3s.morph.xr2rml.mongo.abstractquery
 
+import org.apache.jena.graph.NodeFactory
+import org.apache.jena.graph.Triple
+import org.apache.jena.rdf.model.ResourceFactory
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-import com.hp.hpl.jena.graph.NodeFactory
-import com.hp.hpl.jena.graph.Triple
-import com.hp.hpl.jena.rdf.model.ResourceFactory
-
 import es.upm.fi.dia.oeg.morph.base.exception.MorphException
 import es.upm.fi.dia.oeg.morph.base.query.AbstractConditionEquals
 import es.upm.fi.dia.oeg.morph.base.query.AbstractConditionNotNull
 import es.upm.fi.dia.oeg.morph.base.query.AbstractQueryProjection
+import es.upm.fi.dia.oeg.morph.base.querytranslator.TpBinding
 import es.upm.fi.dia.oeg.morph.base.querytranslator.TpBindings
 import es.upm.fi.dia.oeg.morph.r2rml.model.R2RMLTriplesMap
 import es.upm.fi.dia.oeg.morph.r2rml.model.xR2RMLQuery
-import es.upm.fi.dia.oeg.morph.base.querytranslator.TpBinding
 
 /**
  * @author Franck Michel, I3S laboratory

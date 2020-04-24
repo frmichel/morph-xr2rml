@@ -40,13 +40,13 @@ Several configuration files are provided in project morph-xr2rml-dist for both t
 and both MySQL and MongoDB database. The configuration files defaults to example_mysql/morph.properties.
 
 ### Main objects factory
-es.upm.fi.dia.oeg.morph.base.engine.IMorphFactory (project morph-base) serves as the 
+`es.upm.fi.dia.oeg.morph.base.engine.IMorphFactory` (project morph-base) serves as the 
 provider of all main objects needed during the xR2RML processing, either in materialization or in query rewriting modes.
 
 All those objects have an abstract version in project morph-base (package es.upm.fi.dia.oeg.morph.base) and a concrete implementation
-in projects morph-xr2rml-rb and morph-xr2rml-mongo.
+in projects `morph-xr2rml-rdb` and `morph-xr2rml-mongo`.
 
-The es.upm.fi.dia.oeg.morph.base.engine.MorphBaseRunnerFactory (project morph-base) is an abstract implementation of IMorphFactory:
+The `es.upm.fi.dia.oeg.morph.base.engine.MorphBaseRunnerFactory` (project `morph-base`) is an abstract implementation of IMorphFactory:
 it builds all main objects relying on database-specific implementations in MorphRDBRunnerFactory and MorphMongoRunnerFactory:
 
 - A *properties* object: es.upm.fi.dia.oeg.morph.base.MorphProperties holds members for each property definable in the configuration file.
@@ -68,10 +68,10 @@ it builds all main objects relying on database-specific implementations in Morph
 
 ### Execution entry point
 
-fr.unice.i3s.morph.xr2rml.engine.MorphRunner (project morph-xr2rml-dist) provides the main class to run the process:
-- Load the configuration file and crezate the MorphProperties object,
+`fr.unice.i3s.morph.xr2rml.engine.MorphRunner` (project morph-xr2rml-dist) provides the main class to run the process:
+- Load the configuration file and create the MorphProperties object,
 - Create the concrete instance of MorphBaseRunnerFactory whose distinguished name is provided in the configuration file
-  (property runner_factory.class.name),
+  (property `runner_factory.class.name`),
 - Get a MorphBaseRunner from the factory and run it.
 
 # Processing steps
@@ -79,6 +79,8 @@ fr.unice.i3s.morph.xr2rml.engine.MorphRunner (project morph-xr2rml-dist) provide
 Below we describe the architecture of classes regarding the treatment of RDBs. This is easily adapted to the case of MongoDB.
 
 ### Materialization process
+The description below talks about SQL queries but the very same process can be translated to MongoDB.
+
 For each triples map (R2RMLTriplesMap) of the mapping document (R2RMLMappingDocument):
 
 - Unfold the triples map (MorphRDBUnfolder.unfoldTriplesMap): unfolding means to progressively

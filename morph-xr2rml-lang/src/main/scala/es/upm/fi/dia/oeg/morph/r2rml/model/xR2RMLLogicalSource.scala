@@ -4,7 +4,7 @@ import scala.collection.JavaConversions.asScalaIterator
 
 import org.apache.log4j.Logger
 
-import com.hp.hpl.jena.rdf.model.Resource
+import org.apache.jena.rdf.model.Resource
 
 import es.upm.fi.dia.oeg.morph.base.Constants
 
@@ -19,6 +19,7 @@ import es.upm.fi.dia.oeg.morph.base.Constants
  * In an RDB, this is typically the primary key but it is possible to get this information using table metadata.
  * In MongoDB, the "_id" field is unique thus reference "$._id" is unique, but there is no way to know whether
  * some other fields are unique.
+ * @param split max number of triples in the model (in materialization mode). Allow to generate multiple files for big datasets.
  *
  * @author Freddy Priyatna
  * @author Franck Michel, I3S laboratory
@@ -61,7 +62,7 @@ object xR2RMLLogicalSource {
      * @param reource an xrr:LogicalSource or rr:LogicalTable resource
      * @param logResType class URI of a logical source or logical table
      * @param refFormulation the reference formulation
-     * @return instance of xR2RMLTable and xR2RMLQuery
+     * @return instance of xR2RMLTable or xR2RMLQuery
      */
     def parse(resource: Resource, logResType: String, refFormulation: String): xR2RMLLogicalSource = {
         val logSrc: xR2RMLLogicalSource =
@@ -112,7 +113,7 @@ object xR2RMLLogicalSource {
                         throw new Exception(msg);
                     }
 
-                    new xR2RMLTable(tableName, listPushDown)
+                    new xR2RMLTable(tableName)
 
                 } else if (sqlQueryStmt != null) {
 

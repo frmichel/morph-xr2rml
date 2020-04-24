@@ -1,6 +1,6 @@
 package es.upm.fi.dia.oeg.morph.base
 
-import com.hp.hpl.jena.rdf.model.ResourceFactory
+import org.apache.jena.rdf.model.ResourceFactory
 
 import Zql.ZConstant
 import Zql.ZExpression
@@ -128,10 +128,10 @@ object Constants {
     val QUERYFILE_PROP_NAME = "query.file.path";
     val ONTOURL_PROP_NAME = "onto.url.path";
     val OUTPUTFILE_PROP_NAME = "output.file.path";
+    val OUTPUTFILE_MAX_TRIPLES = "output.file.max_triples";
     val OUTPUT_SYNTAX_RDF = "output.syntax.rdf";
     val OUTPUT_SYNTAX_RESULT = "output.syntax.result";
     val OUTPUTFILE_DISPLAY = "output.display";
-    val SPLIT_OUTPUT_PER_CONCEPT = "split_output_per_concept";
 
     val OPTIMIZE_TB = "querytranslator.abstract.selfjoinelimination";
     val OPTIMIZE_SU = "querytranslator.abstract.selfunionelimination";

@@ -1,22 +1,20 @@
 package es.upm.fi.dia.oeg.morph.base.materializer
 
 import java.io.File
-import java.io.OutputStream
+import java.io.FileOutputStream
 import java.io.OutputStreamWriter
 
 import scala.collection.JavaConversions.mapAsJavaMap
 
+import org.apache.jena.rdf.model.Model
+import org.apache.jena.rdf.model.ModelFactory
+import org.apache.jena.rdf.model.RDFNode
+import org.apache.jena.tdb.TDBFactory
 import org.apache.log4j.Logger
-
-import com.hp.hpl.jena.rdf.model.Model
-import com.hp.hpl.jena.rdf.model.ModelFactory
-import com.hp.hpl.jena.rdf.model.RDFNode
-import com.hp.hpl.jena.tdb.TDBFactory
 
 import es.upm.fi.dia.oeg.morph.base.Constants
 import es.upm.fi.dia.oeg.morph.base.GeneralUtility
 import es.upm.fi.dia.oeg.morph.base.engine.IMorphFactory
-import java.io.FileOutputStream
 
 /**
  * @author Freddy Priyatna
@@ -28,6 +26,9 @@ class MorphBaseMaterializer(
 
     val logger = Logger.getLogger(this.getClass.getName)
 
+    /** Count of files serialized in case a max number of triples is defined by property split of logical source */
+    var counter: Integer = 0
+
     /**
      * Serialize the default Jena model into the output file defined in the configuration
      *
@@ -37,6 +38,22 @@ class MorphBaseMaterializer(
     def serialize(syntax: String): Option[File] = {
         val output = new File(factory.getProperties.outputFilePath)
         serialize(this.model, output, syntax)
+    }
+
+    /**
+     * Serialize the default Jena model into the file defined in the configuration
+     * with an additional index at the end of the file name,
+     * and removes all triples from the model.
+     *
+     * @param syntax the RDF syntax to use
+     * @return the output file or None if the operation failed
+     */
+    def serializeIncremental(syntax: String): Option[File] = {
+        val output = new File(factory.getProperties.outputFilePath + '.' + counter.toString)
+        val result = serialize(this.model, output, syntax)
+        counter += 1
+        this.model.removeAll()
+        result
     }
 
     /**
@@ -96,7 +113,7 @@ class MorphBaseMaterializer(
                  * in the model. If yes,
                  * - first we do not add a triple.
                  * - but that not enough. The collection/container passed to the method (parameter obj),
-                 *   exists in the model since it consists of several triples. 
+                 *   exists in the model since it consists of several triples.
                  *   Therefore, we have to remove this collection/container from the model.
                  */
 
@@ -157,11 +174,11 @@ class MorphBaseMaterializer(
      * @return number of triples generated
      */
     def materializeQuads(
-        subjects: List[RDFNode],
-        predicates: List[RDFNode],
-        objects: List[RDFNode],
-        refObjects: List[RDFNode],
-        graphs: List[RDFNode]): Integer = {
+            subjects: List[RDFNode],
+            predicates: List[RDFNode],
+            objects: List[RDFNode],
+            refObjects: List[RDFNode],
+            graphs: List[RDFNode]): Integer = {
 
         var nbTriples = 0
         predicates.foreach(pred => {
@@ -243,7 +260,7 @@ object MorphBaseMaterializer {
 
         val tdbFileBase = tdbDatabaseFolder + "/" + jenaDatabaseName;
         logger.info("TDB filebase = " + tdbFileBase);
-        return TDBFactory.createModel(tdbFileBase);
+        return TDBFactory.createDataset(tdbFileBase).getDefaultModel;
     }
 
 }

@@ -1,17 +1,16 @@
 package es.upm.fi.dia.oeg.morph.base.engine
 
 import java.io.BufferedWriter
+import java.io.File
 import java.io.FileWriter
 import java.io.IOException
 import java.io.PrintWriter
 
+import org.apache.jena.query.Query
+import org.apache.jena.query.QueryFactory
 import org.apache.log4j.Logger
 
-import com.hp.hpl.jena.query.Query
-import com.hp.hpl.jena.query.QueryFactory
-
 import es.upm.fi.dia.oeg.morph.base.querytranslator.SparqlUtility
-import java.io.File
 
 /**
  * @author Freddy Priyatna
@@ -43,7 +42,11 @@ class MorphBaseRunner(val factory: IMorphFactory) {
         factory.getDataTranslator.translateData_Materialization(factory.getMappingDocument)
 
         // Write the result to the output file
-        factory.getMaterializer.serialize(factory.getProperties.outputSyntaxRdf)
+        if (factory.getProperties.outputFileMaxTriples > 0)
+            factory.getMaterializer.serializeIncremental(factory.getProperties.outputSyntaxRdf)
+        else
+            factory.getMaterializer.serialize(factory.getProperties.outputSyntaxRdf)
+
         conclude(startTime)
     }
 
@@ -62,7 +65,7 @@ class MorphBaseRunner(val factory: IMorphFactory) {
         val startTime = System.currentTimeMillis()
         var output: Option[File] = None
 
-        // Figure out the output syntax using the query content-type if any, 
+        // Figure out the output syntax using the query content-type if any,
         // the type of query (SELECT, ASK, DESCRIBE, CONSTRUCT),
         // and the default formats mentioned in the configuration file
         val dfltSyntaxRdf = factory.getProperties.outputSyntaxRdf
@@ -95,7 +98,7 @@ class MorphBaseRunner(val factory: IMorphFactory) {
                 logger.warn("Could not translate the SPARQL into a target query.")
 
             // Execute the query and build the response.
-            // If the translation failed because no binding was found (rewrittenQuery is None) 
+            // If the translation failed because no binding was found (rewrittenQuery is None)
             // then send an empty response, but send a valid SPARQL response anyway
             output = factory.getQueryProcessor.process(query, rewrittenQuery, syntax)
         }

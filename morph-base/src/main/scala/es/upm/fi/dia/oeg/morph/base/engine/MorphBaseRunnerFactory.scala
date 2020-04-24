@@ -1,8 +1,7 @@
 package es.upm.fi.dia.oeg.morph.base.engine
 
+import org.apache.jena.sparql.core.describe.DescribeHandlerRegistry
 import org.apache.log4j.Logger
-
-import com.hp.hpl.jena.sparql.core.describe.DescribeHandlerRegistry
 
 import es.upm.fi.dia.oeg.morph.base.GenericConnection
 import es.upm.fi.dia.oeg.morph.base.MorphProperties
@@ -74,7 +73,7 @@ abstract class MorphBaseRunnerFactory extends IMorphFactory {
     private def createMaterializer: MorphBaseMaterializer = {
 
         // Initialize the SPARQL DESCRIBE handler
-        DescribeHandlerRegistry.get.add(new ExtendedDescribeBNodeCloserFactory)
+        //DescribeHandlerRegistry.get.add(new ExtendedDescribeBNodeCloserFactory)
 
         val jenaMode = this.getProperties.jenaMode;
         val materializer = MorphBaseMaterializer(this, jenaMode)
@@ -100,19 +99,6 @@ object MorphBaseRunnerFactory {
 
     var mappingDocument: R2RMLMappingDocument = null
 
-    //var sparkContext: SparkContext = null
-
-    /* private def createSparkContext(masterUrl: String): SparkContext = {
-        val conf = new SparkConf().setAppName("Morph-xR2RML").setMaster(masterUrl)
-        //conf.setJars(List("file://C:/Users/fmichel/Documents/Development/eclipse-ws-xr2rml/morph-xr2rml/morph-xr2rml-dist/target/morph-xr2rml-dist-1.0-SNAPSHOT-jar-with-dependencies.jar"))
-        //conf.set("spark.driver.memory", "4g")
-        //conf.set("spark.eventLog.enabled", "true")
-        //conf.set("spark.local.dir", "/C:/Users/fmichel/.spark")
-        val sc = new SparkContext(conf)
-        sc.getConf.getAll.foreach(println)
-        sc
-    } */
-
     /**
      * Initialize the factory: create global objects that can be shared by parallel executions
      * of a runner, i.e. properties and mapping document.
@@ -122,9 +108,6 @@ object MorphBaseRunnerFactory {
     def initFactory(props: MorphProperties) = {
         MorphBaseRunnerFactory.properties = props
         MorphBaseRunnerFactory.mappingDocument = R2RMLMappingDocument(properties)
-
-        //if (properties.apacheSpark)
-        //    MorphBaseRunnerFactory.sparkContext = MorphBaseRunnerFactory.createSparkContext(properties.apacheSparkMaster)
     }
 
     /**

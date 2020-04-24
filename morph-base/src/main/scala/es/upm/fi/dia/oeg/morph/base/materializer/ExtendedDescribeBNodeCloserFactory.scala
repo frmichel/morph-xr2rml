@@ -5,8 +5,8 @@
 
 package es.upm.fi.dia.oeg.morph.base.materializer
 
-import com.hp.hpl.jena.sparql.core.describe.DescribeHandler
-import com.hp.hpl.jena.sparql.core.describe.DescribeHandlerFactory
+import org.apache.jena.sparql.core.describe.DescribeHandler
+import org.apache.jena.sparql.core.describe.DescribeHandlerFactory
 
 class ExtendedDescribeBNodeCloserFactory extends DescribeHandlerFactory {
 

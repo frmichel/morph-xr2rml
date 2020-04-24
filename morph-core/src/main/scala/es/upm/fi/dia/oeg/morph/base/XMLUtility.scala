@@ -1,13 +1,14 @@
 package es.upm.fi.dia.oeg.morph.base
 
-import org.w3c.dom.Document
-import javax.xml.parsers.DocumentBuilderFactory
-import org.apache.xml.serialize.OutputFormat
-import org.apache.xml.serialize.XMLSerializer
 import java.io.StringWriter
 import java.io.Writer
+
+import org.apache.jena.datatypes.xsd.XSDDatatype
+import org.apache.xml.serialize.OutputFormat
+import org.apache.xml.serialize.XMLSerializer
 import org.w3c.dom.Document
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype
+
+import javax.xml.parsers.DocumentBuilderFactory
 
 class XMLUtility {
 }

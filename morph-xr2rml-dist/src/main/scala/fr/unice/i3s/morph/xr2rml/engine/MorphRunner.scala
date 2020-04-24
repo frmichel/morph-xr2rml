@@ -7,6 +7,7 @@ import scala.io.Source
 import org.apache.commons.cli.BasicParser
 import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.CommandLineParser
+import org.apache.jena.n3.turtle.TurtleParseException
 import org.apache.log4j.Logger
 import org.apache.log4j.PropertyConfigurator
 
@@ -14,6 +15,7 @@ import es.upm.fi.dia.oeg.morph.base.MorphProperties
 import es.upm.fi.dia.oeg.morph.base.engine.MorphBaseRunnerFactory
 import es.upm.fi.dia.oeg.morph.base.exception.MorphException
 import fr.unice.i3s.morph.xr2rml.server.SparqlEndpoint
+import org.apache.commons.cli.DefaultParser
 
 /**
  * MorphRunner is the main entry point of the Morph-xR2RML application.
@@ -54,8 +56,9 @@ object MorphRunner {
             options.addOption("f", "configFile", true, "Configuration file name. Must be located within the configuration directory")
             options.addOption("m", "mappingFile", true, "xR2RML mapping file name. Overrides the properties file.")
             options.addOption("o", "output", true, "Output file name. Overrides the properties file.")
+            options.addOption("x", "outputMaxTriples", true, "Maximum number of triples per file generated.")
 
-            val parser: CommandLineParser = new BasicParser()
+            val parser: CommandLineParser = new DefaultParser()
             val cmd: CommandLine = parser.parse(options, args)
             if (cmd.hasOption("d")) configDir = cmd.getOptionValue("d")
             if (cmd.hasOption("f")) configFile = cmd.getOptionValue("f")
@@ -69,11 +72,16 @@ object MorphRunner {
                 properties.mappingDocumentFilePath = cmd.getOptionValue("m")
             }
             logger.info("Mapping file = " + properties.mappingDocumentFilePath)
-            
+
             if (cmd.hasOption("o")) {
                 properties.outputFilePath = cmd.getOptionValue("o")
             }
             logger.info("Output file = " + properties.outputFilePath)
+
+            if (cmd.hasOption("x")) {
+                properties.outputFileMaxTriples = cmd.getOptionValue("x").toInt
+            }
+            logger.info("Output file max number of triples = " + properties.outputFileMaxTriples)
 
             // Initialize the runner factory
             MorphBaseRunnerFactory.initFactory(properties)
@@ -96,7 +104,7 @@ object MorphRunner {
             logger.info("Treatment completed, exiting.");
 
         } catch {
-            case e: com.hp.hpl.jena.n3.turtle.TurtleParseException => {
+            case e: TurtleParseException => {
                 logger.fatal("Invalid xR2RML document, parsing error: " + e.getMessage)
                 e.printStackTrace()
                 System.exit(-1)

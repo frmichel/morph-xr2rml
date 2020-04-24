@@ -9,39 +9,39 @@
 	<parent>
 		<groupId>fr.unice.i3s</groupId>
 		<artifactId>morph-xr2rml</artifactId>
-		<version>1.0-SNAPSHOT</version>
+		<version>1.2</version>
 	</parent>
 
 	<dependencies>
 		<dependency>
 			<groupId>fr.unice.i3s</groupId>
 			<artifactId>morph-base</artifactId>
-			<version>1.0-SNAPSHOT</version>
+			<version>1.2</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.mongodb</groupId>
 			<artifactId>mongo-java-driver</artifactId>
-			<version>3.10.1</version>
+			<version>3.12.3</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.jongo</groupId>
 			<artifactId>jongo</artifactId>
-			<version>1.4.0</version>
+			<version>1.4.1</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.mozilla</groupId>
 			<artifactId>rhino</artifactId>
-			<version>1.7.6</version>
+			<version>1.7.12</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
 		<dependency>
 		    <groupId>com.fasterxml.jackson.core</groupId>
 		    <artifactId>jackson-core</artifactId>
-		    <version>2.9.8</version>
+		    <version>2.10.3</version>
 		</dependency>
 
 	</dependencies>

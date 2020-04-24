@@ -6,11 +6,10 @@ import es.upm.fi.dia.oeg.morph.base.Constants
  * @author Franck Michel, I3S laboratory
  */
 class xR2RMLTable(
-    val tableName: String,
-    override val listPushDown: List[xR2RMLPushDown])
+    val tableName: String)
 
         extends xR2RMLLogicalSource(
-            Constants.LogicalTableType.TABLE_NAME, Constants.xR2RML_REFFORMULATION_COLUMN, None, Set.empty, listPushDown) {
+            Constants.LogicalTableType.TABLE_NAME, Constants.xR2RML_REFFORMULATION_COLUMN, None, Set.empty, List()) {
 
     override def equals(q: Any): Boolean = {
         q.isInstanceOf[xR2RMLTable] && {

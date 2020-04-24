@@ -2,17 +2,15 @@ package es.upm.fi.dia.oeg.morph.base
 
 import java.io.File
 import java.net.URL
+import java.util.regex.Pattern
 
 import scala.util.Random
 
+import org.apache.jena.rdf.model.Model
+import org.apache.jena.rdf.model.RDFNode
+import org.apache.jena.rdf.model.Resource
+import org.apache.jena.vocabulary.RDF
 import org.apache.log4j.Logger
-
-import com.hp.hpl.jena.rdf.model.Model
-import com.hp.hpl.jena.rdf.model.RDFNode
-import com.hp.hpl.jena.rdf.model.Resource
-import com.hp.hpl.jena.vocabulary.RDF
-import java.nio.file.Path
-import java.util.regex.Pattern
 
 object GeneralUtility {
     val logger = Logger.getLogger("GeneralUtility");

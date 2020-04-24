@@ -4,14 +4,14 @@ import scala.collection.JavaConversions.asScalaBuffer
 import scala.collection.JavaConversions.seqAsJavaList
 import scala.collection.JavaConverters.asJavaCollectionConverter
 
-import com.hp.hpl.jena.graph.Node
-import com.hp.hpl.jena.graph.Triple
-import com.hp.hpl.jena.sparql.algebra.Op
-import com.hp.hpl.jena.sparql.algebra.op.OpBGP
-import com.hp.hpl.jena.sparql.algebra.op.OpFilter
-import com.hp.hpl.jena.sparql.algebra.op.OpJoin
-import com.hp.hpl.jena.sparql.algebra.op.OpLeftJoin
-import com.hp.hpl.jena.sparql.algebra.op.OpUnion
+import org.apache.jena.graph.Node
+import org.apache.jena.graph.Triple
+import org.apache.jena.sparql.algebra.Op
+import org.apache.jena.sparql.algebra.op.OpBGP
+import org.apache.jena.sparql.algebra.op.OpFilter
+import org.apache.jena.sparql.algebra.op.OpJoin
+import org.apache.jena.sparql.algebra.op.OpLeftJoin
+import org.apache.jena.sparql.algebra.op.OpUnion
 
 import es.upm.fi.dia.oeg.morph.r2rml.model.RDBR2RMLTriplesMap
 

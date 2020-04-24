@@ -1,6 +1,6 @@
 package es.upm.fi.dia.oeg.morph.base
 
-import com.hp.hpl.jena.rdf.model.ResourceFactory
+import org.apache.jena.rdf.model.ResourceFactory
 
 import Zql.ZConstant
 import Zql.ZExpression

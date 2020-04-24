@@ -8,8 +8,8 @@ import scala.collection.JavaConversions.seqAsJavaList
 
 import org.apache.log4j.Logger
 
-import com.hp.hpl.jena.graph.Triple
-import com.hp.hpl.jena.rdf.model.Resource
+import org.apache.jena.graph.Triple
+import org.apache.jena.rdf.model.Resource
 
 import es.upm.fi.dia.oeg.morph.base.Constants
 import es.upm.fi.dia.oeg.morph.base.R2RMLMappingUtility

@@ -1,22 +1,20 @@
 package es.upm.fi.dia.oeg.morph.base.materializer
 
 import java.io.File
-import java.io.OutputStream
+import java.io.FileOutputStream
 import java.io.OutputStreamWriter
 
 import scala.collection.JavaConversions.mapAsJavaMap
 
+import org.apache.jena.rdf.model.Model
+import org.apache.jena.rdf.model.ModelFactory
+import org.apache.jena.rdf.model.RDFNode
+import org.apache.jena.tdb.TDBFactory
 import org.apache.log4j.Logger
-
-import com.hp.hpl.jena.rdf.model.Model
-import com.hp.hpl.jena.rdf.model.ModelFactory
-import com.hp.hpl.jena.rdf.model.RDFNode
-import com.hp.hpl.jena.tdb.TDBFactory
 
 import es.upm.fi.dia.oeg.morph.base.Constants
 import es.upm.fi.dia.oeg.morph.base.GeneralUtility
 import es.upm.fi.dia.oeg.morph.base.engine.IMorphFactory
-import java.io.FileOutputStream
 
 /**
  * @author Freddy Priyatna
@@ -176,11 +174,11 @@ class MorphBaseMaterializer(
      * @return number of triples generated
      */
     def materializeQuads(
-        subjects: List[RDFNode],
-        predicates: List[RDFNode],
-        objects: List[RDFNode],
-        refObjects: List[RDFNode],
-        graphs: List[RDFNode]): Integer = {
+            subjects: List[RDFNode],
+            predicates: List[RDFNode],
+            objects: List[RDFNode],
+            refObjects: List[RDFNode],
+            graphs: List[RDFNode]): Integer = {
 
         var nbTriples = 0
         predicates.foreach(pred => {
@@ -262,7 +260,7 @@ object MorphBaseMaterializer {
 
         val tdbFileBase = tdbDatabaseFolder + "/" + jenaDatabaseName;
         logger.info("TDB filebase = " + tdbFileBase);
-        return TDBFactory.createModel(tdbFileBase);
+        return TDBFactory.createDataset(tdbFileBase).getDefaultModel;
     }
 
 }

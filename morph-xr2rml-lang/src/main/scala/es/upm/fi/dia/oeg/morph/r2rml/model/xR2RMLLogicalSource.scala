@@ -4,7 +4,7 @@ import scala.collection.JavaConversions.asScalaIterator
 
 import org.apache.log4j.Logger
 
-import com.hp.hpl.jena.rdf.model.Resource
+import org.apache.jena.rdf.model.Resource
 
 import es.upm.fi.dia.oeg.morph.base.Constants
 

@@ -1,13 +1,12 @@
 package es.upm.fi.dia.oeg.morph.base.querytranslator
 
+import org.apache.jena.graph.NodeFactory
+import org.apache.jena.graph.Triple
+import org.apache.jena.sparql.algebra.Op
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
-
-import com.hp.hpl.jena.graph.NodeFactory
-import com.hp.hpl.jena.graph.Triple
-import com.hp.hpl.jena.sparql.algebra.Op
 
 import es.upm.fi.dia.oeg.morph.base.MorphProperties
 import es.upm.fi.dia.oeg.morph.base.engine.IMorphFactory

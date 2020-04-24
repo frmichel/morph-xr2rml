@@ -1,9 +1,10 @@
 package fr.unice.i3s.morph.xr2rml.engine
 
+import org.apache.jena.rdf.model.ModelFactory
+import org.apache.jena.util.FileManager
 import org.apache.log4j.Logger
 import org.apache.log4j.PropertyConfigurator
-import com.hp.hpl.jena.rdf.model.ModelFactory
-import com.hp.hpl.jena.util.FileManager
+
 import es.upm.fi.dia.oeg.morph.base.Constants
 
 object ReloadRdf {

@@ -6,11 +6,11 @@ import scala.collection.JavaConversions.setAsJavaSet
 
 import org.apache.log4j.Logger
 
-import com.hp.hpl.jena.rdf.model.Model
-import com.hp.hpl.jena.rdf.model.ModelFactory
-import com.hp.hpl.jena.rdf.model.Property
-import com.hp.hpl.jena.util.FileManager
-import com.hp.hpl.jena.vocabulary.RDF
+import org.apache.jena.rdf.model.Model
+import org.apache.jena.rdf.model.ModelFactory
+import org.apache.jena.rdf.model.Property
+import org.apache.jena.util.FileManager
+import org.apache.jena.vocabulary.RDF
 
 import es.upm.fi.dia.oeg.morph.base.Constants
 import es.upm.fi.dia.oeg.morph.base.MorphProperties

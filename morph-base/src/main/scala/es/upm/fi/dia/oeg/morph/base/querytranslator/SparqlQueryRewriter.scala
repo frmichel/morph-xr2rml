@@ -5,34 +5,34 @@ import scala.collection.JavaConversions.seqAsJavaList
 
 import org.apache.log4j.Logger
 
-import com.hp.hpl.jena.graph.Triple
-import com.hp.hpl.jena.query.ARQ
-import com.hp.hpl.jena.query.Query
-import com.hp.hpl.jena.sparql.algebra.Algebra
-import com.hp.hpl.jena.sparql.algebra.Op
-import com.hp.hpl.jena.sparql.algebra.op.OpBGP
-import com.hp.hpl.jena.sparql.algebra.op.OpDistinct
-import com.hp.hpl.jena.sparql.algebra.op.OpFilter
-import com.hp.hpl.jena.sparql.algebra.op.OpJoin
-import com.hp.hpl.jena.sparql.algebra.op.OpLeftJoin
-import com.hp.hpl.jena.sparql.algebra.op.OpNull
-import com.hp.hpl.jena.sparql.algebra.op.OpOrder
-import com.hp.hpl.jena.sparql.algebra.op.OpProject
-import com.hp.hpl.jena.sparql.algebra.op.OpSlice
-import com.hp.hpl.jena.sparql.algebra.op.OpTable
-import com.hp.hpl.jena.sparql.algebra.op.OpUnion
-import com.hp.hpl.jena.sparql.algebra.optimize.Optimize
-import com.hp.hpl.jena.sparql.core.BasicPattern
-import com.hp.hpl.jena.sparql.core.Var
-import com.hp.hpl.jena.sparql.expr.E_IsBlank
-import com.hp.hpl.jena.sparql.expr.E_LogicalNot
-import com.hp.hpl.jena.sparql.expr.ExprVar
-import com.hp.hpl.jena.sparql.syntax.ElementFilter
-import com.hp.hpl.jena.sparql.syntax.ElementGroup
-import com.hp.hpl.jena.sparql.syntax.ElementTriplesBlock
-import com.hp.hpl.jena.sparql.syntax.ElementUnion
-import com.hp.hpl.jena.sparql.util.Context
-import com.hp.hpl.jena.graph.NodeFactory
+import org.apache.jena.graph.Triple
+import org.apache.jena.query.ARQ
+import org.apache.jena.query.Query
+import org.apache.jena.sparql.algebra.Algebra
+import org.apache.jena.sparql.algebra.Op
+import org.apache.jena.sparql.algebra.op.OpBGP
+import org.apache.jena.sparql.algebra.op.OpDistinct
+import org.apache.jena.sparql.algebra.op.OpFilter
+import org.apache.jena.sparql.algebra.op.OpJoin
+import org.apache.jena.sparql.algebra.op.OpLeftJoin
+import org.apache.jena.sparql.algebra.op.OpNull
+import org.apache.jena.sparql.algebra.op.OpOrder
+import org.apache.jena.sparql.algebra.op.OpProject
+import org.apache.jena.sparql.algebra.op.OpSlice
+import org.apache.jena.sparql.algebra.op.OpTable
+import org.apache.jena.sparql.algebra.op.OpUnion
+import org.apache.jena.sparql.algebra.optimize.Optimize
+import org.apache.jena.sparql.core.BasicPattern
+import org.apache.jena.sparql.core.Var
+import org.apache.jena.sparql.expr.E_IsBlank
+import org.apache.jena.sparql.expr.E_LogicalNot
+import org.apache.jena.sparql.expr.ExprVar
+import org.apache.jena.sparql.syntax.ElementFilter
+import org.apache.jena.sparql.syntax.ElementGroup
+import org.apache.jena.sparql.syntax.ElementTriplesBlock
+import org.apache.jena.sparql.syntax.ElementUnion
+import org.apache.jena.sparql.util.Context
+import org.apache.jena.graph.NodeFactory
 
 /**
  * Apply various rewriting and optimization on the SPARQL query, either Jena std optimizations
@@ -54,7 +54,7 @@ object SparqlQueryRewriter {
     context.put(ARQ.optFilterInequality, true)
     context.put(ARQ.optFilterImplicitJoin, true)
     context.put(ARQ.optImplicitLeftJoin, true)
-    context.put(ARQ.optTermStrings, false)
+    //context.put(ARQ.optTermStrings, false)
     context.put(ARQ.optExprConstantFolding, true)
     context.put(ARQ.optFilterConjunction, true)
     context.put(ARQ.optFilterExpandOneOf, true)

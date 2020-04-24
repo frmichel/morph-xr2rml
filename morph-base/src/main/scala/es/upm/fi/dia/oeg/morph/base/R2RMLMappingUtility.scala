@@ -2,8 +2,8 @@ package es.upm.fi.dia.oeg.morph.base
 
 import scala.collection.JavaConversions.asScalaBuffer
 
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype
-import com.hp.hpl.jena.rdf.model.Resource
+import org.apache.jena.datatypes.xsd.XSDDatatype
+import org.apache.jena.rdf.model.Resource
 
 /**
  * This utility class provides methods that navigate through JENA resources representing the mapping graph.

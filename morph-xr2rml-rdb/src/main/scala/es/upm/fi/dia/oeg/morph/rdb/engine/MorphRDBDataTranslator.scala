@@ -5,16 +5,15 @@ import java.sql.ResultSetMetaData
 
 import scala.collection.JavaConversions.seqAsJavaList
 
+import org.apache.jena.datatypes.xsd.XSDDatatype
+import org.apache.jena.vocabulary.RDF
 import org.apache.log4j.Logger
-
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype
-import com.hp.hpl.jena.rdf.model.RDFNode
-import com.hp.hpl.jena.vocabulary.RDF
 
 import Zql.ZConstant
 import es.upm.fi.dia.oeg.morph.base.Constants
 import es.upm.fi.dia.oeg.morph.base.DBUtility
 import es.upm.fi.dia.oeg.morph.base.GeneralUtility
+import es.upm.fi.dia.oeg.morph.base.RDFTerm
 import es.upm.fi.dia.oeg.morph.base.TemplateUtility
 import es.upm.fi.dia.oeg.morph.base.engine.IMorphFactory
 import es.upm.fi.dia.oeg.morph.base.engine.MorphBaseDataTranslator
@@ -25,7 +24,6 @@ import es.upm.fi.dia.oeg.morph.base.sql.DatatypeMapper
 import es.upm.fi.dia.oeg.morph.base.sql.MorphSQLConstant
 import es.upm.fi.dia.oeg.morph.r2rml.model.R2RMLTermMap
 import es.upm.fi.dia.oeg.morph.r2rml.model.R2RMLTriplesMap
-import es.upm.fi.dia.oeg.morph.base.RDFTerm
 
 class MorphRDBDataTranslator(factory: IMorphFactory) extends MorphBaseDataTranslator(factory) {
 

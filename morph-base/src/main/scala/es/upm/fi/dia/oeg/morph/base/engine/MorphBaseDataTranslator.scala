@@ -1,32 +1,28 @@
 package es.upm.fi.dia.oeg.morph.base.engine
 
-import scala.collection.JavaConversions.asJavaIterator
+import scala.collection.JavaConverters.seqAsJavaListConverter
 
+import org.apache.jena.datatypes.xsd.XSDDatatype
+import org.apache.jena.rdf.model.AnonId
+import org.apache.jena.rdf.model.Literal
+import org.apache.jena.rdf.model.RDFNode
+import org.apache.jena.vocabulary.RDF
 import org.apache.log4j.Logger
-
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype
-import com.hp.hpl.jena.rdf.model.AnonId
-import com.hp.hpl.jena.rdf.model.Literal
-import com.hp.hpl.jena.rdf.model.RDFNode
-import com.hp.hpl.jena.vocabulary.RDF
 
 import es.upm.fi.dia.oeg.morph.base.Constants
 import es.upm.fi.dia.oeg.morph.base.GeneralUtility
+import es.upm.fi.dia.oeg.morph.base.RDFTerm
+import es.upm.fi.dia.oeg.morph.base.RDFTermAlt
+import es.upm.fi.dia.oeg.morph.base.RDFTermBag
+import es.upm.fi.dia.oeg.morph.base.RDFTermBlankNode
+import es.upm.fi.dia.oeg.morph.base.RDFTermIRI
+import es.upm.fi.dia.oeg.morph.base.RDFTermList
+import es.upm.fi.dia.oeg.morph.base.RDFTermLiteral
+import es.upm.fi.dia.oeg.morph.base.RDFTermSeq
 import es.upm.fi.dia.oeg.morph.base.exception.MorphException
 import es.upm.fi.dia.oeg.morph.base.query.AbstractQuery
 import es.upm.fi.dia.oeg.morph.r2rml.model.R2RMLMappingDocument
 import es.upm.fi.dia.oeg.morph.r2rml.model.R2RMLTriplesMap
-import es.upm.fi.dia.oeg.morph.base.RDFTerm
-import es.upm.fi.dia.oeg.morph.base.RDFTermLiteral
-import es.upm.fi.dia.oeg.morph.base.RDFTermIRI
-import arq.iri
-import es.upm.fi.dia.oeg.morph.base.RDFTermBlankNode
-import es.upm.fi.dia.oeg.morph.base.RDFTermList
-import es.upm.fi.dia.oeg.morph.base.RDFTermBag
-import es.upm.fi.dia.oeg.morph.base.RDFTermSeq
-import es.upm.fi.dia.oeg.morph.base.RDFTermAlt
-import es.upm.fi.dia.oeg.morph.base.RDFTermSeq
-import es.upm.fi.dia.oeg.morph.base.RDFTermAlt
 
 /**
  * @author Freddy Priyatna
@@ -112,9 +108,11 @@ abstract class MorphBaseDataTranslator(val factory: IMorphFactory) {
             term match {
                 case a: RDFTermLiteral => this.createLiteralNode(a)
                 case a: RDFTermIRI => factory.getMaterializer.model.createResource(a.getIRI)
+                
                 case a: RDFTermBlankNode => factory.getMaterializer.model.createResource(new AnonId(a.value.asInstanceOf[String]))
+                
                 case a: RDFTermList => {
-                    val members = a.getMembers.map(this.createRDFNode)
+                    val members = a.getMembers.map(this.createRDFNode).asJava
                     val node = factory.getMaterializer.model.createList(members.iterator)
                     factory.getMaterializer.model.add(node, RDF.`type`, RDF.List)
                     node

@@ -1,18 +1,15 @@
 package es.upm.fi.dia.oeg.morph.base.querytranslator
 
+import java.io.File
+import java.io.PrintWriter
+
 import scala.collection.JavaConversions.asScalaBuffer
 
-import org.apache.log4j.Logger
-
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype
-import com.hp.hpl.jena.query.Query
+import org.apache.jena.query.Query
+import org.w3c.dom.Document
 
 import es.upm.fi.dia.oeg.morph.base.XMLUtility
 import es.upm.fi.dia.oeg.morph.base.engine.IMorphFactory
-import java.io.OutputStreamWriter
-import java.io.PrintWriter
-import org.w3c.dom.Document
-import java.io.File
 
 class SparqlResultSetXml(factory: IMorphFactory, xmlDoc: Document, sparqlQuery: Query) {
 

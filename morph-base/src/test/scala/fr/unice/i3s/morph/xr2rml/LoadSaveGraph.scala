@@ -1,11 +1,11 @@
 package fr.unice.i3s.morph.xr2rml
 
-import org.junit.Test
-import com.hp.hpl.jena.rdf.model.ModelFactory
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStreamWriter
-import java.io.FileReader
+
+import org.apache.jena.rdf.model.ModelFactory
+import org.junit.Test
 
 class LoadSaveGraph {
 

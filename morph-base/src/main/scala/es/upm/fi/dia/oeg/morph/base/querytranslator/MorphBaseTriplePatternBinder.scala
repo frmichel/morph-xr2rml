@@ -2,30 +2,30 @@ package es.upm.fi.dia.oeg.morph.base.querytranslator
 
 import scala.collection.JavaConversions.asScalaBuffer
 import scala.collection.JavaConversions.seqAsJavaList
+
+import org.apache.jena.graph.Node
+import org.apache.jena.graph.Triple
+import org.apache.jena.sparql.algebra.Op
+import org.apache.jena.sparql.algebra.op.OpBGP
+import org.apache.jena.sparql.algebra.op.OpDistinct
+import org.apache.jena.sparql.algebra.op.OpFilter
+import org.apache.jena.sparql.algebra.op.OpGroup
+import org.apache.jena.sparql.algebra.op.OpJoin
+import org.apache.jena.sparql.algebra.op.OpLeftJoin
+import org.apache.jena.sparql.algebra.op.OpOrder
+import org.apache.jena.sparql.algebra.op.OpProject
+import org.apache.jena.sparql.algebra.op.OpSlice
+import org.apache.jena.sparql.algebra.op.OpUnion
+import org.apache.jena.sparql.core.BasicPattern
 import org.apache.log4j.Logger
-import com.hp.hpl.jena.graph.Node
-import com.hp.hpl.jena.graph.Triple
-import com.hp.hpl.jena.sparql.algebra.Op
-import com.hp.hpl.jena.sparql.algebra.op.OpBGP
-import com.hp.hpl.jena.sparql.algebra.op.OpDistinct
-import com.hp.hpl.jena.sparql.algebra.op.OpFilter
-import com.hp.hpl.jena.sparql.algebra.op.OpJoin
-import com.hp.hpl.jena.sparql.algebra.op.OpLeftJoin
-import com.hp.hpl.jena.sparql.algebra.op.OpOrder
-import com.hp.hpl.jena.sparql.algebra.op.OpProject
-import com.hp.hpl.jena.sparql.algebra.op.OpSlice
-import com.hp.hpl.jena.sparql.algebra.op.OpUnion
-import com.hp.hpl.jena.sparql.core.BasicPattern
+
 import es.upm.fi.dia.oeg.morph.base.Constants
 import es.upm.fi.dia.oeg.morph.base.TemplateUtility
+import es.upm.fi.dia.oeg.morph.base.engine.IMorphFactory
 import es.upm.fi.dia.oeg.morph.base.exception.MorphException
-import es.upm.fi.dia.oeg.morph.r2rml.model.R2RMLMappingDocument
 import es.upm.fi.dia.oeg.morph.r2rml.model.R2RMLRefObjectMap
 import es.upm.fi.dia.oeg.morph.r2rml.model.R2RMLTermMap
 import es.upm.fi.dia.oeg.morph.r2rml.model.R2RMLTriplesMap
-import es.upm.fi.dia.oeg.morph.base.engine.IMorphFactory
-import com.hp.hpl.jena.sparql.algebra.op.OpGroup
-import com.hp.hpl.jena.reasoner.rulesys.builtins.Bound
 
 /**
  * Implementation of the functions that figure out which triples maps are bound to a triple pattern,
@@ -71,7 +71,7 @@ class MorphBaseTriplePatternBinder(factory: IMorphFactory) {
                         if (logger.isTraceEnabled()) logger.trace("Binding of single triple pattern:\n  " + results)
                         results
                     } else {
-                        // Several triple patterns in the BGP 
+                        // Several triple patterns in the BGP
 
                         // Compute the bindings of the remaining triples
                         val rightTps = new OpBGP(BasicPattern.wrap(triples.tail))
@@ -290,7 +290,7 @@ class MorphBaseTriplePatternBinder(factory: IMorphFactory) {
 
             for (tm1 <- boundTp1)
                 for (tm2 <- boundTp2) {
-                    // For (tm1, tm2) to be an acceptable result their term maps must be compatible 
+                    // For (tm1, tm2) to be an acceptable result their term maps must be compatible
                     // at all positions of variable x in tp1 and tp2
                     var compat = true
                     for (postp1 <- xInTp1)
@@ -361,11 +361,9 @@ class MorphBaseTriplePatternBinder(factory: IMorphFactory) {
 
                     // Check data type
                     val T = tpTerm.getLiteralDatatypeURI
-                    if (T == null || T.isEmpty())
-                        incompatible = incompatible || (termMap.datatype.isDefined)
-                    else
+                    if (T != null && !T.isEmpty())
                         incompatible = incompatible ||
-                            (!termMap.datatype.isDefined || (termMap.datatype.isDefined && termMap.datatype.get != T))
+                            (termMap.datatype.isDefined && termMap.datatype.get != T)
                 }
 
                 // Constant term map and the triple pattern term does not have the same value
@@ -388,7 +386,7 @@ class MorphBaseTriplePatternBinder(factory: IMorphFactory) {
                 // A variable is always compatible with a term map
                 true
             else if (termMap.termType.isDefined && !tpTerm.isBlank)
-                // An xR2RML RefObjectMap may have a termType, but only a RDF collection or list term type. 
+                // An xR2RML RefObjectMap may have a termType, but only a RDF collection or list term type.
                 // In that case, it necessarily produces blank nodes.
                 false
             else {

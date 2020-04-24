@@ -2,6 +2,8 @@
 
 ## [1.2] 2020-04-22
 - Add config property output.file.max_triples (and parameter --outputMaxTriples) to generate files with a maximum number of triples
+- Upgrade to Jena 3
+- Update to Scala 2.12.11 + update misc. libraries
 
 
 ## [1.1-RC2] 2019-09-16: fix bug in Mongo query parsing

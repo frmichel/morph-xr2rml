@@ -1,10 +1,13 @@
 package es.upm.fi.dia.oeg.morph.rdb.querytranslator
 
+import scala.collection.JavaConversions.`deprecated collectionAsScalaIterable`
+import scala.collection.JavaConversions.`deprecated seqAsJavaList`
+
+import org.apache.jena.graph.Node
+import org.apache.log4j.Logger
+
 import Zql.ZConstant
 import Zql.ZSelectItem
-import org.apache.log4j.Logger
-import com.hp.hpl.jena.graph.Node
-import scala.collection.JavaConversions._
 import es.upm.fi.dia.oeg.morph.base.sql.MorphSQLSelectItem
 import es.upm.fi.dia.oeg.morph.rdb.engine.NameGenerator
 

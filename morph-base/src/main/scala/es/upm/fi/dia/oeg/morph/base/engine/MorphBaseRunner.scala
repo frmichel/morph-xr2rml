@@ -1,17 +1,16 @@
 package es.upm.fi.dia.oeg.morph.base.engine
 
 import java.io.BufferedWriter
+import java.io.File
 import java.io.FileWriter
 import java.io.IOException
 import java.io.PrintWriter
 
+import org.apache.jena.query.Query
+import org.apache.jena.query.QueryFactory
 import org.apache.log4j.Logger
 
-import com.hp.hpl.jena.query.Query
-import com.hp.hpl.jena.query.QueryFactory
-
 import es.upm.fi.dia.oeg.morph.base.querytranslator.SparqlUtility
-import java.io.File
 
 /**
  * @author Freddy Priyatna

@@ -1,16 +1,21 @@
 package es.upm.fi.dia.oeg.morph.base.sql
 
-import Zql.ZExpression
-import Zql.ZConstant
-import Zql.ZSelectItem
-import scala.collection.JavaConversions._
-import Zql.ZExp
-import com.hp.hpl.jena.graph.Node
-import org.apache.log4j.Logger
-import Zql.ZOrderBy
-import scala.collection.mutable.LinkedHashMap
-import es.upm.fi.dia.oeg.morph.base.Constants
 import scala.Option.option2Iterable
+import scala.collection.JavaConversions.`deprecated asJavaCollection`
+import scala.collection.JavaConversions.`deprecated asJavaIterator`
+import scala.collection.JavaConversions.`deprecated asScalaBuffer`
+import scala.collection.JavaConversions.`deprecated collectionAsScalaIterable`
+import scala.collection.JavaConversions.`deprecated seqAsJavaList`
+
+import org.apache.jena.graph.Node
+import org.apache.log4j.Logger
+
+import Zql.ZConstant
+import Zql.ZExp
+import Zql.ZExpression
+import Zql.ZOrderBy
+import Zql.ZSelectItem
+import es.upm.fi.dia.oeg.morph.base.Constants
 
 class MorphSQLUtility {
 

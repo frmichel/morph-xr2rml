@@ -6,9 +6,8 @@ import java.util.regex.Pattern
 
 import scala.collection.JavaConversions.asScalaBuffer
 
+import org.apache.jena.query.Query
 import org.apache.log4j.Logger
-
-import com.hp.hpl.jena.query.Query
 
 import es.upm.fi.dia.oeg.morph.base.Constants
 import es.upm.fi.dia.oeg.morph.base.GeneralUtility

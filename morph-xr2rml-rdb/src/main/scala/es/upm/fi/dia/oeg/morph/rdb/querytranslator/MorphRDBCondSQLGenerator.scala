@@ -5,9 +5,9 @@ import scala.collection.JavaConversions.seqAsJavaList
 
 import org.apache.log4j.Logger
 
-import com.hp.hpl.jena.graph.Node
-import com.hp.hpl.jena.graph.Triple
-import com.hp.hpl.jena.vocabulary.RDF
+import org.apache.jena.graph.Node
+import org.apache.jena.graph.Triple
+import org.apache.jena.vocabulary.RDF
 
 import Zql.ZConstant
 import Zql.ZExp

@@ -1,11 +1,11 @@
 package fr.unice.i3s.morph.xr2rml.mongo.engine
 
+import org.apache.jena.datatypes.xsd.XSDDatatype
+import org.apache.jena.rdf.model.Literal
+import org.apache.jena.vocabulary.RDF
 import org.apache.log4j.Logger
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype
-import com.hp.hpl.jena.rdf.model.Literal
-import com.hp.hpl.jena.vocabulary.RDF
 
 import es.upm.fi.dia.oeg.morph.base.Constants
 import es.upm.fi.dia.oeg.morph.base.GeneralUtility
@@ -18,7 +18,6 @@ import es.upm.fi.dia.oeg.morph.base.exception.MorphException
 import es.upm.fi.dia.oeg.morph.base.path.MixedSyntaxPath
 import es.upm.fi.dia.oeg.morph.base.query.AbstractQuery
 import es.upm.fi.dia.oeg.morph.r2rml.model.AbstractTermMap
-import es.upm.fi.dia.oeg.morph.r2rml.model.R2RMLMappingDocument
 import es.upm.fi.dia.oeg.morph.r2rml.model.R2RMLTriplesMap
 import es.upm.fi.dia.oeg.morph.r2rml.model.xR2RMLPushDown
 

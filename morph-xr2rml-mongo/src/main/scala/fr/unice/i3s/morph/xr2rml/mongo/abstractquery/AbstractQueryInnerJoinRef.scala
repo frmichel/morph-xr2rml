@@ -1,7 +1,7 @@
 package fr.unice.i3s.morph.xr2rml.mongo.abstractquery
 
 import org.apache.log4j.Logger
-import com.hp.hpl.jena.graph.Triple
+import org.apache.jena.graph.Triple
 import es.upm.fi.dia.oeg.morph.base.Constants
 import es.upm.fi.dia.oeg.morph.base.MorphBaseResultRdfTerms
 import es.upm.fi.dia.oeg.morph.base.engine.MorphBaseDataSourceReader

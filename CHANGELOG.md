@@ -5,19 +5,12 @@
 - Upgrade to Jena 3
 - Update to Scala 2.12.11 + update misc. libraries
 
+## [1.1-RC2] 2019-09-16
+Fix bug in Mongo query parsing: Mongo query containing parentheses are now supported, e.g ```find({field: "1(2)3"})```
 
-## [1.1-RC2] 2019-09-16: fix bug in Mongo query parsing
-- Mongo query containing parentheses were not supported, e.g ```find({field: "1(2)3"})```
-
-## [1.1-RC] 2019-07-02: undo last modification + fix quotes management
-- Return to last official Jongo version 1.4.0 (https://github.com/frmichel/jongo)
-- Escaped single-quotes not supported anymore, instead use double-quotes notation + single quotes inside e.g.
+## [1.1-RC] 2019-07-02
+- Support for double-quotes notation + single quotes inside e.g.
 ```xrr:query """db.locations.find( {"adminLevel": "Collectivité d'outre-mer"} )""".```
-
-## 2019-06-21: add support for MongoDB queries containing values with escaped single quotes
-- Compile with patched version of Jongo (https://github.com/frmichel/jongo)
-- Fix pre-processing of MongoDB query strings: allow for escaped single-quotes + keep spaces within such escaped strings, e.g.
-```xrr:query """db.locations.find( {'adminLevel': 'Collectivité d\\'outre-mer'} )""".```
  - Upgrade to Scala 2.12.3
  
 ## 2019-06-19: add term map property xrr:languageReference
@@ -25,9 +18,8 @@
 - Update Jongo to 1.4.0
  
 ## 2018-05-31: add run options
-Options `--output` and `--mappingFile` can be used to override the output.file.path and mappingdocument.file properties respectively.
-
-Add configuration parameter `literal.trim` set to true to trim the literal values read from the database.
+- Options `--output` and `--mappingFile` can be used to override the output.file.path and mappingdocument.file properties respectively.
+- Add configuration parameter `literal.trim` set to true to trim the literal values read from the database.
 
 ## 2017-10-25: new property xrr:pushDown 
 Property xrr:pushDown extends the mapping possibilities when defining iterations within a document (pull request #3 by Freddy Priyatna, to fulfill a need of the [SlideWiki project](https://slidewiki.eu/)). 

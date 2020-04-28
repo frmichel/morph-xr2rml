@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.3-SNAPSHOT] 2020-04-27
+- Add mixed syntax path sha1
+
 ## [1.2] 2020-04-22
 - Add config property output.file.max_triples (and parameter --outputMaxTriples) to generate files with a maximum number of triples
 - Upgrade to Jena 3

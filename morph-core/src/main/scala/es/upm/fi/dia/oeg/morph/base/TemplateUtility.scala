@@ -3,7 +3,7 @@ package es.upm.fi.dia.oeg.morph.base
 /**
  * @author Freddy Priyatna
  * @author Franck Michel, I3S laboratory
- */ 
+ */
 import java.util.regex.Pattern
 
 import scala.collection.JavaConversions.seqAsJavaList
@@ -105,13 +105,12 @@ object TemplateUtility {
         // Extract the references of each template group between '{' and '}'
         val groupsFromTpl = listReplaced.map(group =>
             {
-                // For non mixed-syntax paths (like simple column name), there has been no parsing 
+                // For non mixed-syntax paths (like simple column name), there has been no parsing
                 // at all above so they still have the '{' and '}'
                 if (group.startsWith("{") && group.endsWith("}"))
                     group.substring(1, group.length() - 1)
                 else group
-            }
-        )
+            })
         //if (logger.isTraceEnabled()) logger.trace("Extracted groups: " + groupsFromTpl + " from template " + tplStr)
         groupsFromTpl;
     }
@@ -130,8 +129,7 @@ object TemplateUtility {
 
         // Extract the column references of each template group between
         val columnsFromTemplate = groups.map(group =>
-            MixedSyntaxPath(group, Constants.xR2RML_REFFORMULATION_COLUMN).getReferencedColumn.getOrElse("")
-        )
+            MixedSyntaxPath(group, Constants.xR2RML_REFFORMULATION_COLUMN).getReferencedColumn.getOrElse(""))
         if (logger.isTraceEnabled()) logger.trace("Extracted columns: " + columnsFromTemplate + " from template " + tplStr)
         columnsFromTemplate;
     }
@@ -164,6 +162,7 @@ object TemplateUtility {
 
         // Compute all possible combinations between all values of the groups
         val combinations = cartesianProduct(replacements)
+
         if (logger.isTraceEnabled()) logger.trace("Template replacement combinations: " + combinations)
 
         val templateResults = new Queue[String]
@@ -177,9 +176,10 @@ object TemplateUtility {
             var appendIdx = 0
             while (matcher.find()) {
                 val path = matcher.group(1)
+
                 val replacement = combination.get(grpIdx)
 
-                // Copy the part before the match 
+                // Copy the part before the match
                 buffer.append(tpl2.substring(appendIdx, matcher.start()))
 
                 // Append the replacement
@@ -190,13 +190,22 @@ object TemplateUtility {
             }
 
             // Copy the end part after the last match
-            if (appendIdx < tpl2.length() - 1)
+            if (appendIdx < tpl2.length())
                 buffer.append(tpl2.substring(appendIdx, tpl2.length()))
 
             templateResults += buffer.toString
         }
 
-        val result = templateResults.toList
+        // When the result of a template ends with "sha1(anything)" then replace
+        // sha1(anything) with the SHA1 hash of "anything"
+        val result = templateResults.toList.map(res => {
+            if (res.contains(Constants.xR2RML_PATH_CONSTR_SHA1 + "(")) {
+                Constants.xR2RML_PATH_SHA1_REGEX.replaceAllIn(
+                    res,
+                    m => org.apache.commons.codec.digest.DigestUtils.sha1Hex(m.group(1)))
+            } else res
+        })
+
         if (logger.isTraceEnabled()) logger.trace("Generated templates: " + result)
         result
     }
@@ -218,7 +227,7 @@ object TemplateUtility {
         var stillToGo = true
         while (stillToGo) {
 
-            // Build a list (combination) from the current elements of each list 
+            // Build a list (combination) from the current elements of each list
             val combination = for (j <- 0 to (nbLists - 1)) yield {
                 if (lists(j).isEmpty) ""
                 else lists(j)(indexes(j))
@@ -250,7 +259,7 @@ object TemplateUtility {
     }
 
     /**
-     * Check if two template string are compatible, i.e. if there fixed parts are the same 
+     * Check if two template string are compatible, i.e. if there fixed parts are the same
      * and they have {...} at the same place. Example:
      * "http://example.org/{xx}/B{zz}"
      * and

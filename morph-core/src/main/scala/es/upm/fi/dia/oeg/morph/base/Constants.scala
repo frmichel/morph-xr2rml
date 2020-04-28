@@ -96,7 +96,7 @@ object Constants {
     val OUTPUT_FORMAT_RESULT_CSV = "CSV";
     val OUTPUT_FORMAT_RESULT_TSV = "TSV";
 
-    // RDF format 
+    // RDF format
     val OUTPUT_FORMAT_RDFXML = "RDF/XML";
     val OUTPUT_FORMAT_RDFXML_ABBREV = "RDF/XML-ABBREV";
     val OUTPUT_FORMAT_NTRIPLE = "N-TRIPLE";
@@ -151,7 +151,7 @@ object Constants {
 
     val REMOVE_STRANGE_CHARS_FROM_LITERAL = "literal.removestrangechars";
     val TRIM_LITERAL = "literal.trim";
-    
+
     val ENCODE_UNSAFE_CHARS_IN_URI = "uricolumn.encode_uri";
     val ENCODE_UNSAFE_CHARS_IN_DB_VALUES = "uricolumn.encode_unsafe_chars_dbvalues";
 
@@ -184,7 +184,7 @@ object Constants {
     val AGGREGATION_FUNCTION_SUM = "SUM";
 
     // ------------------------------------------------------
-    // R2RML vocabulary 
+    // R2RML vocabulary
     // ------------------------------------------------------
 
     //--- TriplesMap
@@ -337,6 +337,7 @@ object Constants {
     val xR2RML_PATH_CONSTR_JSONPATH = "JSONPath";
     val xR2RML_PATH_CONSTR_CSV = "CSV";
     val xR2RML_PATH_CONSTR_TSV = "TSV";
+    val xR2RML_PATH_CONSTR_SHA1 = "sha1";
 
     val xR2RML_PATH_CONSTRUCTORS = "(" + xR2RML_PATH_CONSTR_COLUMN + "|" + xR2RML_PATH_CONSTR_XPATH + "|" + xR2RML_PATH_CONSTR_JSONPATH + "|" + xR2RML_PATH_CONSTR_CSV + "|" + xR2RML_PATH_CONSTR_TSV + ")"
 
@@ -352,6 +353,8 @@ object Constants {
     val xR2RML_PATH_JSONPATH_REGEX = (xR2RML_PATH_CONSTR_JSONPATH + """\(""" + xR2RML_PATH_EXPR_CHARS + """\)""").r
     val xR2RML_PATH_CSV_REGEX = (xR2RML_PATH_CONSTR_CSV + """\(""" + xR2RML_PATH_EXPR_CHARS + """\)""").r
     val xR2RML_PATH_TSV_REGEX = (xR2RML_PATH_CONSTR_TSV + """\(""" + xR2RML_PATH_EXPR_CHARS + """\)""").r
+    val xR2RML_PATH_SHA1_REGEX = (xR2RML_PATH_CONSTR_SHA1 + """\((.+)\)$""").r
+
     /**
      * Return the enclosed character depending on the type of database
      * @param dbType the database type

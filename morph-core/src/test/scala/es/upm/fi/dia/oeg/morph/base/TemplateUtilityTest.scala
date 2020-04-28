@@ -173,4 +173,14 @@ class TemplateUtilityTest {
         var tpl = "http://example.org/student/{ID}/{" + mixedPath + "}/{ID2}/{" + mixedPath + "}"
         assertTrue(TemplateUtility.compatibleTemplateStrings(tpl, tpl))
     }
+
+    @Test def TestSha1 {
+        println("------------------ TestSha1 ------------------")
+
+        var tpl = "http://example.org/student/sha1({field1}_{field2})"
+        val replacements: List[List[Object]] = List(List("A"), List("B"))
+        val values = TemplateUtility.replaceTemplateGroups(tpl, replacements)
+        println(values)
+        assertEquals(values, List("http://example.org/student/" + org.apache.commons.codec.digest.DigestUtils.sha1Hex("A_B")))
+    }
 }

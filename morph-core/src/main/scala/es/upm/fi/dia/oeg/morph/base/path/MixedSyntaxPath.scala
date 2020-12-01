@@ -228,8 +228,11 @@ object MixedSyntaxPath {
         if (paths == Nil) return List(value)
 
         // Evaluate the value against the first path in the list of paths
-        val currentEval = paths.head.evaluate(value.toString)
-
+        var currentEval = paths.head.evaluate(value.toString)
+        
+        // Remove empty values
+        currentEval = currentEval.filter(! _.toString().isEmpty())
+        
         if (paths.tail == Nil)
             // If there is no more path, then we have finished
             currentEval

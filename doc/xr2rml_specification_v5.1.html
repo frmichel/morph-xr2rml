@@ -63,11 +63,14 @@
         
         <dl>
             <dt>This version:</dt>
-            <dd><a href="http://i3s.unice.fr/~fmichel/xr2rml_specification_v5.html">http://i3s.unice.fr/~fmichel/xr2rml_specification_v5.html</a></dd>
+            <dd><a href="http://i3s.unice.fr/~fmichel/xr2rml_specification_v5.1.html">http://i3s.unice.fr/~fmichel/xr2rml_specification_v5.1.html</a></dd>
             <dt>Latest version:</dt>
             <dd><a href="http://i3s.unice.fr/~fmichel/xr2rml_specification.html">http://i3s.unice.fr/~fmichel/xr2rml_specification.html</a></dd>
+            <dt>Previous version:</dt>
+            <dd><a href="http://i3s.unice.fr/~fmichel/xr2rml_specification_v5.html">http://i3s.unice.fr/~fmichel/xr2rml_specification_v5.html</a></dd>
         </dl>
-
+    
+      
         <p class="copyright"><a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/80x15.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.</p>
       </div>
       <hr/>
@@ -111,6 +114,11 @@
                     <td>2017-10-25</td>
                     <td>Add property xrr:pushDown in logical source and nested term map</td>
                 </tr>
+                <tr>
+                    <td>5.1</td>
+                    <td>2019-06-19</td>
+                    <td>Add property xrr:languageReference to handle varialbe language tag</td>
+                </tr>
             </tbody>
         </table>
 
@@ -145,6 +153,7 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.2.1 <a href="#_Toc466307463">xR2RML Term Maps</a><br/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.2.1.1 <a href="#_Toc466307464">Constant-, Column-, Reference- and Template-valued Term Maps</a><br/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.2.1.2 <a href="#_Toc466307465">Term Types of Term Maps</a><br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.2.1.3 <a href="#_TocLanguageTags">Language Tags</a><br/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.2.1.3 <a href="#_Toc466307466">Nested Term Maps</a><br/>
 
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.2.2 <a href="#_Toc466307467">Referencing data elements</a><br/>
@@ -521,12 +530,6 @@ In the Mood for Love, 2000, Wong Kar-wai</pre></td>
                 <tr>
                     <td>RDF triples produced</td>
                     <td><pre>
-&lt;http://example.org/director/Woody%20Allen&gt; ex:directed [
-  a rdf:List;                            
-  rdf:_1 "Manhattan"@en;                            
-  rdf:_2 "Annie Hall"@en;
-].
-
 &lt;http://example.org/director/&lt;Wong%20Kar-wai&gt; ex:directed
   ( "2046"@en "In the Mood for Love"@en ).</pre></td>
                 </tr>
@@ -925,7 +928,7 @@ In the Mood for Love, 2000, Wong Kar-wai</pre></td>
   xrr:logicalSource [
     xrr:query "db.movies.find( { directors: { $exists: true} } )";
     <span class="red">rml:iterator "$.directors.*";
-    xrr:pushdown [ xrr:reference "$.type" xrr:as "newType" ];</span>
+    xrr:pushDown [ xrr:reference "$.type"; xrr:as "newType" ];</span>
   ];
   rr:subjectMap [ 
     rr:template "http://example.org/director/<span class="red">{$.newType}</span>-{$.name}"; 
@@ -1018,8 +1021,67 @@ In the Mood for Love, 2000, Wong Kar-wai</pre></td>
         </div>
 
         
+
+        <h4 id="_TocLanguageTags">3.2.1.3 Language Tags</h4>
+
+        <p>Like in R2RML, xR2RML allows assigning language tags to literals. Language tags can be defined statically, but unlike R2RML they can also be defined dynamically using a path expression.</p>
         
-        <h4 id="_Toc466307466">3.2.1.3 Nested Term Maps</h4>
+        <div class="definition">
+        <p>A term map or nested term map with an rr:Literal term type may have a specified language tag. 
+        It is represented statically by the <b>rr:language</b> property, or dynamically be the <b>xrr:languageReference</b> property.
+        Both properties cause generated literals to be language-tagged plain literals.</p>
+
+        <p>rr:language and xrr:languageReference are not mutually exclusive. 
+        If only rr:language is present, the language tag is that given by the property.
+        If xrr:languageReference is present, the language tag is the result of evaluating the path expression against the document of the current iteration. If the evaluation fails (no language tag is produced), then the language tag is that given by rr:language, if present.</p>
+
+        <p>If the evaluation of the path expression provided by xrr:languageReference fails, and there is no rr:language property, then the RDF term produced is a literal without language tag.</p>
+        </div>
+        
+        <p>Example:</p>
+        
+        <table>
+            <tbody>
+                <tr>
+                    <td>Input data</td>
+                    <td><pre>
+{ "item": [
+    { "name":"football", "lang":"fr" },
+    { "name":"calcio",   "lang":"it" },
+    { "name":"soccer" }
+]}
+</pre></td>
+                </tr>
+                <tr>
+                    <td>Term map</td>
+                    <td>The first xrr:reference selects all elements of the "item" array. Then, the nested term map selects each "name" field and assigns it the language tag provided in the "lang" field.
+<pre>
+[] rr:objectMap [
+  xrr:reference "$.item.*";
+  xrr:nestedTermMap [
+    xrr:reference "$.name";
+    rr:language "en";
+    xrr:languageReference "$.lang"
+  ]
+];</pre></td>
+                </tr>
+                <tr>
+                    <td>Generated RDF terms</td>
+                    <td>
+                        <pre>
+"football"@en
+"calcio"@it
+"soccer"@en
+</pre>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+
+
+        
+        <h4 id="_Toc466307466">3.2.1.4 Nested Term Maps</h4>
 
         <p>Hierarchical data such as JSON or XML documents commonly have more than one level of nesting, resulting in tree-like values that may need to be parsed in depth, e.g. to nest RDF collections and containers (build an RDF collection of RDF collections).</p>
 
@@ -1044,6 +1106,7 @@ In the Mood for Love, 2000, Wong Kar-wai</pre></td>
                 <li><b>xrr:pushDown</b> properties if and only if there exists an xrr:nestedTermMap property (see section <a href="#_Toc496719460">3.2.2.4</a>).</li>
                 <li><b>rr:termType</b> bears the same semantics as in the context of a term map;</li>
                 <li><b>rr:language</b> bears the same semantics as defined in R2RML;</li>
+                <li><b>xrr:languageReference</b> bears the  semantics as defined in <a href="#_TocLanguageTags">§3.2.1.3</a>;</li>
                 <li><b>rr:datatype</b> bears the same semantics as defined in R2RML.</li>
             </ul>
             <p>A <b>simple nested term map</b> is a nested term map that has no xrr:reference nor rr:template property. A simple nested term map is used to qualify terms of an RDF collection or container generated by its parent term map or nested term map, i.e. assign them an optional term type, data type or language tag.</p>
@@ -1083,10 +1146,10 @@ In the Mood for Love, 2000, Wong Kar-wai</pre></td>
             </ul>
         </div>
 
-        <p>Finally, as defined in R2RML, properties rr:language and rr:datatype apply when generating literals only:</p>
+        <p>Finally, properties rr:language, xrr:languageReference and rr:datatype apply when generating literals only:</p>
 
         <div class="definition">
-            <p>A term map or nested term map may have an rr:language or rr:datatype property only if its term type is rr:Literal (either stated by property rr:termType or inferred as a default value).</p>
+            <p>A term map or nested term map may have an rr:language, xrr:languageReference or rr:datatype property only if its term type is rr:Literal (either stated by property rr:termType or inferred as a default value).</p>
         </div>
 
         
@@ -1849,9 +1912,9 @@ rr:objectMap [
         <li>rr:Literal, if it is an object map and at least one of the following conditions is true:
             <ul>
             <li>It is a column-based term map.</li>
-            <li>It has an rr:language property (and thus a specified language tag).</li>
+            <li>It has an rr:language <span class="highlight">or xrr:languageReference</span> property (and thus a specified language tag).</li>
             <li>It has an rr:datatype property (and thus a specified datatype).</li>
-            <li><span class="highlight">It does not have an rr:language property and it has a nested term map that has an rr:language property.</span></li>
+            <li><span class="highlight">It does not have an rr:language nor xrr:languageReference property and it has a nested term map that has an rr:language property.</span></li>
             <li><span class="highlight">It does not have an rr:datatype property and it has a nested term map that has an rr:datatype property.</span></li>
             </ul>
         </li>

@@ -21,7 +21,7 @@ import es.upm.fi.dia.oeg.morph.base.Constants
  * of the path. A simple expression with no path constructor, like a simple column name or an XPath expression
  * are considered as a mixed syntax path with only one implicit path constructor.
  * The implicit path constructor is figured out from the reference formulation of the logical source.
- * 
+ *
  * @author Franck Michel, I3S laboratory
  */
 class MixedSyntaxPath(
@@ -112,8 +112,7 @@ class MixedSyntaxPath(
                 case p: CSV_PathExpression => "CSV(" + p.pathExpression + ")"
                 case p: TSV_PathExpression => "TSV(" + p.pathExpression + ")"
                 case _ => throw new Exception("Unknown type of path: " + path)
-            }
-        )
+            })
         var pathStr: String = ""
         for (p <- reconstruct)
             pathStr = if (pathStr.isEmpty()) p else pathStr + "/" + p
@@ -146,7 +145,7 @@ object MixedSyntaxPath {
      */
     def apply(rawValue: String, refFormulation: String): MixedSyntaxPath = {
 
-        // Split the mixed syntax path into individual path construct expressions, like "Column(NAME)"  
+        // Split the mixed syntax path into individual path construct expressions, like "Column(NAME)"
         val rawPathList = Constants.xR2RML_MIXED_SYNTX_PATH_REGEX.findAllMatchIn(rawValue).toList
         val result =
             if (rawPathList.isEmpty) {
@@ -160,7 +159,7 @@ object MixedSyntaxPath {
                 List(res)
 
             } else {
-                // The value is a mixed syntax path. Each individual path (in the path constructor) is parsed 
+                // The value is a mixed syntax path. Each individual path (in the path constructor) is parsed
                 rawPathList.map(rawPath =>
                     rawPath match {
                         case Constants.xR2RML_PATH_COLUMN_REGEX(_*) => { Column_PathExpression.parse(rawPath.toString) }
@@ -169,8 +168,7 @@ object MixedSyntaxPath {
                         case Constants.xR2RML_PATH_CSV_REGEX(_*) => { CSV_PathExpression.parse(rawPath.toString) }
                         case Constants.xR2RML_PATH_TSV_REGEX(_*) => { TSV_PathExpression.parse(rawPath.toString) }
                         case _ => throw new Exception("Unknown type of path: " + rawPath)
-                    }
-                )
+                    })
             }
 
         val mxp = new MixedSyntaxPath(rawValue, refFormulation, result)
@@ -224,19 +222,19 @@ object MixedSyntaxPath {
         if (value == null) return List()
         if (value.toString.isEmpty()) return List()
 
-        // Stop condition: this case happens when the mixed syntax path is a single Column() 
+        // Stop condition: this case happens when the mixed syntax path is a single Column()
         if (paths == Nil) return List(value)
 
         // Evaluate the value against the first path in the list of paths
-        var currentEval = paths.head.evaluate(value.toString)
-        
-        // Remove empty values
-        currentEval = currentEval.filter(! _.toString().isEmpty())
-        
-        if (paths.tail == Nil)
-            // If there is no more path, then we have finished
-            currentEval
-        else
+        val currentEval = paths.head.evaluate(value.toString)
+
+        if (paths.tail == Nil) {
+            // If there is no more path, then we have finished.
+            // Just optionally remove empty values to avoid creating empty RDF terms
+            if (currentEval != null)
+                currentEval.filter(_ != null).filterNot(_.toString().isEmpty())
+            else currentEval
+        } else
             // For each value produced by the evaluation above, run the evaluation with the next path in the list
             currentEval.flatMap(value => recursiveEval(value, paths.tail))
     }

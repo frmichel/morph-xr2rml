@@ -119,6 +119,11 @@
                     <td>2019-06-19</td>
                     <td>Add property xrr:languageReference to handle varialbe language tag</td>
                 </tr>
+                <tr>
+                    <td>5.2</td>
+                    <td>2021-07-30</td>
+                    <td>Add extended function sha1()</td>
+                </tr>
             </tbody>
         </table>
 
@@ -171,6 +176,10 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.3.1 <a href="#_Toc466307476">Reference elationship with structured values</a><br/>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.3.2 <a href="#_Toc466307477">Generating RDF ollection/container with a referencing object map</a><br/>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.3.3 <a href="#_Toc466307478">Generating RDF ollection/container with a referencing object map in the relational case</a><br/>
+
+        &nbsp;&nbsp;&nbsp;&nbsp;3.4 <a href="#_Toc_Extension_functions">Extension functions</a><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.4.1 <a href="#_Toc_sha">Computing a hash from data source values</a><br/>
+        
 
     <h3>Appendix</h3>
 
@@ -374,7 +383,6 @@ In the Mood for Love, 2000, Wong Kar-wai</pre></td>
 &lt;http://example.org/director/Wong%20Kar-wai&gt; ex:directed "2046".
 &lt;http://example.org/director/Wong%20Kar-wai&gt; ex:directed "In the Mood for Love".</pre></td>
                 </tr>
-
             </tbody>
         </table>
 
@@ -2348,6 +2356,44 @@ rr:objectMap [
             </tbody>
         </table>
 
+        
+        
+        <h2 id="_Toc_Extension_functions">3.4 Extension functions</h2>
+        
+        <h3 id="_Toc_sha">3.4.1 Computing a hash from data source values</h3>
+        
+        <p>Function <b>sha1()</b> can be used in the context of a template-valued term map (property rr:template) 
+        to calculate the SHA1 digest of components of the data source, where each reference to a data element is enclosed in curly braces ("{" and "}"). Templating still works inside the parentheses of the sha1() function.
+        </p>
+        <p>A typical use case is to build unique resource IRIs using multiple data elements while keeping those elements obfuscated in the IRI. Example:
+        </p>
+
+        <table><tbody>
+                <tr>
+                    <td>Input data</td>
+                    <td><pre>
+{ "name":"John", "birthdate":"1996-05-23" }
+</pre></td>
+                </tr>
+                <tr>
+                    <td>Mapping graph</td>
+                    <td><pre>
+&lt;#HashSubTriplesMap&gt;
+  rr:subjectMap [ rr:template "http://example.org/person/<span class="red">sha1</span>({$.name}_{$.birthdate})" ];
+  rr:predicateObjectMap [
+    rr:predicate schema:name;
+    rr:objectMap [ xrr:reference "$.name" ];
+  ].</pre></td>
+                </tr>
+                <tr>
+                    <td>RDF triples produced</td>
+                    <td><pre>
+&lt;http://example.org/person/1f83650790e2cee21218078f96d9ac88dbdc5621&gt; schema:name "John".
+                </tr>
+        </tbody></table>
+
+ 
+        
         
         
         

@@ -64,6 +64,7 @@ See a detailed [description of the project code and architecture](doc/README_cod
 Pre-requisite: have **Java SDK 10** installed
 
 You can download the last release or snapshot published in [this repository](https://www.dropbox.com/sh/djnztipsclvcskw/AABT1JagzD4K4aCALDNVj-yra?dl=0).
+The latest on-going version is the 1.3.2 snapshot.
 
 Alternatively, you can build the application using [Maven](http://maven.apache.org/): in a shell, CD to the root directory morph-xr2rml, then run the command: `mvn clean package`. A jar with all dependencies is generated in `morph-xr2rml-dist/target`.
 

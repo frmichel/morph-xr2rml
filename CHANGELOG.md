@@ -1,7 +1,15 @@
 # Changelog
 
-## [1.3-SNAPSHOT] 2020-04-27
-- Add mixed syntax path sha1
+## [CURRENT] 2021-07-30
+- fix bug in sha1() mixed path
+- document the sha1() mixed path
+
+## [1.3.1] 2021-01-06
+- fix bug in management of empty values
+- document the variable language tag
+
+## [1.3] 2020-04-27
+- Add mixed syntax path sha1() to compute sha hash in template
 
 ## [1.2] 2020-04-22
 - Add config property output.file.max_triples (and parameter --outputMaxTriples) to generate files with a maximum number of triples

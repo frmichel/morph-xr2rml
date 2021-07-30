@@ -353,7 +353,7 @@ object Constants {
     val xR2RML_PATH_JSONPATH_REGEX = (xR2RML_PATH_CONSTR_JSONPATH + """\(""" + xR2RML_PATH_EXPR_CHARS + """\)""").r
     val xR2RML_PATH_CSV_REGEX = (xR2RML_PATH_CONSTR_CSV + """\(""" + xR2RML_PATH_EXPR_CHARS + """\)""").r
     val xR2RML_PATH_TSV_REGEX = (xR2RML_PATH_CONSTR_TSV + """\(""" + xR2RML_PATH_EXPR_CHARS + """\)""").r
-    val xR2RML_PATH_SHA1_REGEX = (xR2RML_PATH_CONSTR_SHA1 + """\((.+)\)$""").r
+    val xR2RML_PATH_SHA1_REGEX = (xR2RML_PATH_CONSTR_SHA1 + """\((.+)\)""").r
 
     /**
      * Return the enclosed character depending on the type of database

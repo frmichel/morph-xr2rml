@@ -36,7 +36,7 @@ class TemplateUtilityTest {
 
     @Test def TestGetTemplateColumns1() {
         println("------------------ TestGetTemplateColumns1 ------------------")
-        val tpl = "http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/{ar}/{nr}";
+        val tpl = "http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/{ar}/{nr}/";
         val colRefs = TemplateUtility.getTemplateColumns(tpl);
         println("Found columns " + colRefs + " in template " + tpl)
         assertEquals("ar", colRefs(0))
@@ -74,9 +74,9 @@ class TemplateUtilityTest {
         val xPath = """XPath(\/\/root\/node[1]\(\)\/@id)"""
         val jsonPath = """JSONPath($['store'].book[\(@.length-1\)].title)"""
         val mixedPath = "Column(NAME)/CSV(3)/" + xPath + "/" + jsonPath + "/TSV(name)"
-        var tpl = "http://example.org/student/{ID1}/{" + mixedPath + "}/{ID2}"
+        var tpl = "http://example.org/student/{ID1}/{" + mixedPath + "}/{ID2}/"
 
-        groups = TemplateUtility.getTemplateMatching(tpl, "http://example.org/student/id1/mixedPath1/id2")
+        groups = TemplateUtility.getTemplateMatching(tpl, "http://example.org/student/id1/mixedPath1/id2/")
         println("groups: " + groups)
 
     }
@@ -178,9 +178,32 @@ class TemplateUtilityTest {
         println("------------------ TestSha1 ------------------")
 
         var tpl = "http://example.org/student/sha1({field1}_{field2})"
-        val replacements: List[List[Object]] = List(List("A"), List("B"))
-        val values = TemplateUtility.replaceTemplateGroups(tpl, replacements)
+        var replacements: List[List[Object]] = List(List("A"), List("B"))
+        var values = TemplateUtility.replaceTemplateGroups(tpl, replacements)
         println(values)
         assertEquals(values, List("http://example.org/student/" + org.apache.commons.codec.digest.DigestUtils.sha1Hex("A_B")))
+        
+        tpl = "http://example.org/student_sha1({field1}_{field2})"
+        values = TemplateUtility.replaceTemplateGroups(tpl, replacements)
+        println(values)
+        assertEquals(values, List("http://example.org/student_" + org.apache.commons.codec.digest.DigestUtils.sha1Hex("A_B")))
+
+        tpl = "http://example.org/student_sha1({field1}_{field2})/"
+        replacements = List(List("A"), List("B"))
+        values = TemplateUtility.replaceTemplateGroups(tpl, replacements)
+        println(values)
+        assertEquals(values, List("http://example.org/student_" + org.apache.commons.codec.digest.DigestUtils.sha1Hex("A_B") + "/"))
+        
+        tpl = "http://example.org/student/{field0}/sha1({field1}_{field2})"
+        replacements = List(List("a"), List("A"), List("B"))
+        values = TemplateUtility.replaceTemplateGroups(tpl, replacements)
+        println(values)
+        assertEquals(values, List("http://example.org/student/a/" + org.apache.commons.codec.digest.DigestUtils.sha1Hex("A_B")))
+        
+        tpl = "http://example.org/person/sha1({field1}_{field2})"
+        replacements = List(List("John"), List("1996-05-23"))
+        values = TemplateUtility.replaceTemplateGroups(tpl, replacements)
+        println(values)
+        
     }
 }

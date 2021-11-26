@@ -12,7 +12,13 @@ db.students.insert([
 		"FirstNames": ["Paul", "Jack"], 
 		"LastName": "Smith" },
       "Hobbies": [ {"hobby":"Swimming", "place":"pool"}, {"hobby": "Calcio", "place": "stadium", "lang": "it"} ] },
-	  
+
+    { "id2": { "$oid": "123456" },
+      "FullName": { 
+		"FirstNames": ["Paul2", "Jack2"], 
+		"LastName": "Smith" },
+      "Hobbies": [ {"hobby": "Calcio", "place": "stadium", "lang": "it"} ] },
+
     { "FullName": { 
 		"FirstNames": ["Frank", "Francis"], 
 		"LastName": "Underwood" },

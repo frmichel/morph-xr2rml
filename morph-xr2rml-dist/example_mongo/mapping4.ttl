@@ -14,6 +14,7 @@
         xrr:query """db.students.find( { 'FullName' : {$exists: 1} } )""";
         rml:iterator "$.FullName";
         xrr:pushDown [ xrr:reference "$._id"; xrr:as "newId" ] ;
+        xrr:pushDown [ xrr:reference "$.id2"; xrr:as "newId2" ] ;
     ];
 
     rr:subjectMap [ 
@@ -22,9 +23,17 @@
     ];
  
     rr:predicateObjectMap [
-    	rr:predicate ex:names;
+    	rr:predicate ex:names1;
     	rr:objectMap [
 			rr:termType rr:Literal;
-            rr:template "{$.newId} {$.FirstNames.*} {$.LastName}";
+            rr:template "{$.FirstNames.*} {$.LastName}";
 		];
-	].
+	];
+    rr:predicateObjectMap [
+    	rr:predicate ex:names2;
+    	rr:objectMap [
+			rr:termType rr:Literal;
+            rr:template "{$.newId} {$.newId2} {$.FirstNames.*} {$.LastName}";
+		];
+	];
+    .

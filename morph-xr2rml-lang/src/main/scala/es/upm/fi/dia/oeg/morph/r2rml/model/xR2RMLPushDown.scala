@@ -109,6 +109,7 @@ object xR2RMLPushDown {
                 case e: Exception => {
                     logger.error(s"Error occured when trying to generate push down fields from JSON String: $jsonString")
                     logger.error(e.getMessage)
+                    e.printStackTrace()
                     Map.empty
                 }
             }
@@ -132,24 +133,26 @@ object xR2RMLPushDown {
             val pdReferenceKey = pushDown.reference.replaceAllLiterally("$.", "")
 
             // Evaluate the reference against the document
+            val idValue = objectNode.get(pdReferenceKey)
             val pdReferenceValue =
-                if (pdReferenceKey.equals("_id")) {
-                    // Field _id is an ObjectId with a field $oid
-                    val idValue = objectNode.get(pdReferenceKey)
-                    val oidValue = idValue.get("$oid")
-                    if (oidValue == null) idValue else oidValue
-                } else
-                    objectNode.get(pdReferenceKey)
+              if (idValue  != null)  {
+                // If the field is an ObjectId (such as "_id") then return the inner $oid
+                val oidValue = idValue.get("$oid")
+                if (oidValue != null) oidValue else idValue
+              } else null
 
             val pdReferenceValueReplaced =
-                if (pdReferenceValue.isTextual) pdReferenceValue.toString.replaceAll("\"", "");
+              if (pdReferenceValue  != null) {
+                if (pdReferenceValue.isTextual)
+                   pdReferenceValue.toString.replaceAll("\"", "");
                 else pdReferenceValue
+              } else null
 
             // Use the xrr:as property if provided, otherwise use the name of the field whose value is pushed
             val pdAlias = pushDown.alias.getOrElse(pdReferenceKey)
 
             (pdAlias -> pdReferenceValueReplaced)
-        }).toMap
+        }).filter(x => x._2 != null).toMap
         if (logger.isDebugEnabled()) logger.debug("Map of fields pushed down: " + pushedFields)
         pushedFields
     }

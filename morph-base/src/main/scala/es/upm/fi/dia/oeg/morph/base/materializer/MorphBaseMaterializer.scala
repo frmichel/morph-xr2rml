@@ -127,10 +127,9 @@ class MorphBaseMaterializer(
                         val node = existingObjs.next()
                         if (node.isResource && GeneralUtility.isRdfList(model, node.asResource)) {
                             val same = GeneralUtility.compareRdfList(node.asResource, obj.asResource)
-                            // If both lists are the same then we have to remove the new one from the model
+                            // If both lists are the same then do not create the new one
                             if (same)
-                                GeneralUtility.removeRdfList(model, obj.asResource)
-                            tripleAlreadyExists = tripleAlreadyExists || same
+                              tripleAlreadyExists = true
                         }
                     }
                 }
@@ -143,10 +142,9 @@ class MorphBaseMaterializer(
                         val node = existingObjs.next()
                         if (node.isResource && GeneralUtility.isRdfContainer(model, node.asResource)) {
                             val same = GeneralUtility.compareRdfContainer(node.asResource, obj.asResource)
-                            // If both containers are the same, then we have to remove the new one from the model
+                            // If both containers are the same, then do not create the new one
                             if (same)
-                                GeneralUtility.removeRdfContainer(model, obj.asResource)
-                            tripleAlreadyExists = tripleAlreadyExists || same
+                                tripleAlreadyExists = true
                         }
                     }
                 }

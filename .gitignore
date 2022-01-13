@@ -3,6 +3,7 @@ target/
 log/
 rdf_result.ttl
 morph-example/
+_do_not_commit
 
 # Eclipse:
 .cache

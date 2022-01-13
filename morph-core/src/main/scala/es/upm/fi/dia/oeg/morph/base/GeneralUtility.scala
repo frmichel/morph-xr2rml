@@ -206,20 +206,23 @@ object GeneralUtility {
         if ((lst1 != null) && (lst2 == null)) return false
         if ((lst1 == null) && (lst2 == null)) return true
 
-        val first1 = lst1.getProperty(RDF.first).getObject
-        val first2 = lst2.getProperty(RDF.first).getObject
+        val first1 = lst1.getProperty(RDF.first)
+        val first2 = lst2.getProperty(RDF.first)
+        if (first1 == null || first2 == null) return false; // abnormal case, there should be a rdf:first
 
-        if (first1 != first2) return false
+        if (first1.getObject != first2.getObject) return false
 
-        val rest1 = lst1.getProperty(RDF.rest).getObject
-        val rest2 = lst2.getProperty(RDF.rest).getObject
+        val rest1 = lst1.getProperty(RDF.rest)
+        val rest2 = lst2.getProperty(RDF.rest)
+        if (rest1 == null || rest2 == null) return false; // abnormal case, there should be a rdf:rest
 
-        if ((rest1 == RDF.nil && rest2 != RDF.nil) || (rest1 != RDF.nil && rest2 == RDF.nil))
+        if ((rest1.getObject == RDF.nil && rest2.getObject != RDF.nil) || (rest1.getObject != RDF.nil && rest2.getObject == RDF.nil))
             false
-        else if (rest1 == RDF.nil && rest2 == RDF.nil)
+        else if (rest1.getObject == RDF.nil && rest2.getObject == RDF.nil)
             true
         else
-            GeneralUtility.compareRdfList(rest1.asResource, rest2.asResource)
+            // None of rest1 and rest2 are nil => continue
+            GeneralUtility.compareRdfList(rest1.getObject.asResource, rest2.getObject.asResource)
     }
 
     /**

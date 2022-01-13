@@ -1,9 +1,10 @@
 # Changelog
 
-## [CURRENT 1.3.2 SNAPSHOT] 2021-11-3026
+## [CURRENT 1.3.2 SNAPSHOT] 2022-01-12
 - fix bug in sha1() mixed path
 - document the sha1() mixed path
 - (partially) fix bug in pushDown: for any field that is an ObjectID with $oid field (such as "_id"), the value of the $oid is pushed instead of the serialization f the field itself
+- fix bug in management of multiple rdf:List's with conflicting blank node ids
 
 ## [1.3.1] 2021-01-06
 - fix bug in management of empty values

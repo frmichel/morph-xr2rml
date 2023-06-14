@@ -16,23 +16,16 @@ The SPARQL-to-SQL rewriting is an adaptation of the former Morph-RDB implementat
 The SPARQL-to-MongoDB rewriting is a fully new component, it supports the SELECT, ASK, CONSTRUCT and DESCRIBE query forms.
 
 
-
 ## Publications
-[1] F. Michel, L. Djimenou, C. Faron-Zucker, and J. Montagnat. Translation of Relational and Non-Relational Databases into RDF with xR2RML.
-In Proceedings of the *11th International Confenrence on Web Information Systems and Technologies (WEBIST 2015)*, Lisbon, Portugal, 2015.
 
-[2] F. Michel, L. Djimenou, C. Faron-Zucker, and J. Montagnat. xR2RML: Relational and Non-Relational Databases to RDF Mapping Language.
-Research report, CNRS, 2015. https://hal.archives-ouvertes.fr/hal-01066663
+F. Michel, L. Djimenou, C. Faron-Zucker, and J. Montagnat. Translation of Relational and Non-Relational Databases into RDF with xR2RML.
+In Proceedings of the *11th International Confenrence on Web Information Systems and Technologies (WEBIST 2015)*, Lisbon, Portugal, 2015. [HAL](https://hal.science/hal-01207828)
 
-[3] C. Callou, F. Michel, C. Faron-Zucker, C. Martin, J. Montagnat. Towards a Shared Reference Thesaurus for Studies on History of Zoology, Archaeozoology and Conservation Biology. In *Semantic Web For Scientific Heritage (SW4SH), Workshops of the ESWC’15 conference*.
+F. Michel, C. Faron-Zucker, and J. Montagnat. A Generic Mapping-Based Query Translation from SPARQL to Various Target Database Query Languages.
+In Proceedings of the *12th International Confenrence on Web Information Systems and Technologies (WEBIST 2016)*, Roma, Italy, 2016. [HAL](https://hal.science/hal-01280951)
 
-[4] F. Michel, C. Faron-Zucker, and J. Montagnat. A Generic Mapping-Based Query Translation from SPARQL to Various Target Database Query Languages.
-In Proceedings of the *12th International Confenrence on Web Information Systems and Technologies (WEBIST 2016)*, Roma, Italy, 2016.
+F. Michel, C. Faron-Zucker, and J. Montagnat. A Mapping-Based Method to Query MongoDB Documents with SPARQL. In *27th International Conference on Database and Expert Systems Applications (DEXA 2016)*, 2016. [HAL](https://hal.science/hal-01330146)
 
-[5] F. Michel, C. Faron-Zucker, and J. Montagnat. Mapping-based SPARQL access to a MongoDB database. Research report, CNRS, 2016. 
-https://hal.archives-ouvertes.fr/hal-01245883.
-
-[6] F. Michel, C. Faron-Zucker, and J. Montagnat. A Mapping-Based Method to Query MongoDB Documents with SPARQL. In *27th International Conference on Database and Expert Systems Applications (DEXA 2016)*, 2016.
 
 
 ## Limitations

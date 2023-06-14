@@ -1,0 +1,33 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: Morph-xR2RML
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Franck
+    family-names: Michel
+    email: franck.michel@inria.fr
+    affiliation: 'Univ. Côte d''''Azur, CNRS, Inria'
+    orcid: 'https://orcid.org/0000-0001-9064-0463'
+  - given-names: Freddy
+    family-names: Priyatna
+    orcid: 'https://orcid.org/0000-0002-9292-4010'
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.5148233
+repository-code: 'https://github.com/frmichel/morph-xr2rml'
+repository-artifact: >-
+  https://www.dropbox.com/sh/djnztipsclvcskw/AABT1JagzD4K4aCALDNVj-yra?dl=0
+abstract: >-
+  Morph-xR2RML is an implementation of the xR2RML mapping
+  language that enables the description of mappings from
+  relational or non relational databases to RDF. It comes
+  with connectors for relational databases (MySQL,
+  PostgreSQL, MonetDB) and the MongoDB NoSQL database.
+license: Apache-2.0
+version: 1.3.1
+date-released: '2021-07-30'

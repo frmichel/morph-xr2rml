@@ -20,13 +20,16 @@
     "funder": [
         {
             "@type": "Organization",
-            "name": "University Côte d'Azur"
+            "name": "University Côte d'Azur",
+            "@id": "https://ror.org/0496p8026"
         }, {
             "@type": "Organization",
-            "name": "CNRS"
+            "name": "CNRS",
+            "@id": "https://ror.org/04zzdbj59"
         }, {
             "@type": "Organization",
-            "name": "Inria"
+            "name": "Inria",
+            "@id": "https://ror.org/02kvxyf05"
         }
     ],
     "keywords": [
@@ -40,7 +43,7 @@
         "Scala"
     ],
     "runtimePlatform": [
-        "JVM 10"
+        "Java v10"
     ],
     "softwareRequirements": [
         "https://raw.githubusercontent.com/frmichel/morph-xr2rml/master/pom.xml"

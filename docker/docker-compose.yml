@@ -3,6 +3,7 @@ services:
 
   morph-xr2rml:
     image: frmichel/morph-xr2rml
+    container_name: morph-xr2rml
     networks:
       - xr2rml-net
     volumes:
@@ -11,7 +12,8 @@ services:
       - "./log:/log"
 
   mongo-xr2rml:
-    image: mongo:3.7
+    image: mongo:4.4.6
+    container_name: mongo-xr2rml    
     networks:
       - xr2rml-net
     volumes:

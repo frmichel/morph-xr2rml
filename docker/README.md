@@ -2,15 +2,24 @@
 
 You can deploy Morph-xR2RML along with a MongoDB database using Docker.
 
-First download file [xr2rml_docker.zip](xr2rml_docker.zip), unzip it to the directory from where you will run docker-compose, and set file access rights as shown below:
+First make sure your have [docker-compose](https://docs.docker.com/compose/) or [install it](https://docs.docker.com/compose/install/linux/).
+
+If you have cloned this repository, just skip the next step. Otherwise, download file [xr2rml_docker.zip](xr2rml_docker.zip), and unzip it to the directory from where you will run docker-compose. From a Linux terminal that would be:
 
 ```bash
+wget https://github.com/frmichel/morph-xr2rml/raw/master/docker/xr2rml_docker.zip
 unzip xr2rml_docker.zip
+```
+
+Set file access rights as shown below:
+
+```bash
 chmod -R 755 mongo_import
 chmod -R 755 xr2rml_config
 chmod -R 777 log
 chmod -R 777 mongo_db
 chmod -R 777 xr2rml_output
+chmod 777 run.sh
 ```
 
 Then run:
@@ -31,11 +40,11 @@ Script `run.sh` provides an example of how to (1) import data located in `mongo_
 - `mongo_import`: copy your files to import in this folder, it is mouned in the MongoDB container.
 - `xr2rml_config`: mapping files, morph.properties, log configuration file, and bash scripts to run Morph-xR2RML. This folder is mouned in the Morph-xR2RML container.
 - `xr2rml_config`: where the RDF files will be written.
-- `run.sh`: example script to show you how to import data into MongoDB and run Morph-xR2RML to translate the data to RDF.
+- `run.sh`: example script showing how to import data into MongoDB and run Morph-xR2RML to translate the data to RDF.
 
 
 
-### Accessing Logs 
+### Accessing Logs
 
 The `docker-compose.yml` mounts the Morph-xR2RML log directory to the Docker host in directory `log`.
 
@@ -62,3 +71,13 @@ Scripts `mongo_tools/import-file.sh` and `mongo_tools/import-json-files.sh` prov
 ### log or mongo_db directory not writable
 
 The containers need to write in directories ```log``` and ```mongo_db```. They will fail if you do not set rights 777 (`chmod 777 <dir name>`).
+
+### SLF4J messages at Morph-xR2RML startup
+
+When it starts up, Morph-xR2RML shows the messages below. They are just warning, you can safely ignore them.
+
+```
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+```

@@ -38,7 +38,7 @@ index_col=$5
 if [[ -z "$index_col" ]] ; then help; fi
 
 # Optional
-extra_script=$5
+extra_script=$6
 
 
 # Functions definitions

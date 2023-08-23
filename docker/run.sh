@@ -16,9 +16,6 @@ docker exec -w /mongo_tools $MONGO_CONTAINER \
    /bin/bash import-json-files.sh $DB $COLLECTION id
 
 # --- Run the translation to RDF
-# Note that at start-up Morph-xR2RML shows these warning messages, just ignore them:
-#    SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
-#    SLF4J: Defaulting to no-operation (NOP) logger implementation
-#    SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+# Note that at start-up Morph-xR2RML shows 3 SLF4J warning messages, just ignore them.
 docker exec -w /xr2rml_config $XR2RML_CONTAINER \
    /bin/bash run_xr2rml_template.sh mapping_movies.ttl movies.ttl dataset1.0 $COLLECTION

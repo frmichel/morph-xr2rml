@@ -48,7 +48,7 @@ java -Xmx4g \
      -jar "$JAR" \
      --configDir $CONFIG_DIR \
      --configFile xr2rml.properties \
-     --mappingFile $CONFIG/$mappingFile \
+     --mappingFile $CONFIG_DIR/$mappingFile \
      --output $OUTPUT_DIR/$output \
      >> $log
 date >> $log

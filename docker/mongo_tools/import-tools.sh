@@ -187,7 +187,7 @@ mongo_drop_import_file_index() {
     _collection_c=$4
     _index_col_c=$5
 
-    mongoimport --drop --type=_type --headerline --ignoreBlanks -d $_database_c -c $_collection_c $_file_c
+    mongoimport --drop --type=$_type --headerline --ignoreBlanks -d $_database_c -c $_collection_c $_file_c
     mongo --eval "db.${_collection_c}.createIndex({${_index_col_c}: 1})" localhost/$_database_c --quiet
     mongo --eval "db.${_collection_c}.count()" localhost/$_database_c --quiet
 }

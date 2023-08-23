@@ -1,6 +1,10 @@
 # Changelog
 
-## [CURRENT 1.3.2 SNAPSHOT] 2022-01-12
+## [CURRENT 1.3.2] 2023-08-23
+
+Add Docker deplyment.
+
+## [1.3.2 SNAPSHOT] 2022-01-12
 - fix bug in sha1() mixed path
 - document the sha1() mixed path
 - (partially) fix bug in pushDown: for any field that is an ObjectID with $oid field (such as "_id"), the value of the $oid is pushed instead of the serialization f the field itself

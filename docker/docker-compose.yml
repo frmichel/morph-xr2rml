@@ -2,7 +2,7 @@ version: '3.2'
 services:
 
   morph-xr2rml:
-    image: frmichel/morph-xr2rml
+    image: frmichel/morph-xr2rml:1.3.2
     container_name: morph-xr2rml
     networks:
       - xr2rml-net

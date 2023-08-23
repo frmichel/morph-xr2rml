@@ -30,32 +30,31 @@ docker-compose up -d
 
 Now, both containers are started and ready to process data.
 
-Script `run.sh` provides an example of how to (1) import data located in `mongo_import` into MongoDB, and (2) run Morph-xR2RML to translate the data to RDF and store the result in `xr2rml_output`.
+Script `run.sh` provides an example of how to run the different steps manually: (1) import data located in `mongo_import` into MongoDB, and (2) run Morph-xR2RML to translate the data to RDF and store the result in `xr2rml_output`.
 
 
 ### Description of each folder
 
-- `mongo_db`: will contain the actual Mongo database, so that you don't need to re-import files everytime you rerun it.
+- `mongo_db`: will contain the actual Mongo database, so that you don't need to re-import files everytime you rerun Morph-xR2RML.
 - `mongo_tools`: set of handy bash scripts to import json/csv/tsv data into MongoDB.
-- `mongo_import`: copy your files to import in this folder, it is mouned in the MongoDB container.
-- `xr2rml_config`: mapping files, morph.properties, log configuration file, and bash scripts to run Morph-xR2RML. This folder is mouned in the Morph-xR2RML container.
+- `mongo_import`: copy your files to import in this folder, it is moutned in the MongoDB container.
+- `xr2rml_config`: mapping files (morph.properties, log configuration file) and bash scripts to run Morph-xR2RML. This folder is mounted in the Morph-xR2RML container.
 - `xr2rml_config`: where the RDF files will be written.
-- `run.sh`: example script showing how to import data into MongoDB and run Morph-xR2RML to translate the data to RDF.
+- `run.sh`: example script showing how to use evrything from your machine, i.e. to import data into MongoDB and run Morph-xR2RML to translate the data to RDF.
 
 
 
 ### Accessing Logs
 
 The `docker-compose.yml` mounts the Morph-xR2RML log directory to the Docker host in directory `log`.
-
 Check it if an error occurs or if your mapping does not generate the expected triples.
 
 
 ### Changing Morph-xR2RML configuration and mappings
 
-Put your mapping files in folder `xr2rml_config`. Script `run_xr2rml.sh` will be used to run the transltation from within the container.
+Put your mapping files in folder `xr2rml_config`. Script `xr2rml_config/run_xr2rml.sh` will be used to run the transltation from within the container.
 
-Mapping files can also be templates, with 2 predefined placeholders: `{{collection}}` and  `{{dataset}}`. Script `run_xr2rml_template.sh` wil replace them before running the translation. Check the example mapping `xr2rml_config/mapping_movies.ttl` and how it is used by script `run.sh`.
+Mapping files can also be templates, with 2 predefined placeholders: `{{collection}}` and  `{{dataset}}`. Script `xr2rml_config/run_xr2rml_template.sh` will replace them before running the translation. Check the example mapping `xr2rml_config/mapping_movies.ttl` and how it is used by script `run.sh`.
 
 The main Morph-xR2RML configuration file is editable at ```xr2rml_config/morph.properties```. In particular that's where you would change the name of the MongoDB database.
 

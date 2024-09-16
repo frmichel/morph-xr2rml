@@ -1,0 +1,17 @@
+version: '3.2'
+networks:
+  xr2rml-net:
+    driver: bridge
+
+services:
+  morph-xr2rml:
+    networks:
+      - xr2rml-net
+  mongo-xr2rml:
+    image: mongo:4.4.6
+    networks:
+      - xr2rml-net
+    volumes:
+      - "./mongo_db:/data/db"
+      - "./mongo_tools:/mongo_tools"
+      - "./mongo_import:/mongo_import"

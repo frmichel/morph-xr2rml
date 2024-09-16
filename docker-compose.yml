@@ -1,0 +1,8 @@
+version: '3.2'
+services:
+  morph-xr2rml:
+    build: .
+    volumes:
+      - "./xr2rml_config:/xr2rml_config"
+      - "./xr2rml_output:/xr2rml_output"
+      - "./log:/log"

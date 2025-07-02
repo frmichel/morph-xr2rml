@@ -128,12 +128,16 @@ object xR2RMLPushDown {
      */
     private def generatePushDownFieldsFromObjectNode(listPushDown: List[xR2RMLPushDown], objectNode: ObjectNode): Map[String, Any] = {
 
+        if (logger.isTraceEnabled()) logger.trace("listPushDown: " + listPushDown)
+        if (logger.isTraceEnabled()) logger.trace("objectNode: " + objectNode)
+
         val pushedFields: Map[String, Any] = listPushDown.map(pushDown => {
 
             val pdReferenceKey = pushDown.reference.replaceAllLiterally("$.", "")
 
             // Evaluate the reference against the document
             val idValue = objectNode.get(pdReferenceKey)
+            if (logger.isTraceEnabled()) logger.trace("Result of evaluating [" + pdReferenceKey + "] on objectNode: " + idValue)
             val pdReferenceValue =
               if (idValue  != null)  {
                 // If the field is an ObjectId (such as "_id") then return the inner $oid
@@ -153,7 +157,7 @@ object xR2RMLPushDown {
 
             (pdAlias -> pdReferenceValueReplaced)
         }).filter(x => x._2 != null).toMap
-        if (logger.isDebugEnabled()) logger.debug("Map of fields pushed down: " + pushedFields)
+        if (logger.isTraceEnabled()) logger.trace("Map of fields pushed down: " + pushedFields)
         pushedFields
     }
 

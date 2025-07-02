@@ -44,7 +44,7 @@ abstract class xR2RMLLogicalSource(
             case _: xR2RMLQuery => { "xR2RMLQuery"; }
             case _ => throw new Exception("Unkown type of logical source or logical table")
         }
-        result + ": " + this.getValue + ". ReferenceFormulation: " + this.refFormulation + ". Iterator: " + this.docIterator
+        result + ": " + this.getValue + ". ReferenceFormulation: " + this.refFormulation + ". Iterator: " + this.docIterator + ". Pushdowns: " + this.listPushDown
     }
 
     override def hashCode(): Int = {

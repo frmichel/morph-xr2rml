@@ -39,7 +39,7 @@ Script `run.sh` provides an example of how to run the different steps manually: 
 - `mongo_tools`: set of handy bash scripts to import json/csv/tsv data into MongoDB.
 - `mongo_import`: copy your files to import in this folder, it is moutned in the MongoDB container.
 - `xr2rml_config`: mapping files (morph.properties, log configuration file) and bash scripts to run Morph-xR2RML. This folder is mounted in the Morph-xR2RML container.
-- `xr2rml_config`: where the RDF files will be written.
+- `xr2rml_output`: where the RDF files will be written.
 - `run.sh`: example script showing how to use evrything from your machine, i.e. to import data into MongoDB and run Morph-xR2RML to translate the data to RDF.
 
 

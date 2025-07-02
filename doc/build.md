@@ -12,12 +12,14 @@ Alternatively, you can build the application using [Maven](http://maven.apache.o
 
 ## Run it
 
-The application takes two options: `--configDir` gives the configuration directory and `--configFile` give the configuration file within this directory. Option `--configFile` defaults to `morph.properties`.
+The application takes several options: 
+- `--configDir` gives the configuration directory, and 
+- `--configFile` give the configuration file within this directory. Option `--configFile` defaults to `morph.properties`.
 
 Additionally, several parameter given in the configuration file can be overridden using the following options: 
 - mapping file: `--mappingFile` 
 - output file : `--output`
-- maximum number of triples generated in a single output file: `--outputMaxTriples`
+- maximum number of triples generated in a single output file: `--outputMaxTriples`. Once the max is reached, the current graph is saved to a file whose name is indexed .0, .1, .2 etc.
 
 **From a command line interface**, CD to directory morph-xr2rml-dist and run the application as follows:
 

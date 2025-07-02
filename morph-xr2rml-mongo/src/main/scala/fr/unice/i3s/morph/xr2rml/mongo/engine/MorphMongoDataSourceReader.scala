@@ -129,6 +129,7 @@ class MorphMongoDataSourceReader(factory: IMorphFactory) extends MorphBaseDataSo
                     else {
                         // Compute the values of fields to push down using the initial MongoDB document (before the iterator)
                         val pushedFields: Map[String, Any] = xR2RMLPushDown.generatePushDownFieldsFromJsonString(listPushDown, mongoResult);
+                        if (logger.isTraceEnabled()) logger.trace("Values of fields to push down: " + pushedFields)
 
                         // Push down fields into each of the result documents
                         val mongoResultIterPushDown = mongoResultIter.flatMap(resultIter => {
@@ -149,6 +150,7 @@ class MorphMongoDataSourceReader(factory: IMorphFactory) extends MorphBaseDataSo
                                 }
                             }
                         })
+                        if (logger.isTraceEnabled()) logger.trace("Result of pushdown: " + mongoResultIterPushDown)
                         mongoResultIterPushDown
                     }
                 })
